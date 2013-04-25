@@ -17,48 +17,45 @@ PathInfo.prototype = {
 	subCategoryNameStatus: 'status',
 	subCategoryNameSet: 'set',
 	subCategoryNameCancel: "cancel",
-
-	pMessagesTimeline: undefined,
-	pMessagesSay: undefined,
-	pMessagesTalk: undefined,
-	pMessagesCancel: undefined,
-	pAnnounceTimeline: undefined,
-	pAnnounceSend: undefined,
-	pAnnounceCancel: undefined,
-	pPrivateTimeline: undefined,
-	pPrivateSend: undefined,
-	pPrivateCancel: undefined,
-	pMonologTimeline: undefined,
-	pMonologSend: undefined,
-	pMonologCancel: undefined,
-	pRelationshipStatus: undefined,
-	pRelationshipListen: undefined,
-	pReadSet: undefined,
 }
+
+PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
+PathInfo.prototype.pMessagesSay = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSay);
+PathInfo.prototype.pMessagesTalk = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTalk);
+PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
+PathInfo.prototype.pAnnounceTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameTimeline);
+PathInfo.prototype.pAnnounceSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameSend);
+PathInfo.prototype.pAnnounceCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameCancel);
+PathInfo.prototype.pPrivateTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameTimeline);
+PathInfo.prototype.pPrivateSend = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameSend);
+PathInfo.prototype.pPrivateCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameCancel);
+PathInfo.prototype.pMonologTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameTimeline);
+PathInfo.prototype.pMonologSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameSend);
+PathInfo.prototype.pMonologCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameCancel);
+PathInfo.prototype.pRelationshipStatus = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameStatus);
+PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListen);
+PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet)
 
 function getPathInfo() {
 	var p = new PathInfo();
-	
-	p.pMessagesTimeline = createRouteMatcherPattern(p.categoryNameMessages, p.subCategoryNameTimeline);
-	p.pMessagesSay = createRouteMatcherPattern(p.categoryNameMessages, p.subCategoryNameSay),
-	p.pMessagesTalk = createRouteMatcherPattern(p.categoryNameMessages, p.subCategoryNameTalk),
-	p.pMessagesCancel = createRouteMatcherPattern(p.categoryNameMessages, p.subCategoryNameCancel),
-	p.pAnnounceTimeline = createRouteMatcherPattern(p.categoryNameAnnounce, p.subCategoryNameTimeline),
-	p.pAnnounceSend = createRouteMatcherPattern(p.categoryNameAnnounce, p.subCategoryNameSend),
-	p.pAnnounceCancel = createRouteMatcherPattern(p.categoryNameAnnounce, p.subCategoryNameCancel),
-	p.pPrivateTimeline = createRouteMatcherPattern(p.categoryNamePrivate, p.subCategoryNameTimeline),
-	p.pPrivateSend = createRouteMatcherPattern(p.categoryNamePrivate, p.subCategoryNameSend),
-	p.pPrivateCancel = createRouteMatcherPattern(p.categoryNamePrivate, p.subCategoryNameCancel),
-	p.pMonologTimeline = createRouteMatcherPattern(p.categoryNameMonolog, p.subCategoryNameTimeline),
-	p.pMonologSend = createRouteMatcherPattern(p.categoryNameMonolog, p.subCategoryNameSend),
-	p.pMonologCancel = createRouteMatcherPattern(p.categoryNameMonolog, p.subCategoryNameCancel),
-	p.pRelationshipStatus = createRouteMatcherPattern(p.categoryNameRelationship, p.subCategoryNameStatus),
-	p.pRelationshipListen = createRouteMatcherPattern(p.categoryNameRelationship, p.subCategoryNameListen),
-	p.pReadSet = createRouteMatcherPattern(p.categoryNameRead, p.subCategoryNameSet)
-
 	return p;
 }
 
 function createRouteMatcherPattern(category, subCategory) {
 	return '/' + category + '/' + subCategory;
+}
+
+var Constants = function() {};
+Constants.prototype = {
+	hostname: "localhost",
+	listenPort: 9999,
+	persistorAddress: "atmos_persistor",
+	persistorHostname: "localhost",
+	persistorPort: 27017,
+	persistorDbName: "atmosphere"
+}
+
+function getConstants() {
+	var c = new Constants();
+	return c;
 }
