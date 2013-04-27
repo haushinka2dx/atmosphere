@@ -2,6 +2,7 @@ load('vertx.js');
 load('atmos_debug.js');
 load('constants.js');
 load('persistor.js');
+load('request_dispatcher.js');
 
 var Atmosphere = function() {};
 Atmosphere.prototype = {
@@ -24,7 +25,7 @@ Atmosphere.prototype = {
 		if (typeof(notFoundHandler) == 'undefined' || notFoundHandler == null) {
 			notFoundHandler = function(req) {
 				Atmosphere.prototype.log('noMatch');
-				dumpRequest(req);
+				dump_request(Atmosphere.prototype.logger, req);
 				req.response.sendFile('json/common/404.json');
 			};
 		}

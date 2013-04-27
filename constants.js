@@ -1,5 +1,3 @@
-load('vertx.js');
-
 var PathInfo = function() {};
 PathInfo.prototype = {
 	categoryNameMessages: 'messages',
@@ -52,7 +50,8 @@ Constants.prototype = {
 	persistorAddress: "atmos_persistor",
 	persistorHostname: "localhost",
 	persistorPort: 27017,
-	persistorDbName: "atmosphere"
+	persistorDbName: "atmosphere",
+	pathInfo: getPathInfo(),
 }
 
 function getConstants() {
