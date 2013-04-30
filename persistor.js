@@ -11,16 +11,7 @@ Persistor.prototype = {
 		return eb;
 	},
 
-	save: function(collName, document) {
-		Persistor.prototype.eb().send(
-			Persistor.prototype.pa,
-			{
-				"action": "save",
-				"collection": collName,
-				"document": document
-			}
-		);
-	},
+	pk: "_id",
 
 	find: function(callback, collName, where) {
 		Persistor.prototype.eb().send(
@@ -32,7 +23,51 @@ Persistor.prototype = {
 			},
 			callback
 		);
-	}
+	},
+	
+	insert: function(callback, collName, document) {
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			{
+				"action": "save",
+				"collection": collName,
+				"document": document
+			},
+			callback
+		);
+	},
+
+	update: function(callback, collName, id, document) {
+		var criteria = {};
+		criteria[Persistor.prototype.pk] = id;
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			{
+				"action": "update",
+				"collection": collName,
+				"criteria": criteria,
+				"objNew": document,
+				"upsert": false,
+				"multi": false
+			},
+			callback
+		);
+	},
+
+	updateByCondition: function(callback, collName, criteria, updateInfo) {
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			{
+				"action": "update",
+				"collection": collName,
+				"criteria": criteria,
+				"objNew": updateInfo,
+				"upsert": false,
+				"multi": true
+			},
+			callback
+		);
+	},
 }
 
 function getPersistor() {

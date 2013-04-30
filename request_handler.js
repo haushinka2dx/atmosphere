@@ -1,61 +1,37 @@
 load('atmosphere.js');
 
-function getParamValue(req, name) {
-	var ret = null;
-	var params = req.params();
-	for (var key in params) {
-		if (key == name) {
-			ret = params[key];
-			break;
-		}
-	}
-	return ret;
-}
-
-function getParamValues(req) {
-	var ret = {};
-	var params = req.params();
-	for (var key in params) {
-		ret[key] = params[key];
-		atmos.log("[" + key + "] " + params[key]);
-	}
-	return ret;
-}
-
-var Messages = function() {};
-Messages.prototype = {
+var CommonHandler = function() {};
+CommonHandler.prototype = {
 	paramNameSearchCondition: "where",
-	collectionName: "messages",
+	paramNameUpdateInformation: "update_info",
 	persistor: atmos.persistor,
-	timeline: function(req) {
-		var where = {};
-		var cond = getParamValue(req, Messages.prototype.paramNameSearchCondition);
-		if (cond != null) {
-			where = JSON.parse(cond);
+	getParamValue: function getParamValue(req, name) {
+		var ret = null;
+		var params = req.params();
+		for (var key in params) {
+			if (key == name) {
+				ret = params[key];
+				break;
+			}
 		}
-		Messages.prototype.persistor.find(
-			function(ret) {
-				req.response.end(JSON.stringify(ret));
-			},
-			Messages.prototype.collectionName,
-			where
-		);
+		return ret;
 	},
-	say: function(req) {
-		var data = getParamValues(req);
-		// remove "id_" if exists
-		delete(data['id_']);
-		atmos.log(JSON.stringify(data));
-
-		Messages.prototype.persistor.save(
-			Messages.prototype.collectionName,
-			data
+	getParamValues: function getParamValues(req) {
+		var ret = {};
+		var params = req.params();
+		for (var key in params) {
+			ret[key] = params[key];
+			atmos.log("[" + key + "] " + params[key]);
+		}
+		return ret;
+	},
+	sendResponse: function(req, body) {
+		req.response.putAllHeaders(
+			{
+				//'Content-Type': 'text/html; charset=UTF-8'
+				'Content-Type': 'application/json; charset=UTF-8'
+			}
 		);
-		req.response.end();
-	}
-}
-
-function getMessagesHandler() {
-	var m = new Messages();
-	return m;
+		req.response.end(body);
+	},
 }
