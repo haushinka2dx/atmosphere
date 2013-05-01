@@ -20,69 +20,48 @@ Messages.prototype.timeline = function(req) {
 	);
 };
 Messages.prototype.say = function(req) {
-	var targetId = Messages.prototype.getParamValue(req, Messages.prototype.persistor.pk);
-	if (targetId != null) {
-		req.dataHandler(function(buffer) {
-			if (buffer.length() > 0) {
-				atmos.log('Received body data: ' + buffer);
-				var bodyJSON = JSON.parse(buffer);
-	
-				Messages.prototype.persistor.update(
-					function(replyJSON) {
-						Messages.prototype.sendResponse(req, JSON.stringify(replyJSON));
-					},
-					Messages.prototype.collectionName,
-					targetId,
-					bodyJSON
-				);
-			}
-			else {
-				Messages.prototype.sendResponse(req, '');
-			}
-		});
-	}
-	else {
-		req.dataHandler(function(buffer) {
-			if (buffer.length() > 0) {
-				atmos.log('Received body data: ' + buffer);
-				var bodyJSON = JSON.parse(buffer);
-	
-				Messages.prototype.persistor.insert(
-					function(replyJSON) {
-						Messages.prototype.sendResponse(req, JSON.stringify(replyJSON));
-					},
-					Messages.prototype.collectionName,
-					bodyJSON
-				);
-			}
-			else {
-				Messages.prototype.sendResponse(req, '');
-			}
-		});
-	}
-};
-Messages.prototype.talk = function(req) {
-	req.dataHandler(function(buffer) {
-		if (buffer.length() > 0) {
-			atmos.log('Received body data: ' + buffer);
-			var bodyJSON = JSON.parse(buffer);
+	Messages.prototype.getBodyAsJSON(req, function(bodyJSON) {
 
-			var whereJSON = bodyJSON[Messages.prototype.persistor.paramNameSearchCondition];
-			var updateInfoJSON = bodyJSON[Messages.prototype.persistor.paramNameUpdateInformation];
-
-			Messages.prototype.persistor.updateByCondition(
+		if (bodyJSON['__count__'] > 0) {
+			Messages.prototype.persistor.insert(
 				function(replyJSON) {
 					Messages.prototype.sendResponse(req, JSON.stringify(replyJSON));
 				},
 				Messages.prototype.collectionName,
-				whereJSON,
-				updateInfoJSON
+				bodyJSON
 			);
 		}
 		else {
-			var res = {};
-			res['msg'] = 'Update requires both "criteria" and "update_info"';
-			Messages.prototype.sendResponse(req, JSON.stringify(res));
+			Messages.prototype.sendResponse(req, '');
+		}
+	});
+};
+Messages.prototype.talk = function(req) {
+	Messages.prototype.say(req);
+};
+Messages.prototype.destroy = function(req) {
+	Messages.prototype.getBodyAsJSON(req, function(bodyJSON) {
+		atmos.log('Received body data: ' + JSON.stringify(bodyJSON));
+		var id = bodyJSON[Messages.prototype.persistor.pk];
+		if (id != null) {
+			try {
+				Messages.prototype.persistor.remove(
+					function(replyJSON) {
+						Messages.prototype.sendResponse(req, JSON.stringify(replyJSON));
+					},
+					Messages.prototype.collectionName,
+					id
+				);
+			}
+			catch (ex) {
+				atmos.log(ex);
+				var res = Messages.prototype.createResponse(Messages.prototype.returnCodeSystemError, ex.message);
+				Messages.prototype.sendResponse(req, JSON.stringify(res), 500);
+			}
+		}
+		else {
+			var res = Messages.prototype.createResponse(Messages.prototype.returnCodeArgumentMissingError, 'Destroy requires "_id"');
+			Messages.prototype.sendResponse(req, JSON.stringify(res), 400);
 		}
 	});
 };

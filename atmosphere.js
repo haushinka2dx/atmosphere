@@ -31,7 +31,7 @@ Atmosphere.prototype = {
 		}
 
 		rm.noMatch(notFoundHandler);
-		server.requestHandler(rm);1
+		server.requestHandler(rm);
 
 		return server;
 	},

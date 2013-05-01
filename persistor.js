@@ -37,6 +37,10 @@ Persistor.prototype = {
 		);
 	},
 
+	/// update document which has assigned "_id"
+	/// ex.
+	/// id: hosgeiljsaese38833 // String
+	/// document: whole data after updated // JSON
 	update: function(callback, collName, id, document) {
 		var criteria = {};
 		criteria[Persistor.prototype.pk] = id;
@@ -54,6 +58,11 @@ Persistor.prototype = {
 		);
 	},
 
+	/// update documents which is mathed for criteria.
+	/// ex.
+	/// criteria: {"user":"hogehoge"} // JSON
+	/// updateInfo: {"$set":{"user":"hoge"}} // JSON
+	///  => updates documents' attribute "user" to "hoge" which documents has attribute user with "hogehoge" value.
 	updateByCondition: function(callback, collName, criteria, updateInfo) {
 		Persistor.prototype.eb().send(
 			Persistor.prototype.pa,
@@ -64,6 +73,24 @@ Persistor.prototype = {
 				"objNew": updateInfo,
 				"upsert": false,
 				"multi": true
+			},
+			callback
+		);
+	},
+
+	remove: function(callback, collName, id) {
+		if (typeof(id) == 'undefined' || id == null) {
+			atmos.log('id: ' + id);
+			throw new Error('remove function can not use without parameter "id".');
+		}
+		var matcher = {};
+		matcher[Persistor.prototype.pk] = id;
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			{
+				"action": "delete",
+				"collection": collName,
+				"matcher": matcher
 			},
 			callback
 		);
