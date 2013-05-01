@@ -1,23 +1,24 @@
-var PathInfo = function() {};
+var PathInfo = function() {
+};
 PathInfo.prototype = {
-	categoryNameMessages: 'messages',
-	categoryNameAnnounce: 'announce',
-	categoryNamePrivate: 'private',
-	categoryNameMonolog: 'monolog',
-	categoryNameRelationship: 'relationship',
-	categoryNameRead: 'read',
+	categoryNameMessages : 'messages',
+	categoryNameAnnounce : 'announce',
+	categoryNamePrivate : 'private',
+	categoryNameMonolog : 'monolog',
+	categoryNameRelationship : 'relationship',
+	categoryNameRead : 'read',
 
-	subCategoryNameTimeline: 'timeline',
-	subCategoryNameSay: 'say',
-	subCategoryNameTalk: 'talk',
-	subCategoryNameSend: 'send',
-	subCategoryNameListen: 'listen',
-	subCategoryNameStatus: 'status',
-	subCategoryNameSet: 'set',
-	subCategoryNameCancel: "cancel",
-	subCategoryNameDestroy: "destroy",
-	subCategoryNameResponse: "response",
-}
+	subCategoryNameTimeline : 'timeline',
+	subCategoryNameSay : 'say',
+	subCategoryNameTalk : 'talk',
+	subCategoryNameSend : 'send',
+	subCategoryNameListen : 'listen',
+	subCategoryNameStatus : 'status',
+	subCategoryNameSet : 'set',
+	subCategoryNameCancel : "cancel",
+	subCategoryNameDestroy : "destroy",
+	subCategoryNameResponse : "response",
+};
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
 PathInfo.prototype.pMessagesSay = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSay);
@@ -42,7 +43,7 @@ PathInfo.prototype.pMonologDestroy = createRouteMatcherPattern(PathInfo.prototyp
 PathInfo.prototype.pMonologResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameResponse);
 PathInfo.prototype.pRelationshipStatus = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameStatus);
 PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListen);
-PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet)
+PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet);
 
 function getPathInfo() {
 	var p = new PathInfo();
@@ -53,16 +54,17 @@ function createRouteMatcherPattern(category, subCategory) {
 	return '/' + category + '/' + subCategory;
 }
 
-var Constants = function() {};
+var Constants = function() {
+};
 Constants.prototype = {
-	hostname: "localhost",
-	listenPort: 9999,
-	persistorAddress: "atmos_persistor",
-	persistorHostname: "localhost",
-	persistorPort: 27017,
-	persistorDbName: "atmosphere",
-	pathInfo: getPathInfo(),
-}
+	hostname : "localhost",
+	listenPort : 9999,
+	persistorAddress : "atmos_persistor",
+	persistorHostname : "localhost",
+	persistorPort : 27017,
+	persistorDbName : "atmosphere",
+	pathInfo : getPathInfo(),
+};
 
 function getConstants() {
 	var c = new Constants();
