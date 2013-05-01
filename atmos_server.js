@@ -1,16 +1,18 @@
 load('atmosphere.js');
 load('vertx.js');
 load('messages_handler.js');
+load('atmos_handler.js');
 
 /// main function
 function main() {
-	var messagesHandler = getMessagesHandler();
+	var messagesHandler = getAtmosHandler();
+	var privateHandler = getAtmosHandler();
 
 	// url patterns and handlers for GET method
 	var patternsGET = {};
 	patternsGET[atmos.constants.pathInfo.pMessagesTimeline] = messagesHandler.timeline;
 	patternsGET[atmos.constants.pathInfo.pAnnounceTimeline] = function(req) { req.response.end(); };
-	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = function(req) { req.response.end(); };
+	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = privateHandler.timeline;
 	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = function(req) { req.response.end(); };
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = function(req) { req.response.end(); };
 
@@ -25,7 +27,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pAnnounceCancel] = function(req) { req.response.end(); };
 	patternsPOST[atmos.constants.pathInfo.pAnnounceDestroy] = function(req) { req.response.end(); };
 	patternsPOST[atmos.constants.pathInfo.pAnnounceResponse] = function(req) { req.response.end(); };
-	patternsPOST[atmos.constants.pathInfo.pPrivateSend] = function(req) { req.response.end(); };
+	patternsPOST[atmos.constants.pathInfo.pPrivateSend] = privateHandler.send;
 	patternsPOST[atmos.constants.pathInfo.pPrivateCancel] = function(req) { req.response.end(); };
 	patternsPOST[atmos.constants.pathInfo.pPrivateDestroy] = function(req) { req.response.end(); };
 	patternsPOST[atmos.constants.pathInfo.pPrivateResponse] = function(req) { req.response.end(); };
