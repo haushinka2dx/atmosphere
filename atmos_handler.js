@@ -37,23 +37,6 @@ AtmosHandler.prototype.send = function(req) {
 	});
 };
 
-AtmosHandler.prototype.say = function(req) {
-	AtmosHandler.prototype.getBodyAsJSON(req, function(bodyJSON) {
-
-		if (bodyJSON['__count__'] > 0) {
-			AtmosHandler.prototype.persistor.insert(
-				function(replyJSON) {
-					AtmosHandler.prototype.sendResponse(req, JSON.stringify(replyJSON));
-				},
-				getCollectionName(req),
-				bodyJSON
-			);
-		}
-		else {
-			AtmosHandler.prototype.sendResponse(req, '');
-		}
-	});
-};
 AtmosHandler.prototype.talk = function(req) {
 	AtmosHandler.prototype.say(req);
 };
