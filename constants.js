@@ -7,6 +7,7 @@ PathInfo.prototype = {
 	categoryNameMonolog : 'monolog',
 	categoryNameRelationship : 'relationship',
 	categoryNameRead : 'read',
+	categoryNameAuth : 'auth',
 
 	subCategoryNameTimeline : 'timeline',
 	subCategoryNameSay : 'say',
@@ -18,6 +19,8 @@ PathInfo.prototype = {
 	subCategoryNameCancel : "cancel",
 	subCategoryNameDestroy : "destroy",
 	subCategoryNameResponse : "response",
+	subCategoryNameLogin : "login",
+	subCategoryNameLogout : "logout",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -44,6 +47,8 @@ PathInfo.prototype.pMonologResponse = createRouteMatcherPattern(PathInfo.prototy
 PathInfo.prototype.pRelationshipStatus = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameStatus);
 PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListen);
 PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet);
+PathInfo.prototype.pAuthLogin = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogin);
+PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogout);
 
 function getPathInfo() {
 	var p = new PathInfo();
@@ -63,6 +68,13 @@ Constants.prototype = {
 	persistorHostname : "localhost",
 	persistorPort : 27017,
 	persistorDbName : "atmosphere",
+	sessionManagerAddress : "atmos_session_manager",
+	sessionTimeoutMilliseconds : 10 * 60 * 1000,
+	sessionCleanedNotifyAddress : null,
+	sessionIdPrefix : "atmos_",
+	authManagerAddress : "atmos_auth_manager",
+	authTimeoutMilliseconds : 10 * 60 * 1000,
+	authCollectionName : "users",
 	pathInfo : getPathInfo(),
 };
 

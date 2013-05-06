@@ -35,6 +35,70 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pMonologResponse] = function(req) { req.response.end(); };
 	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = function(req) { req.response.end(); };
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = function(req) { req.response.end(); };
+//	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = function(req) { 
+//		req.dataHandler(function(buffer) {
+//			atmos.session.start(function(sessionId) {
+//				atmos.log('SessionID: ' + sessionId);
+//				atmos.session.putValue(function(result) { atmos.log('result: ' + result); }, sessionId, 'testkey', 13);
+//				req.response.end(sessionId);
+//			});
+//		});
+//	};
+//	patternsPOST[atmos.constants.pathInfo.pAuthLogout] = function(req) {
+//		req.dataHandler(function(buffer) {
+//			var bodyJSON = JSON.parse(buffer);
+//			var sessionId = bodyJSON['session_id'];
+//			atmos.log('body: ' + buffer);
+//			atmos.log('session_id: ' + sessionId);
+//			atmos.session.getValue(
+//				function(data) {
+//					atmos.log('data from session: ' + data);
+//					req.response.end(data);
+//				},
+//				sessionId,
+//				'testkey');
+//		});
+//	};
+	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = function(req) { 
+		req.dataHandler(function(buffer) {
+			var bodyJSON = JSON.parse(buffer);
+			var userId = bodyJSON['user_id'];
+			var password = bodyJSON['password'];
+			atmos.session.start(function(sessionId) {
+				atmos.log('SessionID: ' + sessionId);
+				atmos.session.putValue(function(result) { atmos.log('result: ' + result); }, sessionId, 'testkey', 13);
+				atmos.auth.login(
+					function(res) {
+						var response;
+						if (res) {
+							response = { 'status' : 'login successful', 'session_id' : sessionId };
+						}
+						else {
+							response = { 'status' : 'login failed', 'session_id' : sessionId };
+						}
+						req.response.end(JSON.stringify(response));
+					},
+					sessionId,
+					userId,
+					password
+				);
+			});
+		});
+	};
+	patternsPOST[atmos.constants.pathInfo.pAuthLogout] = function(req) {
+		req.dataHandler(function(buffer) {
+			var bodyJSON = JSON.parse(buffer);
+			var sessionId = bodyJSON['session_id'];
+			atmos.log('body: ' + buffer);
+			atmos.log('session_id: ' + sessionId);
+			atmos.auth.getCurrentUser(
+				function(userInfo) {
+					req.response.end(JSON.stringify(userInfo));
+				},
+				sessionId
+			);
+		});
+	};
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);
 
@@ -46,6 +110,29 @@ function main() {
 	};
 
 	vertx.deployModule('vertx.mongo-persistor-v1.2.1', mongoconf, 1, function() {
+		atmos.log('Mongo persistor was deployed.');
+	});
+
+	var sessionManagerConf = {
+		"address" : atmos.constants.sessionManagerAddress,
+		"timeout" : atmos.constants.sessionTimeoutMilliseconds,
+		"cleaner" : atmos.constants.sessionCleanedNotifyAddress,
+		"prefix" : atmos.constants.sessionIdPrefix,
+	}
+
+	vertx.deployModule('com.campudus.session-manager-v1.2.1', sessionManagerConf, 1, function() {
+		atmos.log('Session Manager was deployed.');
+	});
+
+	var authManagerConf = {
+		"address" : atmos.constants.authManagerAddress,
+		"user_collection" : atmos.constants.authCollectionName,
+		"persistor_address" : atmos.constants.persistorAddress,
+		"session_timeout" : atmos.constants.authTimeoutMilliseconds,
+	}
+
+	vertx.deployModule('vertx.auth-mgr-v1.1', authManagerConf, 1, function() {
+		atmos.log('Auth Manager was deployed.');
 	});
 
 	//var sockjsServer = vertx.createSockJSServer(server);

@@ -3,6 +3,8 @@ load('atmos_debug.js');
 load('constants.js');
 load('persistor.js');
 load('request_dispatcher.js');
+load('session_manager.js');
+load('auth_manager.js');
 
 var Atmosphere = function() {
 };
@@ -17,6 +19,8 @@ Atmosphere.prototype = {
 
 	constants : getConstants(),
 	persistor : getPersistor(),
+	session : getSessionManager(),
+	auth : getAuthManager(),
 
 	createHttpServer : function(patternHandlerMapGET, patternHandlerMapPOST, notFoundHandler) {
 		var server = vertx.createHttpServer();
