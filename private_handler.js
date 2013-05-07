@@ -1,9 +1,11 @@
 load('atmos_handler.js');
 
+var collectionName = "private";
 var Private = function() {};
-Private.prototype = new AtmosHandler();
+
+Private.prototype = new AtmosHandler(collectionName);
 
 function getPrivateHandler() {
-	var p = new Private();
-	return p;
+	var private = new Private();
+	return private;
 }
