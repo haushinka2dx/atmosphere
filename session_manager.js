@@ -123,7 +123,7 @@ SessionManager.prototype = {
 			}
 		);
 	}
-}
+};
 
 function getSessionManager() {
 	var m = new SessionManager();

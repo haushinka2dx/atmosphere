@@ -91,7 +91,7 @@ AuthManager.prototype = {
 			keys
 		);
 	}
-}
+};
 
 function getAuthManager() {
 	var a = new AuthManager();

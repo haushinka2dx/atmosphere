@@ -5,7 +5,6 @@ var AtmosHandler = function(cName) {
 	var commandHandler = new CommonHandler();
 
 	AtmosHandler.prototype.timeline = function(req) {
-		vertx.logger.info(cName);
 		var where = {};
 		var cond = commandHandler.getParamValue(req, commandHandler.paramNameSearchCondition);
 		if (cond != null) {

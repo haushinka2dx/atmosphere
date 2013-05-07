@@ -124,7 +124,7 @@ function main() {
 		"timeout" : atmos.constants.sessionTimeoutMilliseconds,
 		"cleaner" : atmos.constants.sessionCleanedNotifyAddress,
 		"prefix" : atmos.constants.sessionIdPrefix,
-	}
+	};
 
 	vertx.deployModule('com.campudus.session-manager-v1.2.1', sessionManagerConf, 1, function() {
 		atmos.log('Session Manager was deployed.');
@@ -135,7 +135,7 @@ function main() {
 		"user_collection" : atmos.constants.authCollectionName,
 		"persistor_address" : atmos.constants.persistorAddress,
 		"session_timeout" : atmos.constants.authTimeoutMilliseconds,
-	}
+	};
 
 	vertx.deployModule('vertx.auth-mgr-v1.1', authManagerConf, 1, function() {
 		atmos.log('Auth Manager was deployed.');
