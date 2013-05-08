@@ -39,14 +39,9 @@ CommonHandler.prototype = {
 			var keyCount = 0;
 			if (buffer.length() > 0) {
 				bodyJSON = JSON.parse(buffer);
-				// FIXME In What are you using here 'key'?
-				for ( var key in bodyJSON) {
-					keyCount += 1;
-				}
 			} else {
 				bodyJSON = {};
 			}
-			bodyJSON["__count__"] = keyCount;
 			callback(bodyJSON);
 		});
 	},
