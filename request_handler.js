@@ -33,7 +33,7 @@ CommonHandler.prototype = {
 		}
 		return ret;
 	},
-	getBodyAsJSON : function(req, callback) {
+	getBodyAsJSON : function(req, target, callback) {
 		req.dataHandler(function(buffer) {
 			var bodyJSON;
 			var keyCount = 0;
@@ -42,7 +42,7 @@ CommonHandler.prototype = {
 			} else {
 				bodyJSON = {};
 			}
-			callback(bodyJSON);
+			callback.call(target, bodyJSON);
 		});
 	},
 	sendResponse : function(req, body, statusCode) {

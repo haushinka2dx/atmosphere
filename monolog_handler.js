@@ -1,8 +1,10 @@
 load('atmos_handler.js');
 
-var collectionName = "monolog";
-var Monolog = function() {};
-Monolog.prototype = new AtmosHandler(collectionName);
+function Monolog() {
+	AtmosHandler.apply(this, [ "monolog" ]);
+}
+Monolog.prototype = Object.create(AtmosHandler.prototype);
+Monolog.constructor = Monolog;
 
 function getMonologHandler() {
 	var m = new Monolog();

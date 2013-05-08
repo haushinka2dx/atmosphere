@@ -3,13 +3,13 @@ load('atmos_debug.js');
 ///
 /// dispatch HTTP Request handler
 ///
-function dispatchRequestHandler(routeMatcher, pattern, method, handler, logger) {
+function dispatchRequestHandler(routeMatcher, pattern, method, target, handler, logger) {
 	var wrappedHandler = function(req) {
 		if (typeof(logger) != 'undefined') {
 			plog(logger, '[' + method + ']' + pattern + ' was started.');
 			dump_request(logger, req);
 		}
-		handler(req);
+		handler.call(target, req);
 		if (typeof(logger) != 'undefined') {
 			plog(logger, '[' + method + ']' + pattern + ' was finished.');
 		}
@@ -30,7 +30,9 @@ function dispatchRequestHandler(routeMatcher, pattern, method, handler, logger) 
 ///
 function dispatchRequestHandlers(routeMatcher, method, patternHandlerMap, logger) {
 	for (var pattern in patternHandlerMap) {
-		var handler = patternHandlerMap[pattern];
-		dispatchRequestHandler(routeMatcher, pattern, method, handler, logger);
+		var targetAndHandler = patternHandlerMap[pattern];
+		var target = targetAndHandler[0];
+		var handler = targetAndHandler[1];
+		dispatchRequestHandler(routeMatcher, pattern, method, target, handler, logger);
 	}
 }
