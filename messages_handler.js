@@ -13,12 +13,20 @@ Messages.prototype.say = function(req) {
 	req.getBodyAsJSON(this, function(bodyJSON) {
 		atmos.log('bodyJSON: ' + JSON.stringify(bodyJSON));
 		if (Object.keys(bodyJSON).length > 0) {
-			Messages.prototype.persistor.insert(
-				function(replyJSON) {
-					req.sendResponse(JSON.stringify(replyJSON));
+			var sessionId = req.getSessionId();
+			atmos.auth.getCurrentUser(
+				this,
+				function(currentUserId) {
+					Messages.prototype.persistor.insert(
+						function(replyJSON) {
+							req.sendResponse(JSON.stringify(replyJSON));
+						},
+						this.collectionName,
+						bodyJSON,
+						currentUserId
+					);
 				},
-				this.collectionName,
-				bodyJSON
+				sessionId
 			);
 		}
 		else {

@@ -13,16 +13,24 @@ Persistor.prototype = {
 	},
 
 	pk : "_id",
+	createdAt : "created_at",
+	createdBy : "created_by",
 
-	find : function(callback, collName, where) {
+	find : function(callback, collName, where, sort) {
 		Persistor.prototype.eb().send(Persistor.prototype.pa, {
 			"action" : "find",
 			"collection" : collName,
-			"matcher" : where
+			"matcher" : where,
+			"sort" : sort
 		}, callback);
 	},
 
-	insert : function(callback, collName, document) {
+	insert : function(callback, collName, document, userId, createdAt) {
+		if (typeof(createdAt) === 'undefined' || createdAt == null) {
+			createdAt = new Date();
+		}
+		document[Persistor.prototype.createdBy] = userId;
+		document[Persistor.prototype.createdAt] = createdAt;
 		Persistor.prototype.eb().send(Persistor.prototype.pa, {
 			"action" : "save",
 			"collection" : collName,

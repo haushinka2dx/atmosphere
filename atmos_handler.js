@@ -14,22 +14,32 @@ AtmosHandler.prototype.timeline = function(req) {
 	if (cond != null) {
 		where = JSON.parse(cond);
 	}
+
+	// default sort new -> old
+	var sort = {};
+	sort[AtmosHandler.prototype.persistor.createdAt] = -1;
+
 	AtmosHandler.prototype.persistor.find(function(ret) {
 		req.sendResponse(JSON.stringify(ret));
-	}, this.collectionName, where);
+	}, this.collectionName, where, sort);
 };
 
 AtmosHandler.prototype.send = function(req) {
 	req.getBodyAsJSON(this, function(bodyJSON) {
 		atmos.log('bodyJSON: ' + JSON.stringify(bodyJSON));
 		if (Object.keys(bodyJSON).length > 0) {
-			Messages.prototype.persistor.insert(
-				function(replyJSON) {
-					req.sendResponse(JSON.stringify(replyJSON));
-				},
-				this.collectionName,
-				bodyJSON
-			);
+			var sessionId = req.getSessionId();
+			var currentUserId = atmos.auth.getCurrentUser(this, function(currentUserId) {
+				AtmosHandler.prototype.persistor.insert(
+					function(replyJSON) {
+						req.sendResponse(JSON.stringify(replyJSON));
+					},
+					this.collectionName,
+					bodyJSON,
+					currentUserId
+				);
+			},
+			sessionId);
 		}
 		else {
 			req.sendResponse('');

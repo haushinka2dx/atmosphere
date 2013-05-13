@@ -96,6 +96,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pAuthLogout] = [null, function(req) {
 		var sessionId = req.getSessionId();
 		atmos.auth.getCurrentUser(
+			this,
 			function(userInfo) {
 				req.sendResponse(JSON.stringify(userInfo));
 			},

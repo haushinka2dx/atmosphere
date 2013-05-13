@@ -58,7 +58,7 @@ AuthManager.prototype = {
 		);
 	},
 
-	getCurrentUser : function(callback, sessionId) {
+	getCurrentUser : function(target, callback, sessionId) {
 		var keys = [ AuthManager.prototype.keynameAtmosSessionId, AuthManager.prototype.keynameUserId ];
 		atmos.session.getValues(
 			function(res) {
@@ -74,10 +74,10 @@ AuthManager.prototype = {
 						},
 						function(res) {
 							if (res['status'] === 'ok') {
-								callback(currentUserId);
+								callback.call(target, currentUserId);
 							}
 							else {
-								callback(null);
+								callback.call(target, null);
 							}
 						}
 					);
