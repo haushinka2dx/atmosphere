@@ -4,6 +4,7 @@ load('messages_handler.js');
 load('announce_handler.js');
 load('private_handler.js');
 load('monolog_handler.js');
+load('request_info.js');
 
 /// main function
 function main() {
@@ -66,11 +67,11 @@ function main() {
 //		});
 //	};
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [null, function(req) { 
-		req.dataHandler(function(buffer) {
-			var bodyJSON = JSON.parse(buffer);
+		req.getBodyAsJSON(this, function(bodyJSON) {
 			var userId = bodyJSON['user_id'];
 			var password = bodyJSON['password'];
 			atmos.session.start(function(sessionId) {
+				req.sessionId = sessionId;
 				atmos.log('SessionID: ' + sessionId);
 				atmos.session.putValue(function(result) { atmos.log('result: ' + result); }, sessionId, 'testkey', 13);
 				atmos.auth.login(
@@ -82,9 +83,10 @@ function main() {
 						else {
 							response = { 'status' : 'login failed', 'session_id' : sessionId };
 						}
-						req.response.end(JSON.stringify(response));
+						req.sendResponse(JSON.stringify(response));
+						//req.response.end(JSON.stringify(response));
 					},
-					sessionId,
+					req.sessionId,
 					userId,
 					password
 				);
@@ -92,18 +94,13 @@ function main() {
 		});
 	}];
 	patternsPOST[atmos.constants.pathInfo.pAuthLogout] = [null, function(req) {
-		req.dataHandler(function(buffer) {
-			var bodyJSON = JSON.parse(buffer);
-			var sessionId = bodyJSON['session_id'];
-			atmos.log('body: ' + buffer);
-			atmos.log('session_id: ' + sessionId);
-			atmos.auth.getCurrentUser(
-				function(userInfo) {
-					req.response.end(JSON.stringify(userInfo));
-				},
-				sessionId
-			);
-		});
+		var sessionId = req.getSessionId();
+		atmos.auth.getCurrentUser(
+			function(userInfo) {
+				req.sendResponse(JSON.stringify(userInfo));
+			},
+			sessionId
+		);
 	}];
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);

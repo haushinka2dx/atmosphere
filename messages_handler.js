@@ -10,18 +10,19 @@ Messages.prototype = Object.create(AtmosHandler.prototype);
 Messages.prototype.constructor = Messages;
 
 Messages.prototype.say = function(req) {
-	Messages.prototype.getBodyAsJSON(req, this, function(bodyJSON) {
+	req.getBodyAsJSON(this, function(bodyJSON) {
+		atmos.log('bodyJSON: ' + JSON.stringify(bodyJSON));
 		if (Object.keys(bodyJSON).length > 0) {
 			Messages.prototype.persistor.insert(
-					function(replyJSON) {
-						Messages.prototype.sendResponse(req, JSON.stringify(replyJSON));
-					},
-					this.collectionName,
-					bodyJSON
+				function(replyJSON) {
+					req.sendResponse(JSON.stringify(replyJSON));
+				},
+				this.collectionName,
+				bodyJSON
 			);
 		}
 		else {
-			Messages.prototype.sendResponse(req, '');
+			req.sendResponse('');
 		}
 	});
 };

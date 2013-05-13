@@ -13,48 +13,7 @@ CommonHandler.prototype = {
 	paramNameSearchCondition : "where",
 	paramNameUpdateInformation : "update_info",
 	persistor : atmos.persistor,
-	getParamValue : function(req, name) {
-		var ret = null;
-		var params = req.params();
-		for ( var key in params) {
-			if (key == name) {
-				ret = params[key];
-				break;
-			}
-		}
-		return ret;
-	},
-	getParamsAsJSON : function(req) {
-		var ret = {};
-		var params = req.params();
-		for ( var key in params) {
-			ret[key] = params[key];
-			atmos.log("[" + key + "] " + params[key]);
-		}
-		return ret;
-	},
-	getBodyAsJSON : function(req, target, callback) {
-		req.dataHandler(function(buffer) {
-			var bodyJSON;
-			var keyCount = 0;
-			if (buffer.length() > 0) {
-				bodyJSON = JSON.parse(buffer);
-			} else {
-				bodyJSON = {};
-			}
-			callback.call(target, bodyJSON);
-		});
-	},
-	sendResponse : function(req, body, statusCode) {
-		if (typeof (statusCode) != 'undefined' && statusCode != null) {
-			req.response.statusCode = statusCode;
-		}
-		req.response.putAllHeaders({
-			// 'Content-Type': 'text/html; charset=UTF-8'
-			'Content-Type' : 'application/json; charset=UTF-8'
-		});
-		req.response.end(body);
-	},
+
 	createResponse : function(code, additionalMsg) {
 		var r = {};
 		r['code'] = code;

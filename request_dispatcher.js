@@ -1,4 +1,5 @@
 load('atmos_debug.js');
+load('request_info.js');
 
 ///
 /// dispatch HTTP Request handler
@@ -9,7 +10,7 @@ function dispatchRequestHandler(routeMatcher, pattern, method, target, handler, 
 			plog(logger, '[' + method + ']' + pattern + ' was started.');
 			dump_request(logger, req);
 		}
-		handler.call(target, req);
+		handler.call(target, new RequestInfo(req));
 		if (typeof(logger) != 'undefined') {
 			plog(logger, '[' + method + ']' + pattern + ' was finished.');
 		}
