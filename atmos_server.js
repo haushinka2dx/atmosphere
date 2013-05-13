@@ -4,6 +4,7 @@ load('messages_handler.js');
 load('announce_handler.js');
 load('private_handler.js');
 load('monolog_handler.js');
+load('auth_handler.js');
 load('request_info.js');
 
 /// main function
@@ -12,6 +13,7 @@ function main() {
 	var announceHandler = getAnnounceHandler();
 	var privateHandler = getPrivateHandler();
 	var monologHandler = getMonologHandler();
+	var authHandler = getAuthHandler();
 
 	// url patterns and handlers for GET method
 	var patternsGET = {};
@@ -20,6 +22,8 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [privateHandler, privateHandler.timeline];
 	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [monologHandler, monologHandler.timeline];
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [null, function(req) { req.response.end(); }];
+	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [authHandler, authHandler.logout];
+	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [authHandler, authHandler.whoami];
 
 	// url patterns and handlers for POST method
 	var patternsPOST = {};
@@ -42,67 +46,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pMonologResponse] = [null, function(req) { req.response.end(); }];
 	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [null, function(req) { req.response.end(); }];
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = [null, function(req) { req.response.end(); }];
-//	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = function(req) { 
-//		req.dataHandler(function(buffer) {
-//			atmos.session.start(function(sessionId) {
-//				atmos.log('SessionID: ' + sessionId);
-//				atmos.session.putValue(function(result) { atmos.log('result: ' + result); }, sessionId, 'testkey', 13);
-//				req.response.end(sessionId);
-//			});
-//		});
-//	};
-//	patternsPOST[atmos.constants.pathInfo.pAuthLogout] = function(req) {
-//		req.dataHandler(function(buffer) {
-//			var bodyJSON = JSON.parse(buffer);
-//			var sessionId = bodyJSON['session_id'];
-//			atmos.log('body: ' + buffer);
-//			atmos.log('session_id: ' + sessionId);
-//			atmos.session.getValue(
-//				function(data) {
-//					atmos.log('data from session: ' + data);
-//					req.response.end(data);
-//				},
-//				sessionId,
-//				'testkey');
-//		});
-//	};
-	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [null, function(req) { 
-		req.getBodyAsJSON(this, function(bodyJSON) {
-			var userId = bodyJSON['user_id'];
-			var password = bodyJSON['password'];
-			atmos.session.start(function(sessionId) {
-				req.sessionId = sessionId;
-				atmos.log('SessionID: ' + sessionId);
-				atmos.session.putValue(function(result) { atmos.log('result: ' + result); }, sessionId, 'testkey', 13);
-				atmos.auth.login(
-					function(res) {
-						var response;
-						if (res) {
-							response = { 'status' : 'login successful', 'session_id' : sessionId };
-						}
-						else {
-							response = { 'status' : 'login failed', 'session_id' : sessionId };
-						}
-						req.sendResponse(JSON.stringify(response));
-						//req.response.end(JSON.stringify(response));
-					},
-					req.sessionId,
-					userId,
-					password
-				);
-			});
-		});
-	}];
-	patternsPOST[atmos.constants.pathInfo.pAuthLogout] = [null, function(req) {
-		var sessionId = req.getSessionId();
-		atmos.auth.getCurrentUser(
-			this,
-			function(userInfo) {
-				req.sendResponse(JSON.stringify(userInfo));
-			},
-			sessionId
-		);
-	}];
+	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [authHandler, authHandler.tryLogin];
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);
 

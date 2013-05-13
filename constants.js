@@ -21,6 +21,7 @@ PathInfo.prototype = {
 	subCategoryNameResponse : "response",
 	subCategoryNameLogin : "login",
 	subCategoryNameLogout : "logout",
+	subCategoryNameWhoami : "whoami",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -49,6 +50,7 @@ PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prot
 PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet);
 PathInfo.prototype.pAuthLogin = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogin);
 PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogout);
+PathInfo.prototype.pAuthWhoami = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameWhoami);
 
 function getPathInfo() {
 	var p = new PathInfo();
