@@ -29,7 +29,7 @@ AtmosHandler.prototype.send = function(req) {
 		atmos.log('bodyJSON: ' + JSON.stringify(bodyJSON));
 		if (Object.keys(bodyJSON).length > 0) {
 			var sessionId = req.getSessionId();
-			var currentUserId = atmos.auth.getCurrentUser(this, function(currentUserId) {
+			req.getCurrentUserId(this, function(currentUserId) {
 				AtmosHandler.prototype.persistor.insert(
 					function(replyJSON) {
 						req.sendResponse(JSON.stringify(replyJSON));

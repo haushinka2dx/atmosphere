@@ -84,7 +84,7 @@ AuthManager.prototype = {
 
 				}
 				else {
-					callback(null);
+					callback.call(target, null);
 				}
 			},
 			sessionId,

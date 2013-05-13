@@ -5,7 +5,6 @@ function RequestInfo(req) {
 	this.req = req;
 	this.query = req.query;
 }
-//RequestInfo.prototype = Object.create(Object.prototype);
 RequestInfo.prototype.constructor = RequestInfo;
 
 RequestInfo.prototype.headerNameSessionId = getConstants().headerNameSessionId;
@@ -15,6 +14,30 @@ RequestInfo.prototype.getSessionId = function() {
 		this.sessionId = this.req.headers()[this.headerNameSessionId];
 	}
 	return this.sessionId;
+};
+
+RequestInfo.prototype.getCurrentUserId = function(target, callback) {
+	if (this.currentUserId != null) {
+		callback.call(target, this.currentUserId);
+	}
+	else {
+		var sessionId = this.getSessionId();
+		if (sessionId != null) {
+			atmos.auth.getCurrentUser(
+				this,
+				function(userId) {
+					if (userId != null) {
+						this.currentUserId = userId;
+					}
+					callback.call(target, userId);
+				},
+				sessionId
+			);
+		}
+		else {
+			callback.call(target, null);
+		}
+	}
 };
 
 //	paramNameSearchCondition : "where",
@@ -60,21 +83,34 @@ RequestInfo.prototype.getParamsAsJSON = function() {
 };
 
 RequestInfo.prototype.getBodyAsJSON = function(target, callback) {
-	var body = new vertx.Buffer();
-	this.req.dataHandler(function(buffer) {
-		atmos.log('body buffer: ' + buffer);
-		body.appendBuffer(buffer);
-	});
-	this.req.endHandler(function() {
-		atmos.log('body: ' + body);
-		var bodyJSON;
-		if (body.length() > 0) {
-			bodyJSON = JSON.parse(body);
-		} else {
-			bodyJSON = {};
-		}
-		callback.call(target, bodyJSON);
-	});
+	if (this.bodyJSON != null) {
+		callback.call(target, this.bodyJSON);
+	}
+	else {
+		var body = new vertx.Buffer();
+		var reqInfo = this;
+		this.req.dataHandler(function(buffer) {
+			var inner = function(buffer) {
+				atmos.log('body buffer: ' + buffer);
+				body.appendBuffer(buffer);
+			};
+			inner.call(reqInfo, buffer);
+		});
+		this.req.endHandler(function() {
+			var inner = function() {
+				atmos.log('body: ' + body);
+				var bodyJSON;
+				if (body.length() > 0) {
+					bodyJSON = JSON.parse(body);
+				} else {
+					bodyJSON = {};
+				}
+				this.bodyJSON = bodyJSON;
+				callback.call(target, bodyJSON);
+			};
+			inner.call(reqInfo);
+		});
+	}
 };
 
 RequestInfo.prototype.sendResponse = function(body, statusCode) {
