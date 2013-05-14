@@ -1,10 +1,45 @@
 load('atmos_handler.js');
 
 function Announce() {
-	AtmosHandler.apply(this, [ "announce" ]);
+	var collectionName = "announce";
+	AtmosHandler.apply(this, [ collectionName ]);
+	this.collectionName = collectionName;
 }
 Announce.prototype = Object.create(AtmosHandler.prototype);
 Announce.prototype.constructor = Announce;
+
+Announce.prototype.timeline = function(req) {
+	this.timelineInternal(req);
+};
+
+Announce.prototype.send = function(req) {
+	req.getBodyAsJSON(this, function(bodyJSON) {
+		var msg = bodyJSON['message'];
+
+		// extract group_ids from message
+		var groupIds = this.extractGroupIds(msg);
+
+		var dataJSON = {};
+		dataJSON['message'] = msg;
+		dataJSON['addresses'] = groupIds;
+		this.sendInternal(req, dataJSON);
+	});
+};
+
+Announce.prototype.destroy = function(req) {
+	this.destroyInternal(req);
+};
+
+Announce.prototype.extractGroupIds = function(msg) {
+	var groupIdList = new Array();
+	var pattern = /[^@.-_a-zA-Z0-9]@@([a-zA-Z0-9.-_]+)/g;
+	var tempMsg = ' ' + msg + ' ';
+	var groupId;
+	while (groupId = pattern.exec(tempMsg)) {
+		groupIdList.push(groupId[1]);
+	}
+	return groupIdList;
+};
 
 function getAnnounceHandler() {
 	var announce = new Announce();

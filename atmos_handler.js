@@ -8,7 +8,7 @@ function AtmosHandler(cName) {
 AtmosHandler.prototype = Object.create(CommonHandler.prototype);
 AtmosHandler.prototype.constructor = AtmosHandler;
 
-AtmosHandler.prototype.timeline = function(req) {
+AtmosHandler.prototype.timelineInternal = function(req) {
 	var where = {};
 	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
 	if (cond != null) {
@@ -24,30 +24,27 @@ AtmosHandler.prototype.timeline = function(req) {
 	}, this.collectionName, where, sort);
 };
 
-AtmosHandler.prototype.send = function(req) {
-	req.getBodyAsJSON(this, function(bodyJSON) {
-		atmos.log('bodyJSON: ' + JSON.stringify(bodyJSON));
-		if (Object.keys(bodyJSON).length > 0) {
-			var sessionId = req.getSessionId();
-			req.getCurrentUserId(this, function(currentUserId) {
-				AtmosHandler.prototype.persistor.insert(
-					function(replyJSON) {
-						req.sendResponse(JSON.stringify(replyJSON));
-					},
-					this.collectionName,
-					bodyJSON,
-					currentUserId
-				);
-			},
-			sessionId);
-		}
-		else {
-			req.sendResponse('');
-		}
-	});
+AtmosHandler.prototype.sendInternal = function(req, dataJSON) {
+	if (Object.keys(dataJSON).length > 0) {
+		var sessionId = req.getSessionId();
+		req.getCurrentUserId(this, function(currentUserId) {
+			AtmosHandler.prototype.persistor.insert(
+				function(replyJSON) {
+					req.sendResponse(JSON.stringify(replyJSON));
+				},
+				this.collectionName,
+				dataJSON,
+				currentUserId
+			);
+		},
+		sessionId);
+	}
+	else {
+		req.sendResponse('');
+	}
 };
 
-AtmosHandler.prototype.destroy = function(req) {
+AtmosHandler.prototype.destroyInternal = function(req) {
 	req.getBodyAsJSON(this, function(bodyJSON) {
 		var id = bodyJSON[AtmosHandler.prototype.persistor.pk];
 		if (id != null) {

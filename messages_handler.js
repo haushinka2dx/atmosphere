@@ -9,30 +9,39 @@ function Messages() {
 Messages.prototype = Object.create(AtmosHandler.prototype);
 Messages.prototype.constructor = Messages;
 
-Messages.prototype.say = function(req) {
+Messages.prototype.timeline = function(req) {
+	this.timelineInternal(req);
+};
+
+Messages.prototype.send = function(req) {
 	req.getBodyAsJSON(this, function(bodyJSON) {
-		atmos.log('bodyJSON: ' + JSON.stringify(bodyJSON));
-		if (Object.keys(bodyJSON).length > 0) {
-			var sessionId = req.getSessionId();
-			atmos.auth.getCurrentUser(
-				this,
-				function(currentUserId) {
-					Messages.prototype.persistor.insert(
-						function(replyJSON) {
-							req.sendResponse(JSON.stringify(replyJSON));
-						},
-						this.collectionName,
-						bodyJSON,
-						currentUserId
-					);
-				},
-				sessionId
-			);
-		}
-		else {
-			req.sendResponse('');
-		}
+		var msg = bodyJSON['message'];
+		var replyTo = bodyJSON['reply_to'];
+
+		// extract user_ids from message
+		var addresses = this.extractAddresses(msg);
+
+		var dataJSON = {};
+		dataJSON['message'] = msg;
+		dataJSON['addresses'] = addresses;
+		dataJSON['reply_to'] = replyTo;
+		this.sendInternal(req, dataJSON);
 	});
+};
+
+Messages.prototype.destroy = function(req) {
+	this.destroyInternal(req);
+};
+
+Messages.prototype.extractAddresses = function(msg) {
+	var addressList = new Array();
+	var pattern = /[^@.-_a-zA-Z0-9]@([a-zA-Z0-9.-_]+)/g;
+	var tempMsg = ' ' + msg + ' ';
+	var address;
+	while (address = pattern.exec(tempMsg)) {
+		addressList.push(address[1]);
+	}
+	return addressList;
 };
 
 function getMessagesHandler() {

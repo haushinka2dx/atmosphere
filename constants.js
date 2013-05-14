@@ -10,8 +10,6 @@ PathInfo.prototype = {
 	categoryNameAuth : 'auth',
 
 	subCategoryNameTimeline : 'timeline',
-	subCategoryNameSay : 'say',
-	subCategoryNameTalk : 'talk',
 	subCategoryNameSend : 'send',
 	subCategoryNameListen : 'listen',
 	subCategoryNameStatus : 'status',
@@ -25,8 +23,7 @@ PathInfo.prototype = {
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
-PathInfo.prototype.pMessagesSay = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSay);
-PathInfo.prototype.pMessagesTalk = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTalk);
+PathInfo.prototype.pMessagesSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMessagesDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pMessagesResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameResponse);

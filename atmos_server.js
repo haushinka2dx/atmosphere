@@ -5,7 +5,6 @@ load('announce_handler.js');
 load('private_handler.js');
 load('monolog_handler.js');
 load('auth_handler.js');
-load('request_info.js');
 
 /// main function
 function main() {
@@ -27,8 +26,7 @@ function main() {
 
 	// url patterns and handlers for POST method
 	var patternsPOST = {};
-	patternsPOST[atmos.constants.pathInfo.pMessagesSay] = [messagesHandler, messagesHandler.say, true];
-	patternsPOST[atmos.constants.pathInfo.pMessagesTalk] = [messagesHandler, messagesHandler.talk, true];
+	patternsPOST[atmos.constants.pathInfo.pMessagesSend] = [messagesHandler, messagesHandler.send, true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesCancel] = [null, function(req) { req.response.end(); }, true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesDestroy] = [messagesHandler, messagesHandler.destroy, true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesResponse] = [null, function(req) { req.response.end(); }, true];
