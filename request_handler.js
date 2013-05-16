@@ -11,6 +11,9 @@ CommonHandler.prototype = {
 	returnMessageSystemError : "Unexpected error occured.",
 
 	paramNameSearchCondition : "where",
+	paramNameCount : "count",
+	paramNameFutureThan : "future_than",
+	paramNamePastThan : "past_than",
 	paramNameUpdateInformation : "update_info",
 	persistor : atmos.persistor,
 

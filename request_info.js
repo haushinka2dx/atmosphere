@@ -55,11 +55,26 @@ RequestInfo.prototype.getQueryAsJSON = function() {
 		return this.queryAsJSON;
 	}
 	this.queryAsJSON = {};
-	var keyValues = /[^&]+/.exec(this.req.query);
-	for (var i = 0; i < keyValues.length; i++) {
-		var keyValue = /[^=]+/.exec(keyValues[i]);
-		var key = keyValue[0];
-		var value = keyValue.length > 1 ? keyValue[1] : '';
+	var p1 = /[^&]+/g;
+	var keyValue;
+	while (keyValue = p1.exec(this.req.query)) {
+		var p2 = /[^=]+/g;
+		var kvpos = 0;
+		var keyOrValue;
+		var key;
+		var value;
+		while (keyOrValue = p2.exec(keyValue[0])) {
+			if (kvpos === 0) {
+				key = keyOrValue[0];
+			}
+			else if (kvpos === 1) {
+				value = keyOrValue[0];
+			}
+			else {
+				//ignore
+			}
+			kvpos++;
+		}
 		this.queryAsJSON[key] = value;
 	}
 	return this.queryAsJSON;

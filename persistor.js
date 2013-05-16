@@ -16,13 +16,36 @@ Persistor.prototype = {
 	createdAt : "created_at",
 	createdBy : "created_by",
 
-	find : function(callback, collName, where, sort) {
-		Persistor.prototype.eb().send(Persistor.prototype.pa, {
-			"action" : "find",
-			"collection" : collName,
-			"matcher" : where,
-			"sort" : sort
-		}, callback);
+	condLessThan : "$lt",
+	condGreaterThan : "$gt",
+
+	find : function(callback, collName, where, futureThan, pastThan, sort, limit) {
+		var createdAtRange = {};
+		if (futureThan != null && futureThan instanceof Date) {
+			createdAtRange[Persistor.prototype.condGreaterThan] = futureThan;
+		}
+		if (pastThan != null && pastThan instanceof Date) {
+			createdAtRange[Persistor.prototype.condLessThan] = pastThan;
+		}
+		if (Object.keys(createdAtRange).length > 0) {
+			where[Persistor.prototype.createdAt] = createdAtRange;
+		}
+
+		var ebMsg = {};
+		ebMsg['action'] = "find";
+		ebMsg['collection'] = collName;
+		ebMsg['matcher'] = where;
+		ebMsg['sort'] = sort;
+	 	if (limit > 0) {
+			ebMsg['limit'] = limit;
+		}
+		atmos.log("find msg: " + JSON.stringify(ebMsg));
+
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			ebMsg,
+			callback
+		);
 	},
 
 	insert : function(callback, collName, document, userId, createdAt) {

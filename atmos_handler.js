@@ -15,13 +15,56 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 		where = JSON.parse(cond);
 	}
 
+	var futureThan = null;
+	var futureThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+	if (futureThanSrc != null && futureThanSrc.length > 0) {
+		futureThan = AtmosHandler.prototype.parseUTC(futureThanSrc);
+	}
+
+	var pastThan = null;
+	var pastThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+	if (pastThanSrc != null && pastThanSrc.length > 0) {
+		pastThan = AtmosHandler.prototype.parseUTC(pastThanSrc);
+	}
+
+	var limit = -1;
+	var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+	atmos.log('count: ' + count);
+	if (count != null && count > 0) {
+		limit = count;
+	}
+
 	// default sort new -> old
 	var sort = {};
 	sort[AtmosHandler.prototype.persistor.createdAt] = -1;
 
 	AtmosHandler.prototype.persistor.find(function(ret) {
-		req.sendResponse(JSON.stringify(ret));
-	}, this.collectionName, where, sort);
+		if (ret['status'] === 'ok') {
+			var res = {};
+			res['status'] = 'ok';
+			res['count'] = ret['number'];
+			res['results'] = ret['results'];
+			var oldestDate = null;
+			var latestDate = null;
+			for (var ii=0; ii<ret['results'].length; ii++) {
+				var resDate = ret['results'][ii]['created_at'];
+				if (resDate) {
+					if (oldestDate == null || oldestDate > resDate) {
+						oldestDate = resDate;
+					}
+					if (latestDate == null || latestDate < resDate) {
+						latestDate = resDate;
+					}
+				}
+			}
+			res['oldest_created_at'] = oldestDate != null ? oldestDate : '';
+			res['latest_created_at'] = latestDate != null ? latestDate : '';
+			req.sendResponse(JSON.stringify(res));
+		}
+		else {
+			req.sendResponse(JSON.stringify(ret));
+		}
+	}, this.collectionName, where, futureThan, pastThan, sort, limit);
 };
 
 AtmosHandler.prototype.sendInternal = function(req, dataJSON) {
@@ -62,5 +105,11 @@ AtmosHandler.prototype.destroyInternal = function(req) {
 			req.sendResponse(JSON.stringify(res), 400);
 		}
 	});
+};
+
+AtmosHandler.prototype.parseUTC = function(dateString) {
+	var pattern = /([1-9][0-9]{3})-([01][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})Z/;
+	var d = pattern.exec(dateString);
+	return new Date(Date.UTC(d[1],parseInt(d[2],10)-1,d[3],d[4],d[5],d[6],d[7]));
 };
 
