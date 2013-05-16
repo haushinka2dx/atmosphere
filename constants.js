@@ -8,6 +8,8 @@ PathInfo.prototype = {
 	categoryNameRelationship : 'relationship',
 	categoryNameRead : 'read',
 	categoryNameAuth : 'auth',
+	categoryNameUser : 'user',
+	categoryNameGroup : 'group',
 
 	subCategoryNameTimeline : 'timeline',
 	subCategoryNameSend : 'send',
@@ -20,6 +22,8 @@ PathInfo.prototype = {
 	subCategoryNameLogin : "login",
 	subCategoryNameLogout : "logout",
 	subCategoryNameWhoami : "whoami",
+	subCategoryNameRegister : "register",
+	subCategoryNameList : "list",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -48,6 +52,8 @@ PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categ
 PathInfo.prototype.pAuthLogin = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogin);
 PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogout);
 PathInfo.prototype.pAuthWhoami = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameWhoami);
+PathInfo.prototype.pUserList = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameList);
+PathInfo.prototype.pUserRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameRegister);
 
 function getPathInfo() {
 	var p = new PathInfo();

@@ -5,6 +5,7 @@ load('announce_handler.js');
 load('private_handler.js');
 load('monolog_handler.js');
 load('auth_handler.js');
+load('user_handler.js');
 
 /// main function
 function main() {
@@ -13,6 +14,7 @@ function main() {
 	var privateHandler = getPrivateHandler();
 	var monologHandler = getMonologHandler();
 	var authHandler = getAuthHandler();
+	var userHandler = getUserHandler();
 
 	// url patterns and handlers for GET method
 	var patternsGET = {};
@@ -23,6 +25,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [null, function(req) { req.response.end(); }, true];
 	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [authHandler, authHandler.logout, true];
 	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [authHandler, authHandler.whoami, true];
+	patternsGET[atmos.constants.pathInfo.pUserList] = [userHandler, userHandler.list, true];
 
 	// url patterns and handlers for POST method
 	var patternsPOST = {};

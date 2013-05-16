@@ -15,20 +15,15 @@ Persistor.prototype = {
 	pk : "_id",
 	createdAt : "created_at",
 	createdBy : "created_by",
+	userId : "username",
 
 	condLessThan : "$lt",
 	condGreaterThan : "$gt",
 
-	find : function(callback, collName, where, futureThan, pastThan, sort, limit) {
-		var createdAtRange = {};
-		if (futureThan != null && futureThan instanceof Date) {
-			createdAtRange[Persistor.prototype.condGreaterThan] = futureThan;
-		}
-		if (pastThan != null && pastThan instanceof Date) {
-			createdAtRange[Persistor.prototype.condLessThan] = pastThan;
-		}
-		if (Object.keys(createdAtRange).length > 0) {
-			where[Persistor.prototype.createdAt] = createdAtRange;
+	find : function(callback, collName, where, rangeCondition, sort, limit) {
+		var rangeConditionJSON = rangeCondition.toJSON();
+		if (Object.keys(rangeConditionJSON).length > 0) {
+			where[rangeCondition.columnName] = rangeConditionJSON;
 		}
 
 		var ebMsg = {};
@@ -114,3 +109,24 @@ function getPersistor() {
 	var p = new Persistor();
 	return p;
 }
+
+
+var RangeCondition = function(columnName) {
+	this.columnName = columnName;
+	this.greaterThan = null;
+	this.lessThan = null;
+};
+RangeCondition.prototype = {
+	gt : "$gt",
+	lt : "$lt",
+	toJSON : function() {
+		var condition = {};
+		if (this.greaterThan != null) {
+			condition[this.gt] = this.greaterThan;
+		}
+		if (this.lessThan != null) {
+			condition[this.lt] = this.lessThan;
+		}
+		return condition;
+	}
+};

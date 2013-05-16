@@ -1,4 +1,5 @@
 load('request_handler.js');
+load('persistor.js');
 
 function AtmosHandler(cName) {
 	CommonHandler.apply(this);
@@ -15,16 +16,15 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 		where = JSON.parse(cond);
 	}
 
-	var futureThan = null;
+	var createdAtRange = new RangeCondition(Persistor.prototype.createdAt);
 	var futureThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 	if (futureThanSrc != null && futureThanSrc.length > 0) {
-		futureThan = AtmosHandler.prototype.parseUTC(futureThanSrc);
+		createdAtRange.greaterThan = AtmosHandler.prototype.parseUTC(futureThanSrc);
 	}
 
-	var pastThan = null;
 	var pastThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 	if (pastThanSrc != null && pastThanSrc.length > 0) {
-		pastThan = AtmosHandler.prototype.parseUTC(pastThanSrc);
+		createdAtRange.lessThan = AtmosHandler.prototype.parseUTC(pastThanSrc);
 	}
 
 	var limit = -1;
@@ -64,7 +64,7 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 		else {
 			req.sendResponse(JSON.stringify(ret));
 		}
-	}, this.collectionName, where, futureThan, pastThan, sort, limit);
+	}, this.collectionName, where, createdAtRange, sort, limit);
 };
 
 AtmosHandler.prototype.sendInternal = function(req, dataJSON) {
