@@ -27,6 +27,10 @@ Private.prototype.destroy = function(req) {
 	this.destroyInternal(req);
 };
 
+Private.prototype.response = function(req) {
+	this.responseInternal(req);
+};
+
 function getPrivateHandler() {
 	var private = new Private();
 	return private;

@@ -30,6 +30,10 @@ Announce.prototype.destroy = function(req) {
 	this.destroyInternal(req);
 };
 
+Announce.prototype.response = function(req) {
+	this.responseInternal(req);
+};
+
 Announce.prototype.extractGroupIds = function(msg) {
 	var groupIdList = new Array();
 	var pattern = /[^@.-_a-zA-Z0-9]@@([a-zA-Z0-9.-_]+)/g;

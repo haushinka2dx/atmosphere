@@ -45,7 +45,6 @@ PathInfo.prototype.pMonologTimeline = createRouteMatcherPattern(PathInfo.prototy
 PathInfo.prototype.pMonologSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pMonologCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMonologDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameDestroy);
-PathInfo.prototype.pMonologResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameResponse);
 PathInfo.prototype.pRelationshipStatus = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameStatus);
 PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListen);
 PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet);
@@ -62,6 +61,32 @@ function getPathInfo() {
 
 function createRouteMatcherPattern(category, subCategory) {
 	return '/' + category + '/' + subCategory;
+}
+
+var ResponseAction = function() {
+};
+ResponseAction.prototype = {
+	memo : "memo",
+	usefull : "usefull",
+	good : "good",
+	fun : "fun",
+	all : function() {
+		return [ ResponseAction.prototype.memo, ResponseAction.prototype.usefull, ResponseAction.prototype.good, ResponseAction.prototype.fun ];
+	},
+	contains : function(action) {
+		var all = ResponseAction.prototype.all();
+		for (var i=0; i<all.length; i++) {
+			if (action === all[i]) {
+				return true;
+			}
+		}
+		return false;
+	},
+}
+
+function getResponseAction() {
+	var r = new ResponseAction();
+	return r;
 }
 
 var Constants = function() {
@@ -82,6 +107,7 @@ Constants.prototype = {
 	authCollectionName : "users",
 	headerNameSessionId : "atmosphere-session-id",
 	pathInfo : getPathInfo(),
+	responseAction : getResponseAction(),
 };
 
 function getConstants() {

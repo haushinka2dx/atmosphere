@@ -9,6 +9,8 @@ function AtmosHandler(cName) {
 AtmosHandler.prototype = Object.create(CommonHandler.prototype);
 AtmosHandler.prototype.constructor = AtmosHandler;
 
+AtmosHandler.prototype.responseCollectionName = 'response';
+
 AtmosHandler.prototype.timelineInternal = function(req) {
 	var where = {};
 	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
@@ -104,6 +106,69 @@ AtmosHandler.prototype.destroyInternal = function(req) {
 			var res = AtmosHandler.prototype.createResponse(AtmosHandler.prototype.returnCodeArgumentMissingError, 'Destroy requires "_id"');
 			req.sendResponse(JSON.stringify(res), 400);
 		}
+	});
+};
+
+AtmosHandler.prototype.responseInternal = function(req) {
+	var targetCollection = this.collectionName;
+	req.getBodyAsJSON(this, function(bodyJSON) {
+		var targetId = bodyJSON['target_id'];
+		var action = bodyJSON['action'];
+		var sessionId = req.getSessionId();
+		req.getCurrentUserId(this, function(currentUserId) {
+			if (atmos.constants.responseAction.contains(action)) {
+				//search target message
+				this.persistor.findOne(
+					function(existRet) {
+						if (existRet['status'] === 'ok' && existRet['number'] === 1) {
+							if (existRet['results'][0]['created_by'] != currentUserId) {
+								var where = {};
+								where['target_id'] = targetId;
+								where['action'] = action;
+								where['created_by'] = currentUserId;
+								Messages.prototype.persistor.find(
+									function(dupRet) {
+										if (dupRet['status'] === 'ok' && dupRet['number'] === 0) {
+											var response = {};
+											response['target_collection'] = targetCollection;
+											response['target_id'] = targetId;
+											response['action'] = action;
+											Messages.prototype.persistor.insert(
+												function(insRet) {
+													req.sendResponse(JSON.stringify(insRet));
+												},
+												AtmosHandler.prototype.responseCollectionName,
+												response,
+												currentUserId
+											);
+										}
+										else {
+											req.sendResponse("You aleady responded.", 400);
+										}
+									},
+									AtmosHandler.prototype.responseCollectionName,
+									where,
+									null,
+									null,
+									1
+								);
+							}
+							else {
+								req.sendResponse("You can not respond your own message.", 400);
+							}
+						}
+						else {
+							req.sendResponse("There is no message assigned by 'targetId'.", 400);
+						}
+					},
+					targetCollection,
+					targetId
+				);
+			}
+			else {
+				req.sendResponse("'action' must be " + atmos.constants.responseAction.all() + ".", 400);
+			}
+		});
 	});
 };
 

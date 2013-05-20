@@ -21,19 +21,43 @@ Persistor.prototype = {
 	condGreaterThan : "$gt",
 
 	find : function(callback, collName, where, rangeCondition, sort, limit) {
-		var rangeConditionJSON = rangeCondition.toJSON();
-		if (Object.keys(rangeConditionJSON).length > 0) {
-			where[rangeCondition.columnName] = rangeConditionJSON;
+		if (typeof(rangeCondition) != 'undefined' && rangeCondition != null) {
+			var rangeConditionJSON = rangeCondition.toJSON();
+			if (Object.keys(rangeConditionJSON).length > 0) {
+				where[rangeCondition.columnName] = rangeConditionJSON;
+			}
 		}
 
 		var ebMsg = {};
 		ebMsg['action'] = "find";
 		ebMsg['collection'] = collName;
-		ebMsg['matcher'] = where;
-		ebMsg['sort'] = sort;
+		if (typeof(where) != 'undefined' && where != null) {
+			ebMsg['matcher'] = where;
+		}
+		if (typeof(sort) != 'undefined' && sort != null) {
+			ebMsg['sort'] = sort;
+		}
 	 	if (limit > 0) {
 			ebMsg['limit'] = limit;
 		}
+		atmos.log("find msg: " + JSON.stringify(ebMsg));
+
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			ebMsg,
+			callback
+		);
+	},
+
+	findOne : function(callback, collName, _id) {
+		var where = {};
+		where[Persistor.prototype.pk] = _id;
+
+		var ebMsg = {};
+		ebMsg['action'] = "find";
+		ebMsg['collection'] = collName;
+		ebMsg['matcher'] = where;
+		ebMsg['limit'] = 1;
 		atmos.log("find msg: " + JSON.stringify(ebMsg));
 
 		Persistor.prototype.eb().send(
