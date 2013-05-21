@@ -67,6 +67,39 @@ Persistor.prototype = {
 		);
 	},
 
+	findIn : function(callback, collName, where, inCondition, sort, limit) {
+		var w = {};
+		if (typeof(where) != 'undefined' && where != null && Object.keys(where).length > 0) {
+			w = where;
+		}
+		var inConditionJSON = inCondition.toJSON();
+		if (Object.keys(inConditionJSON).length > 0) {
+			for (var k in inConditionJSON) {
+				w[k] = inConditionJSON[k];
+			}
+		}
+
+		var ebMsg = {};
+		ebMsg['action'] = "find";
+		ebMsg['collection'] = collName;
+		if (Object.keys(w).length > 0) {
+			ebMsg['matcher'] = w;
+		}
+		if (typeof(sort) != 'undefined' && sort != null) {
+			ebMsg['sort'] = sort;
+		}
+	 	if (limit > 0) {
+			ebMsg['limit'] = limit;
+		}
+		atmos.log("find msg: " + JSON.stringify(ebMsg));
+
+		Persistor.prototype.eb().send(
+			Persistor.prototype.pa,
+			ebMsg,
+			callback
+		);
+	},
+
 	insert : function(callback, collName, document, userId, createdAt) {
 		if (typeof(createdAt) === 'undefined' || createdAt == null) {
 			createdAt = new Date();
@@ -150,6 +183,39 @@ RangeCondition.prototype = {
 		}
 		if (this.lessThan != null) {
 			condition[this.lt] = this.lessThan;
+		}
+		return condition;
+	}
+};
+
+var InCondition = function(columnName) {
+	this.columnName = columnName;
+	this.values = [];
+};
+InCondition.prototype = {
+	or : "$or",
+	addValue : function(value) {
+		if (typeof(value) != 'undefined' && value != null) {
+			this.values.push(value);
+		}
+	},
+	addValues : function(values) {
+		if (typeof(values) != 'undefined' && value != null) {
+			for (var i=0; i<values.length; i++) {
+				this.addValue(values[i]);
+			}
+		}
+	},
+	toJSON : function() {
+		var condition = {};
+		if (this.values.length > 0) {
+			var ors = [];
+			for (var i=0; i<this.values.length; i++) {
+				var o = {};
+				o[this.columnName] = this.values[i];
+				ors.push(o);
+			}
+			condition[this.or] = ors;
 		}
 		return condition;
 	}

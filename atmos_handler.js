@@ -12,6 +12,8 @@ AtmosHandler.prototype.constructor = AtmosHandler;
 AtmosHandler.prototype.responseCollectionName = 'response';
 
 AtmosHandler.prototype.timelineInternal = function(req) {
+	var targetCollection = this.collectionName;
+
 	var where = {};
 	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
 	if (cond != null) {
@@ -45,7 +47,8 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 			var res = {};
 			res['status'] = 'ok';
 			res['count'] = ret['number'];
-			res['results'] = ret['results'];
+			//res['results'] = ret['results'];
+			res['results'] = [];
 			var oldestDate = null;
 			var latestDate = null;
 			for (var ii=0; ii<ret['results'].length; ii++) {
@@ -61,7 +64,47 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 			}
 			res['oldest_created_at'] = oldestDate != null ? oldestDate : '';
 			res['latest_created_at'] = latestDate != null ? latestDate : '';
-			req.sendResponse(JSON.stringify(res));
+
+			var inCondition = new InCondition('target_id');
+			for (var ii=0; ii<ret['results'].length; ii++) {
+				var resId = ret['results'][ii][AtmosHandler.prototype.persistor.pk];
+				inCondition.addValue(resId);
+			}
+			var responseWhere = {};
+			responseWhere['target_collection'] = targetCollection;
+			AtmosHandler.prototype.persistor.findIn(
+				function(retIn) {
+					atmos.log('in result: ' + JSON.stringify(retIn));
+					// convert array to map(key: target_id, value:array of response document)
+					var resMap = new Array();
+					for (var jj=0; jj<retIn['results'].length; jj++) {
+						var response = retIn['results'][jj];
+						var targetId = response['target_id'];
+						if (typeof(resMap[targetId]) === 'undefined' || resMap[targetId] == null) {
+							resMap[targetId] = new Array();
+						}
+						resMap[targetId].push(response);
+					}
+
+					// add response information to each timeline information
+					for (var ii=0; ii<ret['results'].length; ii++) {
+						var tlElement = ret['results'][ii];
+						var responseInfo = AtmosHandler.prototype.createBlankResponseInfo();
+						var responses = resMap[tlElement['_id']];
+						if (typeof(responses) != 'undefined' && responses != null) {
+							for (var iii=0; iii<responses.length; iii++) {
+								responseInfo[responses[iii]['action']].push(responses[iii]);
+							}
+						}
+						tlElement['responses'] = responseInfo;
+						res['results'].push(tlElement);
+					}
+					req.sendResponse(JSON.stringify(res));
+				},
+				'response',
+				responseWhere,
+				inCondition
+			);
 		}
 		else {
 			req.sendResponse(JSON.stringify(ret));
@@ -170,6 +213,15 @@ AtmosHandler.prototype.responseInternal = function(req) {
 			}
 		});
 	});
+};
+
+AtmosHandler.prototype.createBlankResponseInfo = function() {
+	var actions = ResponseAction.prototype.all();
+	var info = {};
+	for (var i=0; i<actions.length; i++) {
+		info[actions[i]] = new Array();
+	}
+	return info;
 };
 
 AtmosHandler.prototype.parseUTC = function(dateString) {
