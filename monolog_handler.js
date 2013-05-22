@@ -9,7 +9,13 @@ Monolog.prototype = Object.create(AtmosHandler.prototype);
 Monolog.constructor = Monolog;
 
 Monolog.prototype.timeline = function(req) {
-	this.timelineInternal(req);
+	this.getTimelineInternal(
+		this,
+		function(timeline) {
+			req.sendResponse(JSON.stringify(timeline));
+		},
+		req
+	);
 };
 
 Monolog.prototype.send = function(req) {

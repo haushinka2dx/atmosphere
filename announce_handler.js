@@ -9,7 +9,21 @@ Announce.prototype = Object.create(AtmosHandler.prototype);
 Announce.prototype.constructor = Announce;
 
 Announce.prototype.timeline = function(req) {
-	this.timelineInternal(req);
+	this.getTimelineInternal(
+		this,
+		function(timeline) {
+			this.appendResponseInfo(
+				this,
+				function(responsedTimelineElements) {
+					timeline['results'] = responsedTimelineElements;
+					req.sendResponse(JSON.stringify(timeline));
+				},
+				timeline['results'],
+				this.collectionName
+			);
+		},
+		req
+	);
 };
 
 Announce.prototype.send = function(req) {

@@ -9,7 +9,21 @@ Private.prototype = Object.create(AtmosHandler.prototype);
 Private.prototype.constructor = Private;
 
 Private.prototype.timeline = function(req) {
-	this.timelineInternal(req);
+	this.getTimelineInternal(
+		this,
+		function(timeline) {
+			this.appendResponseInfo(
+				this,
+				function(responsedTimelineElements) {
+					timeline['results'] = responsedTimelineElements;
+					req.sendResponse(JSON.stringify(timeline));
+				},
+				timeline['results'],
+				this.collectionName
+			);
+		},
+		req
+	);
 };
 
 Private.prototype.send = function(req) {
