@@ -12,6 +12,9 @@ PathInfo.prototype = {
 	categoryNameGroup : 'group',
 
 	subCategoryNameTimeline : 'timeline',
+	subCategoryNameGlobalTimeline : 'global_timeline',
+	subCategoryNameFocusedTimeline : 'focused_timeline',
+	subCategoryNameTalkTimeline : 'talk_timeline',
 	subCategoryNameSend : 'send',
 	subCategoryNameListen : 'listen',
 	subCategoryNameStatus : 'status',
@@ -27,6 +30,9 @@ PathInfo.prototype = {
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
+PathInfo.prototype.pMessagesGlobalTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameGlobalTimeline);
+PathInfo.prototype.pMessagesFocusedTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameFocusedTimeline);
+PathInfo.prototype.pMessagesTalkTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTalkTimeline);
 PathInfo.prototype.pMessagesSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMessagesDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameDestroy);

@@ -18,7 +18,10 @@ function main() {
 
 	// url patterns and handlers for GET method
 	var patternsGET = {};
-	patternsGET[atmos.constants.pathInfo.pMessagesTimeline] = [messagesHandler, messagesHandler.timeline, true];
+	patternsGET[atmos.constants.pathInfo.pMessagesTimeline] = [messagesHandler, messagesHandler.globalTimeline, true];
+	patternsGET[atmos.constants.pathInfo.pMessagesGlobalTimeline] = [messagesHandler, messagesHandler.globalTimeline, true];
+	patternsGET[atmos.constants.pathInfo.pMessagesFocusedTimeline] = [messagesHandler, messagesHandler.focusedTimeline, true];
+	patternsGET[atmos.constants.pathInfo.pMessagesTalkTimeline] = [messagesHandler, messagesHandler.talkTimeline, true];
 	patternsGET[atmos.constants.pathInfo.pAnnounceTimeline] = [announceHandler, announceHandler.timeline, true];
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [privateHandler, privateHandler.timeline, true];
 	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [monologHandler, monologHandler.timeline, true];

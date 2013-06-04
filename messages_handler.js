@@ -9,7 +9,7 @@ function Messages() {
 Messages.prototype = Object.create(AtmosHandler.prototype);
 Messages.prototype.constructor = Messages;
 
-Messages.prototype.timeline = function(req) {
+Messages.prototype.globalTimeline = function(req) {
 	this.getTimelineInternal(
 		this,
 		function(timeline) {
@@ -25,6 +25,49 @@ Messages.prototype.timeline = function(req) {
 		},
 		req
 	);
+};
+
+Messages.prototype.focusedTimeline = function(req) {
+	this.getTimelineInternal(
+		this,
+		function(timeline) {
+			this.appendResponseInfo(
+				this,
+				function(responsedTimelineElements) {
+					timeline['results'] = responsedTimelineElements;
+					req.sendResponse(JSON.stringify(timeline));
+				},
+				timeline['results'],
+				this.collectionName
+			);
+		},
+		req
+	);
+};
+
+Messages.prototype.talkTimeline = function(req) {
+	req.getCurrentUserId(this, function(currentUserId) {
+		var addressesIn = {};
+		addressesIn['$in'] = [ currentUserId ];
+		var additionalCondition = {};
+		additionalCondition['addresses'] = addressesIn;
+		this.getTimelineInternal(
+			this,
+			function(timeline) {
+				this.appendResponseInfo(
+					this,
+					function(responsedTimelineElements) {
+						timeline['results'] = responsedTimelineElements;
+						req.sendResponse(JSON.stringify(timeline));
+					},
+					timeline['results'],
+					this.collectionName
+				);
+			},
+			req,
+			additionalCondition
+		);
+	});
 };
 
 Messages.prototype.send = function(req) {

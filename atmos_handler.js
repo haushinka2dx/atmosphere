@@ -70,11 +70,16 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 	}, this.collectionName, where, createdAtRange, sort, limit);
 };
 
-AtmosHandler.prototype.getTimelineInternal = function(target, callback, req) {
+AtmosHandler.prototype.getTimelineInternal = function(target, callback, req, additionalConditionJSON) {
 	var where = {};
 	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
 	if (cond != null) {
 		where = JSON.parse(cond);
+	}
+	if (typeof(additionalConditionJSON) != 'undefined' && additionalConditionJSON != null) {
+		for (var condKey in additionalConditionJSON) {
+			where[condKey] = additionalConditionJSON[condKey];
+		}
 	}
 
 	var createdAtRange = new RangeCondition(Persistor.prototype.createdAt);
