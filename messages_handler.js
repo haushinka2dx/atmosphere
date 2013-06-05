@@ -1,4 +1,5 @@
 load('atmos_handler.js');
+load('relationship_handler.js');
 
 
 function Messages() {
@@ -28,21 +29,49 @@ Messages.prototype.globalTimeline = function(req) {
 };
 
 Messages.prototype.focusedTimeline = function(req) {
-	this.getTimelineInternal(
-		this,
-		function(timeline) {
-			this.appendResponseInfo(
-				this,
-				function(responsedTimelineElements) {
-					timeline['results'] = responsedTimelineElements;
-					req.sendResponse(JSON.stringify(timeline));
-				},
-				timeline['results'],
-				this.collectionName
-			);
-		},
-		req
-	);
+	req.getCurrentUserId(this, function(currentUserId) {
+		//自分がListenしてるユーザーを取得
+		var relationHandler = getRelationshipHandler();
+		relationHandler.getSpeakers(
+			this,
+			function(res) {
+				atmos.log('result of getSpeakers: ' + JSON.stringify(res));
+				if (res['count'] == 0) {
+					req.sendResponse('You listen nobody.', 400);
+				}
+				else {
+					var speakerUserIds = new Array();
+					var listenRelations = res['results'];
+					for (var i=0; i<listenRelations.length; i++) {
+						var listenRelation = listenRelations[i];
+						speakerUserIds.push(listenRelation['target_user_id']);
+					}
+					var createdByIn = {};
+					createdByIn['$in'] = speakerUserIds;
+					var additionalCondition = {};
+					additionalCondition['created_by'] = createdByIn;
+					this.getTimelineInternal(
+						this,
+						function(timeline) {
+							this.appendResponseInfo(
+								this,
+								function(responsedTimelineElements) {
+									timeline['results'] = responsedTimelineElements;
+									req.sendResponse(JSON.stringify(timeline));
+								},
+								timeline['results'],
+								this.collectionName
+							);
+						},
+						req,
+						additionalCondition
+					);
+				}
+			},
+			currentUserId
+		);
+		
+	});
 };
 
 Messages.prototype.talkTimeline = function(req) {

@@ -17,6 +17,8 @@ PathInfo.prototype = {
 	subCategoryNameTalkTimeline : 'talk_timeline',
 	subCategoryNameSend : 'send',
 	subCategoryNameListen : 'listen',
+	subCategoryNameListeners : 'listeners',
+	subCategoryNameSpeakers : 'speakers',
 	subCategoryNameStatus : 'status',
 	subCategoryNameSet : 'set',
 	subCategoryNameCancel : "cancel",
@@ -53,6 +55,8 @@ PathInfo.prototype.pMonologCancel = createRouteMatcherPattern(PathInfo.prototype
 PathInfo.prototype.pMonologDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pRelationshipStatus = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameStatus);
 PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListen);
+PathInfo.prototype.pRelationshipListeners = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListeners);
+PathInfo.prototype.pRelationshipSpeakers = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameSpeakers);
 PathInfo.prototype.pReadSet = createRouteMatcherPattern(PathInfo.prototype.categoryNameRead, PathInfo.prototype.subCategoryNameSet);
 PathInfo.prototype.pAuthLogin = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogin);
 PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogout);

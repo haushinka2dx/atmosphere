@@ -31,7 +31,8 @@ Atmosphere.prototype = {
 			notFoundHandler = function(req) {
 				Atmosphere.prototype.log('noMatch');
 				dump_request(Atmosphere.prototype.logger, req);
-				req.response.sendFile('json/common/404.json');
+				req.response.statusCode = 404;
+				req.response.end();
 			};
 		}
 

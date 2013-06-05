@@ -4,6 +4,7 @@ load('messages_handler.js');
 load('announce_handler.js');
 load('private_handler.js');
 load('monolog_handler.js');
+load('relationship_handler.js');
 load('auth_handler.js');
 load('user_handler.js');
 
@@ -13,6 +14,7 @@ function main() {
 	var announceHandler = getAnnounceHandler();
 	var privateHandler = getPrivateHandler();
 	var monologHandler = getMonologHandler();
+	var relationHandler = getRelationshipHandler();
 	var authHandler = getAuthHandler();
 	var userHandler = getUserHandler();
 
@@ -26,6 +28,8 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [privateHandler, privateHandler.timeline, true];
 	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [monologHandler, monologHandler.timeline, true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [null, function(req) { req.response.end(); }, true];
+	patternsGET[atmos.constants.pathInfo.pRelationshipListeners] = [relationHandler, relationHandler.listeners, true];
+	patternsGET[atmos.constants.pathInfo.pRelationshipSpeakers] = [relationHandler, relationHandler.speakers, true];
 	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [authHandler, authHandler.logout, true];
 	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [authHandler, authHandler.whoami, true];
 	patternsGET[atmos.constants.pathInfo.pUserList] = [userHandler, userHandler.list, true];
@@ -47,7 +51,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pMonologSend] = [monologHandler, monologHandler.send, true];
 	patternsPOST[atmos.constants.pathInfo.pMonologCancel] = [null, function(req) { req.response.end(); }, true];
 	patternsPOST[atmos.constants.pathInfo.pMonologDestroy] = [monologHandler, monologHandler.destroy, true];
-	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [null, function(req) { req.response.end(); }, true];
+	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [relationHandler, relationHandler.listen, true];
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = [null, function(req) { req.response.end(); }, true];
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [authHandler, authHandler.tryLogin, false];
 
