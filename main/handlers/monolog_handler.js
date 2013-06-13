@@ -1,4 +1,4 @@
-load('atmos_handler.js');
+load('main/handlers/atmos_handler.js');
 
 function Monolog() {
 	var collectionName = "monolog";

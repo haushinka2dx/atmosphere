@@ -1,4 +1,4 @@
-load('atmos_handler.js');
+load('main/handlers/atmos_handler.js');
 
 function Private() {
 	var collectionName = "private";

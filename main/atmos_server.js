@@ -1,12 +1,12 @@
-load('atmosphere.js');
+load('main/core/atmosphere.js');
 load('vertx.js');
-load('messages_handler.js');
-load('announce_handler.js');
-load('private_handler.js');
-load('monolog_handler.js');
-load('relationship_handler.js');
-load('auth_handler.js');
-load('user_handler.js');
+load('main/handlers/messages_handler.js');
+load('main/handlers/announce_handler.js');
+load('main/handlers/private_handler.js');
+load('main/handlers/monolog_handler.js');
+load('main/handlers/relationship_handler.js');
+load('main/handlers/auth_handler.js');
+load('main/handlers/user_handler.js');
 
 /// main function
 function main() {

@@ -1,4 +1,4 @@
-load('request_handler.js');
+load('main/handlers/request_handler.js');
 
 function Auth() {
 	CommonHandler.apply(this);

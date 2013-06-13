@@ -1,6 +1,6 @@
-load('atmos_handler.js');
-load('constants.js');
-load('persistor.js');
+load('main/handlers/atmos_handler.js');
+load('main/core/constants.js');
+load('main/core/persistor.js');
 
 function UserHandler() {
 	var collectionName = getConstants().authCollectionName;

@@ -1,4 +1,4 @@
-load('time_format.js');
+load('main/util/time_format.js');
 
 function plog(logger, msg) {
 	var message = '[' + getCurrentTime() + '] ' + msg;

@@ -1,5 +1,5 @@
-load('atmos_debug.js');
-load('request_info.js');
+load('main/util/atmos_debug.js');
+load('main/net/http/request_info.js');
 
 ///
 /// dispatch HTTP Request handler

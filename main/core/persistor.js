@@ -1,6 +1,6 @@
 load('vertx.js');
-load('atmos_debug.js');
-load('constants.js');
+load('main/util/atmos_debug.js');
+load('main/core/constants.js');
 
 var Persistor = function() {
 };

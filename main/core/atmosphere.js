@@ -1,10 +1,10 @@
 load('vertx.js');
-load('atmos_debug.js');
-load('constants.js');
-load('persistor.js');
-load('request_dispatcher.js');
-load('session_manager.js');
-load('auth_manager.js');
+load('main/util/atmos_debug.js');
+load('main/core/constants.js');
+load('main/core/persistor.js');
+load('main/net/http/request_dispatcher.js');
+load('main/managers/session_manager.js');
+load('main/managers/auth_manager.js');
 
 var Atmosphere = function() {
 };

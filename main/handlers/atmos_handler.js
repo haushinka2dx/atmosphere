@@ -1,5 +1,5 @@
-load('request_handler.js');
-load('persistor.js');
+load('main/handlers/request_handler.js');
+load('main/core/persistor.js');
 
 function AtmosHandler(cName) {
 	CommonHandler.apply(this);

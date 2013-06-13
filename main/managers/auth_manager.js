@@ -1,5 +1,5 @@
 load('vertx.js');
-load('constants.js');
+load('main/core/constants.js');
 
 var AuthManager = function() {
 };

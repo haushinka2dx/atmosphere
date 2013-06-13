@@ -1,5 +1,5 @@
 load('vertx.js');
-load('constants.js');
+load('main/core/constants.js');
 
 function RequestInfo(req) {
 	this.req = req;

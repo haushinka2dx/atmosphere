@@ -1,4 +1,4 @@
-load('atmosphere.js');
+load('main/core/atmosphere.js');
 
 var CommonHandler = function() {
 };

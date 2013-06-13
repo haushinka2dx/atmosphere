@@ -1,3 +1,3 @@
 #!/bin/sh
 
-vertx run atmos_server.js &
+vertx run main/atmos_server.js &

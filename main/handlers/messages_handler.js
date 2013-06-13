@@ -1,5 +1,5 @@
-load('atmos_handler.js');
-load('relationship_handler.js');
+load('main/handlers/atmos_handler.js');
+load('main/handlers/relationship_handler.js');
 
 
 function Messages() {
