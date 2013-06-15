@@ -13,12 +13,14 @@ Persistor.prototype = {
 	},
 
 	pk : "_id",
+	numOfResult : "number",
 	createdAt : "created_at",
 	createdBy : "created_by",
 	userId : "username",
 
 	condLessThan : "$lt",
 	condGreaterThan : "$gt",
+	condIn : "$in",
 
 	find : function(callback, collName, where, rangeCondition, sort, limit) {
 		if (typeof(rangeCondition) != 'undefined' && rangeCondition != null) {
@@ -159,6 +161,19 @@ Persistor.prototype = {
 			"collection" : collName,
 			"matcher" : matcher
 		}, callback);
+	},
+
+	createInCondition : function(columnName, values) {
+		if (atmos.can(columnName) && atmos.can(values)) {
+			var inJson = {};
+			inJson[Persistor.prototype.condIn] = values;
+			var cond = {};
+			cond[columnName] = inJson;
+			return cond;
+		}
+		else {
+			return null;
+		}
 	},
 };
 

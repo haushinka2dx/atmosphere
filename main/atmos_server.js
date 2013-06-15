@@ -54,6 +54,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [relationHandler, relationHandler.listen, true];
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = [null, function(req) { req.response.end(); }, true];
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [authHandler, authHandler.tryLogin, false];
+	patternsPOST[atmos.constants.pathInfo.pUserRegister] = [userHandler, userHandler.regist, false];
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);
 

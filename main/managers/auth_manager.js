@@ -90,6 +90,50 @@ AuthManager.prototype = {
 			sessionId,
 			keys
 		);
+	},
+
+	getCurrentUserInfo : function(callbackInfo, sessionId) {
+		var keys = [ AuthManager.prototype.keynameAtmosSessionId, AuthManager.prototype.keynameUserId ];
+		atmos.session.getValues(
+			function(res) {
+				var atmosSessionId = res[AuthManager.prototype.keynameAtmosSessionId];
+				var currentUserId = res[AuthManager.prototype.keynameUserId];
+				if (atmos.can(atmosSessionId) && atmos.can(currentUserId)) {
+
+					AuthManager.prototype.eb().send(
+						AuthManager.prototype.pa + ".authorise",
+						{
+							"sessionID" : atmosSessionId,
+						},
+						function(res) {
+							if (res['status'] === 'ok') {
+								var userCallback = atmos.createCallback(
+									function(currentUserInfo) {
+										if (atmos.can(callbackInfo)) {
+											callbackInfo.fire(currentUserInfo);
+										}
+									},
+									this 
+								);
+								atmos.user.getUser(
+									userCallback,
+									currentUserId
+								);
+							}
+							else {
+								callbackInfo.fire(null);
+							}
+						}
+					);
+
+				}
+				else {
+					callbackInfo.fire(null);
+				}
+			},
+			sessionId,
+			keys
+		);
 	}
 };
 

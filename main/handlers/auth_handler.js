@@ -10,6 +10,7 @@ Auth.prototype.tryLogin = function(req) {
 	req.getBodyAsJSON(this, function(bodyJSON) {
 		var userId = bodyJSON['user_id'];
 		var password = bodyJSON['password'];
+		var encryptedPassword = atmos.user.encryptPassword(userId, password);
 		atmos.session.start(function(sessionId) {
 			req.sessionId = sessionId;
 			atmos.log('SessionID: ' + sessionId);
@@ -26,7 +27,7 @@ Auth.prototype.tryLogin = function(req) {
 				},
 				req.sessionId,
 				userId,
-				password
+				encryptedPassword
 			);
 		});
 	});
@@ -50,13 +51,12 @@ Auth.prototype.logout = function(req) {
 
 Auth.prototype.whoami = function(req) {
 	var sessionId = req.getSessionId();
-	atmos.auth.getCurrentUser(
-		this,
+	var callbackInfo = atmos.createCallback(
 		function(userInfo) {
 			var userJSON = {};
 			if (userInfo != null) {
 				userJSON['status'] = 'ok';
-				userJSON['user_id'] = userInfo;
+				userJSON['user_id'] = userInfo.user_id;
 			}
 			else {
 				userJSON['status'] = 'error';
@@ -64,6 +64,10 @@ Auth.prototype.whoami = function(req) {
 			}
 			req.sendResponse(JSON.stringify(userJSON));
 		},
+		this
+	);
+	atmos.auth.getCurrentUserInfo(
+		callbackInfo,
 		sessionId
 	);
 }

@@ -2,9 +2,11 @@ load('vertx.js');
 load('main/util/atmos_debug.js');
 load('main/core/constants.js');
 load('main/core/persistor.js');
+load('main/core/callback_info.js');
 load('main/net/http/request_dispatcher.js');
 load('main/managers/session_manager.js');
 load('main/managers/auth_manager.js');
+load('main/managers/user_manager.js');
 
 var Atmosphere = function() {
 };
@@ -21,6 +23,15 @@ Atmosphere.prototype = {
 	persistor : getPersistor(),
 	session : getSessionManager(),
 	auth : getAuthManager(),
+	user : getUserManager(),
+
+	createCallback : function(callback, callbackTarget) {
+		return new CallbackInfo(callback, callbackTarget);
+	},
+
+	can : function(v) {
+		return typeof(v) != 'undefined' && v != null;
+	},
 
 	createHttpServer : function(patternHandlerMapGET, patternHandlerMapPOST, notFoundHandler) {
 		var server = vertx.createHttpServer();

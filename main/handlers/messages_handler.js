@@ -1,6 +1,4 @@
 load('main/handlers/atmos_handler.js');
-load('main/handlers/relationship_handler.js');
-
 
 function Messages() {
 	var collectionName = "messages";
@@ -31,25 +29,16 @@ Messages.prototype.globalTimeline = function(req) {
 Messages.prototype.focusedTimeline = function(req) {
 	req.getCurrentUserId(this, function(currentUserId) {
 		//自分がListenしてるユーザーを取得
-		var relationHandler = getRelationshipHandler();
-		relationHandler.getSpeakers(
-			this,
-			function(res) {
-				atmos.log('result of getSpeakers: ' + JSON.stringify(res));
-				if (res['count'] == 0) {
+		var getSpeakersCallback = atmos.createCallback(
+			function(speakerUserIds) {
+				if (speakerUserIds.length === 0) {
 					req.sendResponse('You listen nobody.', 400);
 				}
 				else {
-					var speakerUserIds = new Array();
-					var listenRelations = res['results'];
-					for (var i=0; i<listenRelations.length; i++) {
-						var listenRelation = listenRelations[i];
-						speakerUserIds.push(listenRelation['target_user_id']);
-					}
-					var createdByIn = {};
-					createdByIn['$in'] = speakerUserIds;
-					var additionalCondition = {};
-					additionalCondition['created_by'] = createdByIn;
+					var additionalCondition = this.persistor.createInCondition(
+						'created_by',
+						speakerUserIds
+					);
 					this.getTimelineInternal(
 						this,
 						function(timeline) {
@@ -68,9 +57,12 @@ Messages.prototype.focusedTimeline = function(req) {
 					);
 				}
 			},
+			this
+		);
+		atmos.user.getSpeakers(
+			getSpeakersCallback,
 			currentUserId
 		);
-		
 	});
 };
 
