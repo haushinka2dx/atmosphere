@@ -9,35 +9,48 @@ Announce.prototype = Object.create(AtmosHandler.prototype);
 Announce.prototype.constructor = Announce;
 
 Announce.prototype.timeline = function(req) {
-	this.getTimelineInternal(
-		this,
+	var timelineInternalCallback = atmos.createCallback(
 		function(timeline) {
-			this.appendResponseInfo(
-				this,
+			var appendResponseCallback = atmos.createCallback(
 				function(responsedTimelineElements) {
 					timeline['results'] = responsedTimelineElements;
 					req.sendResponse(JSON.stringify(timeline));
 				},
+				this
+			);
+			this.appendResponseInfo(
+				appendResponseCallback,
 				timeline['results'],
 				this.collectionName
 			);
 		},
+		this
+	);
+
+	this.getTimelineInternal(
+		timelineInternalCallback,
 		req
 	);
 };
 
 Announce.prototype.send = function(req) {
-	req.getBodyAsJSON(this, function(bodyJSON) {
-		var msg = bodyJSON['message'];
-
-		// extract group_ids from message
-		var groupIds = this.extractGroupIds(msg);
-
-		var dataJSON = {};
-		dataJSON['message'] = msg;
-		dataJSON['addresses'] = groupIds;
-		this.sendInternal(req, dataJSON);
-	});
+	var getBodyAsJSONCallback = atmos.createCallback(
+		function(bodyJSON) {
+			var msg = bodyJSON['message'];
+	
+			// extract group_ids from message
+			var groupIds = this.extractGroupIds(msg);
+	
+			var dataJSON = {};
+			dataJSON['message'] = msg;
+			dataJSON['addresses'] = groupIds;
+			this.sendInternal(req, dataJSON);
+		},
+		this
+	);
+	req.getBodyAsJSON(
+		getBodyAsJSONCallback
+	);
 };
 
 Announce.prototype.destroy = function(req) {

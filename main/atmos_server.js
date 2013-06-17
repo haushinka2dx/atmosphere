@@ -20,41 +20,41 @@ function main() {
 
 	// url patterns and handlers for GET method
 	var patternsGET = {};
-	patternsGET[atmos.constants.pathInfo.pMessagesTimeline] = [messagesHandler, messagesHandler.globalTimeline, true];
-	patternsGET[atmos.constants.pathInfo.pMessagesGlobalTimeline] = [messagesHandler, messagesHandler.globalTimeline, true];
-	patternsGET[atmos.constants.pathInfo.pMessagesFocusedTimeline] = [messagesHandler, messagesHandler.focusedTimeline, true];
-	patternsGET[atmos.constants.pathInfo.pMessagesTalkTimeline] = [messagesHandler, messagesHandler.talkTimeline, true];
-	patternsGET[atmos.constants.pathInfo.pAnnounceTimeline] = [announceHandler, announceHandler.timeline, true];
-	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [privateHandler, privateHandler.timeline, true];
-	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [monologHandler, monologHandler.timeline, true];
-	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [null, function(req) { req.response.end(); }, true];
-	patternsGET[atmos.constants.pathInfo.pRelationshipListeners] = [relationHandler, relationHandler.listeners, true];
-	patternsGET[atmos.constants.pathInfo.pRelationshipSpeakers] = [relationHandler, relationHandler.speakers, true];
-	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [authHandler, authHandler.logout, true];
-	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [authHandler, authHandler.whoami, true];
-	patternsGET[atmos.constants.pathInfo.pUserList] = [userHandler, userHandler.list, true];
+	patternsGET[atmos.constants.pathInfo.pMessagesTimeline] = [atmos.createCallback(messagesHandler.globalTimeline, messagesHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMessagesGlobalTimeline] = [atmos.createCallback(messagesHandler.globalTimeline, messagesHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMessagesFocusedTimeline] = [atmos.createCallback(messagesHandler.focusedTimeline, messagesHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMessagesTalkTimeline] = [atmos.createCallback(messagesHandler.talkTimeline, messagesHandler), true];
+	patternsGET[atmos.constants.pathInfo.pAnnounceTimeline] = [atmos.createCallback(announceHandler.timeline, announceHandler), true];
+	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [atmos.createCallback(privateHandler.timeline, privateHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [atmos.createCallback(monologHandler.timeline, monologHandler), true];
+	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
+	patternsGET[atmos.constants.pathInfo.pRelationshipListeners] = [atmos.createCallback(relationHandler.listeners, relationHandler), true];
+	patternsGET[atmos.constants.pathInfo.pRelationshipSpeakers] = [atmos.createCallback(relationHandler.speakers, relationHandler), true];
+	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [atmos.createCallback(authHandler.logout, authHandler), true];
+	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [atmos.createCallback(authHandler.whoami, authHandler), true];
+	patternsGET[atmos.constants.pathInfo.pUserList] = [atmos.createCallback(userHandler.list, userHandler), true];
 
 	// url patterns and handlers for POST method
 	var patternsPOST = {};
-	patternsPOST[atmos.constants.pathInfo.pMessagesSend] = [messagesHandler, messagesHandler.send, true];
-	patternsPOST[atmos.constants.pathInfo.pMessagesCancel] = [null, function(req) { req.response.end(); }, true];
-	patternsPOST[atmos.constants.pathInfo.pMessagesDestroy] = [messagesHandler, messagesHandler.destroy, true];
-	patternsPOST[atmos.constants.pathInfo.pMessagesResponse] = [messagesHandler, messagesHandler.response, true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceSend] = [announceHandler, announceHandler.send, true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceCancel] = [null, function(req) { req.response.end(); }, true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceDestroy] = [announceHandler, announceHandler.destroy, true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceResponse] = [announceHandler, announceHandler.response, true];
-	patternsPOST[atmos.constants.pathInfo.pPrivateSend] = [privateHandler, privateHandler.send, true];
-	patternsPOST[atmos.constants.pathInfo.pPrivateCancel] = [null, function(req) { req.response.end(); }, true];
-	patternsPOST[atmos.constants.pathInfo.pPrivateDestroy] = [privateHandler, privateHandler.destroy, true];
-	patternsPOST[atmos.constants.pathInfo.pPrivateResponse] = [privateHandler, privateHandler.response, true];
-	patternsPOST[atmos.constants.pathInfo.pMonologSend] = [monologHandler, monologHandler.send, true];
-	patternsPOST[atmos.constants.pathInfo.pMonologCancel] = [null, function(req) { req.response.end(); }, true];
-	patternsPOST[atmos.constants.pathInfo.pMonologDestroy] = [monologHandler, monologHandler.destroy, true];
-	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [relationHandler, relationHandler.listen, true];
-	patternsPOST[atmos.constants.pathInfo.pReadSet] = [null, function(req) { req.response.end(); }, true];
-	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [authHandler, authHandler.tryLogin, false];
-	patternsPOST[atmos.constants.pathInfo.pUserRegister] = [userHandler, userHandler.regist, false];
+	patternsPOST[atmos.constants.pathInfo.pMessagesSend] = [atmos.createCallback(messagesHandler.send, messagesHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pMessagesCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
+	patternsPOST[atmos.constants.pathInfo.pMessagesDestroy] = [atmos.createCallback(messagesHandler.destroy, messagesHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pMessagesResponse] = [atmos.createCallback(messagesHandler.response, messagesHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pAnnounceSend] = [atmos.createCallback(announceHandler.send, announceHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pAnnounceCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
+	patternsPOST[atmos.constants.pathInfo.pAnnounceDestroy] = [atmos.createCallback(announceHandler.destroy, announceHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pAnnounceResponse] = [atmos.createCallback(announceHandler.response, announceHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pPrivateSend] = [atmos.createCallback(privateHandler.send, privateHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pPrivateCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
+	patternsPOST[atmos.constants.pathInfo.pPrivateDestroy] = [atmos.createCallback(privateHandler.destroy, privateHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pPrivateResponse] = [atmos.createCallback(privateHandler.response, privateHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pMonologSend] = [atmos.createCallback(monologHandler.send, monologHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pMonologCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
+	patternsPOST[atmos.constants.pathInfo.pMonologDestroy] = [atmos.createCallback(monologHandler.destroy, monologHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [atmos.createCallback(relationHandler.listen, relationHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pReadSet] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
+	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [atmos.createCallback(authHandler.tryLogin, authHandler), false];
+	patternsPOST[atmos.constants.pathInfo.pUserRegister] = [atmos.createCallback(userHandler.regist, userHandler), false];
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);
 

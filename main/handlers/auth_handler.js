@@ -7,30 +7,36 @@ Auth.prototype = Object.create(CommonHandler.prototype);
 Auth.prototype.constructor = Announce;
 
 Auth.prototype.tryLogin = function(req) {
-	req.getBodyAsJSON(this, function(bodyJSON) {
-		var userId = bodyJSON['user_id'];
-		var password = bodyJSON['password'];
-		var encryptedPassword = atmos.user.encryptPassword(userId, password);
-		atmos.session.start(function(sessionId) {
-			req.sessionId = sessionId;
-			atmos.log('SessionID: ' + sessionId);
-			atmos.auth.login(
-				function(res) {
-					var response;
-					if (res) {
-						response = { 'status' : 'login successful', 'session_id' : sessionId };
-					}
-					else {
-						response = { 'status' : 'login failed' };
-					}
-					req.sendResponse(JSON.stringify(response));
-				},
-				req.sessionId,
-				userId,
-				encryptedPassword
-			);
-		});
-	});
+	var getBodyAsJSONCallback = atmos.createCallback(
+		function(bodyJSON) {
+			var userId = bodyJSON['user_id'];
+			var password = bodyJSON['password'];
+			var encryptedPassword = atmos.user.encryptPassword(userId, password);
+			atmos.session.start(function(sessionId) {
+				req.sessionId = sessionId;
+				atmos.log('SessionID: ' + sessionId);
+				atmos.auth.login(
+					function(res) {
+						var response;
+						if (res) {
+							response = { 'status' : 'login successful', 'session_id' : sessionId };
+						}
+						else {
+							response = { 'status' : 'login failed' };
+						}
+						req.sendResponse(JSON.stringify(response));
+					},
+					req.sessionId,
+					userId,
+					encryptedPassword
+				);
+			});
+		},
+		this
+	);
+	req.getBodyAsJSON(
+		getBodyAsJSONCallback
+	);
 };
 
 Auth.prototype.logout = function(req) {

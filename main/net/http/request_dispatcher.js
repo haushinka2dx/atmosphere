@@ -4,7 +4,7 @@ load('main/net/http/request_info.js');
 ///
 /// dispatch HTTP Request handler
 ///
-function dispatchRequestHandler(routeMatcher, pattern, method, target, handler, requiresAuth, logger) {
+function dispatchRequestHandler(routeMatcher, pattern, method, handlerInfo, requiresAuth, logger) {
 	var wrappedHandler = function(req) {
 		if (typeof(logger) != 'undefined') {
 			plog(logger, '[' + method + ']' + pattern + ' was started.');
@@ -13,27 +13,33 @@ function dispatchRequestHandler(routeMatcher, pattern, method, target, handler, 
 		
 		// 最初にRequestのBodyを取得しておかないと後で取得できなくなるのでここで一度取得しておく
 		var requestInfo = new RequestInfo(req);
-		requestInfo.getBodyAsJSON(
-			this,
+		var getBodyAsJSONCallback = atmos.createCallback(
 			function(bodyJSON) {
 				// login check
 				if (requiresAuth) {
-					requestInfo.getCurrentUserId(
-						this,
+					var getCurrentUserIdCallback = atmos.createCallback(
 						function(currentUserId) {
 							if (currentUserId != null) {
-								handler.call(target, requestInfo);
+								handlerInfo.fire(requestInfo);
 							}
 							else {
 								requestInfo.sendResponse('', 401);
 							}
-						}
+						},
+						this
+					);
+					requestInfo.getCurrentUserId(
+						getCurrentUserIdCallback
 					);
 				}
 				else {
-					handler.call(target, requestInfo);
+					handlerInfo.fire(requestInfo);
 				}
-			}
+			},
+			this
+		);
+		requestInfo.getBodyAsJSON(
+			getBodyAsJSONCallback
 		);
 
 		if (typeof(logger) != 'undefined') {

@@ -9,32 +9,44 @@ Private.prototype = Object.create(AtmosHandler.prototype);
 Private.prototype.constructor = Private;
 
 Private.prototype.timeline = function(req) {
-	this.getTimelineInternal(
-		this,
+	var timelineInternalCallback = atmos.createCallback(
 		function(timeline) {
-			this.appendResponseInfo(
-				this,
+			var appendResponseCallback = atmos.createCallback(
 				function(responsedTimelineElements) {
 					timeline['results'] = responsedTimelineElements;
 					req.sendResponse(JSON.stringify(timeline));
 				},
+				this
+			);
+			this.appendResponseInfo(
+				appendResponseCallback,
 				timeline['results'],
 				this.collectionName
 			);
 		},
+		this
+	);
+	this.getTimelineInternal(
+		timelineInternalCallback,
 		req
 	);
 };
 
 Private.prototype.send = function(req) {
-	req.getBodyAsJSON(this, function(bodyJSON) {
-		var to = bodyJSON['to_user_id'];
-		var msg = bodyJSON['message'];
-		var dataJSON = {};
-		dataJSON['to_user_id'] = to;
-		dataJSON['message'] = msg;
-		this.sendInternal(req, dataJSON);
-	});
+	var getBodyAsJSONCallback = atmos.createCallback(
+		function(bodyJSON) {
+			var to = bodyJSON['to_user_id'];
+			var msg = bodyJSON['message'];
+			var dataJSON = {};
+			dataJSON['to_user_id'] = to;
+			dataJSON['message'] = msg;
+			this.sendInternal(req, dataJSON);
+		},
+		this
+	);
+	req.getBodyAsJSON(
+		getBodyAsJSONCallback
+	);
 };
 
 Private.prototype.destroy = function(req) {

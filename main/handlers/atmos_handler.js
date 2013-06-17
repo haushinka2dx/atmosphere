@@ -70,7 +70,7 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 	}, this.collectionName, where, createdAtRange, sort, limit);
 };
 
-AtmosHandler.prototype.getTimelineInternal = function(target, callback, req, additionalConditionJSON) {
+AtmosHandler.prototype.getTimelineInternal = function(callbackInfo, req, additionalConditionJSON) {
 	var where = {};
 	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
 	if (cond != null) {
@@ -126,15 +126,19 @@ AtmosHandler.prototype.getTimelineInternal = function(target, callback, req, add
 			res['oldest_created_at'] = oldestDate != null ? oldestDate : '';
 			res['latest_created_at'] = latestDate != null ? latestDate : '';
 
-			callback.call(target, res);
+			if (atmos.can(callbackInfo)) {
+				callbackInfo.fire(res);
+			}
 		}
 		else {
-			callback.call(target, ret);
+			if (atmos.can(callbackInfo)) {
+				callbackInfo.fire(ret);
+			}
 		}
 	}, this.collectionName, where, createdAtRange, sort, limit);
 };
 
-AtmosHandler.prototype.appendResponseInfo = function(target, callback, timelineElements, timelineCollection) {
+AtmosHandler.prototype.appendResponseInfo = function(callbackInfo, timelineElements, timelineCollection) {
 	var inCondition = new InCondition('target_id');
 	for (var i=0; i<timelineElements.length; i++) {
 		var tlElementId = timelineElements[i][AtmosHandler.prototype.persistor.pk];
@@ -171,7 +175,9 @@ AtmosHandler.prototype.appendResponseInfo = function(target, callback, timelineE
 				tlElement['responses'] = responseInfo;
 				appendedTimelineElements.push(tlElement);
 			}
-			callback.call(target, appendedTimelineElements);
+			if (atmos.can(callbackInfo)) {
+				callbackInfo.fire(appendedTimelineElements);
+			}
 		},
 		'response',
 		responseWhere,
@@ -182,17 +188,22 @@ AtmosHandler.prototype.appendResponseInfo = function(target, callback, timelineE
 AtmosHandler.prototype.sendInternal = function(req, dataJSON) {
 	if (Object.keys(dataJSON).length > 0) {
 		var sessionId = req.getSessionId();
-		req.getCurrentUserId(this, function(currentUserId) {
-			AtmosHandler.prototype.persistor.insert(
-				function(replyJSON) {
-					req.sendResponse(JSON.stringify(replyJSON));
-				},
-				this.collectionName,
-				dataJSON,
-				currentUserId
-			);
-		},
-		sessionId);
+		var getCurrentUserIdCallback = atmos.createCallback(
+			function(currentUserId) {
+				AtmosHandler.prototype.persistor.insert(
+					function(replyJSON) {
+						req.sendResponse(JSON.stringify(replyJSON));
+					},
+					this.collectionName,
+					dataJSON,
+					currentUserId
+				);
+			},
+			this
+		);
+		req.getCurrentUserId(
+			getCurrentUserIdCallback
+		);
 	}
 	else {
 		req.sendResponse('');
@@ -200,86 +211,104 @@ AtmosHandler.prototype.sendInternal = function(req, dataJSON) {
 };
 
 AtmosHandler.prototype.destroyInternal = function(req) {
-	req.getBodyAsJSON(this, function(bodyJSON) {
-		var id = bodyJSON[AtmosHandler.prototype.persistor.pk];
-		if (id != null) {
-			try {
-				AtmosHandler.prototype.persistor.remove(function(replyJSON) {
-					req.sendResponse(JSON.stringify(replyJSON));
-				}, this.collectionName, id);
-			} catch (ex) {
-				atmos.log(ex);
-				var res = AtmosHandler.prototype.createResponse(AtmosHandler.prototype.returnCodeSystemError, ex.message);
-				req.sendResponse(JSON.stringify(res), 500);
+	var getBodyAsJSONCallback = atmos.createCallback(
+		function(bodyJSON) {
+			var id = bodyJSON[AtmosHandler.prototype.persistor.pk];
+			if (id != null) {
+				try {
+					AtmosHandler.prototype.persistor.remove(function(replyJSON) {
+						req.sendResponse(JSON.stringify(replyJSON));
+					}, this.collectionName, id);
+				} catch (ex) {
+					atmos.log(ex);
+					var res = AtmosHandler.prototype.createResponse(AtmosHandler.prototype.returnCodeSystemError, ex.message);
+					req.sendResponse(JSON.stringify(res), 500);
+				}
+			} else {
+				var res = AtmosHandler.prototype.createResponse(AtmosHandler.prototype.returnCodeArgumentMissingError, 'Destroy requires "_id"');
+				req.sendResponse(JSON.stringify(res), 400);
 			}
-		} else {
-			var res = AtmosHandler.prototype.createResponse(AtmosHandler.prototype.returnCodeArgumentMissingError, 'Destroy requires "_id"');
-			req.sendResponse(JSON.stringify(res), 400);
-		}
-	});
+		},
+		this
+	);
+	req.getBodyAsJSON(
+		getBodyAsJSONCallback
+	);
 };
 
 AtmosHandler.prototype.responseInternal = function(req) {
 	var targetCollection = this.collectionName;
-	req.getBodyAsJSON(this, function(bodyJSON) {
-		var targetId = bodyJSON['target_id'];
-		var action = bodyJSON['action'];
-		var sessionId = req.getSessionId();
-		req.getCurrentUserId(this, function(currentUserId) {
-			if (atmos.constants.responseAction.contains(action)) {
-				//search target message
-				this.persistor.findOne(
-					function(existRet) {
-						if (existRet['status'] === 'ok' && existRet['number'] === 1) {
-							if (existRet['results'][0]['created_by'] != currentUserId) {
-								var where = {};
-								where['target_id'] = targetId;
-								where['action'] = action;
-								where['created_by'] = currentUserId;
-								Messages.prototype.persistor.find(
-									function(dupRet) {
-										if (dupRet['status'] === 'ok' && dupRet['number'] === 0) {
-											var response = {};
-											response['target_collection'] = targetCollection;
-											response['target_id'] = targetId;
-											response['action'] = action;
-											Messages.prototype.persistor.insert(
-												function(insRet) {
-													req.sendResponse(JSON.stringify(insRet));
-												},
-												AtmosHandler.prototype.responseCollectionName,
-												response,
-												currentUserId
-											);
-										}
-										else {
-											req.sendResponse("You aleady responded.", 400);
-										}
-									},
-									AtmosHandler.prototype.responseCollectionName,
-									where,
-									null,
-									null,
-									1
-								);
-							}
-							else {
-								req.sendResponse("You can not respond your own message.", 400);
-							}
-						}
-						else {
-							req.sendResponse("There is no message assigned by 'targetId'.", 400);
-						}
-					},
-					targetCollection,
-					targetId
-				);
-			}
-			else {
-				req.sendResponse("'action' must be " + atmos.constants.responseAction.all() + ".", 400);
-			}
-		});
-	});
+	var getBodyAsJSONCallback = atmos.createCallback(
+		function(bodyJSON) {
+			var targetId = bodyJSON['target_id'];
+			var action = bodyJSON['action'];
+			var sessionId = req.getSessionId();
+			var getCurrentUserIdCallback = atmos.createCallback(
+				function(currentUserId) {
+					if (atmos.constants.responseAction.contains(action)) {
+						//search target message
+						this.persistor.findOne(
+							function(existRet) {
+								if (existRet['status'] === 'ok' && existRet['number'] === 1) {
+									if (existRet['results'][0]['created_by'] != currentUserId) {
+										var where = {};
+										where['target_id'] = targetId;
+										where['action'] = action;
+										where['created_by'] = currentUserId;
+										Messages.prototype.persistor.find(
+											function(dupRet) {
+												if (dupRet['status'] === 'ok' && dupRet['number'] === 0) {
+													var response = {};
+													response['target_collection'] = targetCollection;
+													response['target_id'] = targetId;
+													response['action'] = action;
+													Messages.prototype.persistor.insert(
+														function(insRet) {
+															req.sendResponse(JSON.stringify(insRet));
+														},
+														AtmosHandler.prototype.responseCollectionName,
+														response,
+														currentUserId
+													);
+												}
+												else {
+													req.sendResponse("You aleady responded.", 400);
+												}
+											},
+											AtmosHandler.prototype.responseCollectionName,
+											where,
+											null,
+											null,
+											1
+										);
+									}
+									else {
+										req.sendResponse("You can not respond your own message.", 400);
+									}
+								}
+								else {
+									req.sendResponse("There is no message assigned by 'targetId'.", 400);
+								}
+							},
+							targetCollection,
+							targetId
+						);
+					}
+					else {
+						req.sendResponse("'action' must be " + atmos.constants.responseAction.all() + ".", 400);
+					}
+				},
+				this
+			);
+			req.getCurrentUserId(
+				getCurrentUserIdCallback
+			);
+		},
+		this
+	);
+	req.getBodyAsJSON(
+		getBodyAsJSONCallback
+	);
 };
 
 AtmosHandler.prototype.createBlankResponseInfo = function() {

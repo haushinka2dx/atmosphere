@@ -16,26 +16,29 @@ RequestInfo.prototype.getSessionId = function() {
 	return this.sessionId;
 };
 
-RequestInfo.prototype.getCurrentUserId = function(target, callback) {
+RequestInfo.prototype.getCurrentUserId = function(callbackInfo) {
 	if (this.currentUserId != null) {
-		callback.call(target, this.currentUserId);
+		callbackInfo.fire(this.currentUserId);
 	}
 	else {
 		var sessionId = this.getSessionId();
 		if (sessionId != null) {
-			atmos.auth.getCurrentUser(
-				this,
+			var getCurrentUserCallback = atmos.createCallback(
 				function(userId) {
 					if (userId != null) {
 						this.currentUserId = userId;
 					}
-					callback.call(target, userId);
+					callbackInfo.fire(userId);
 				},
+				this
+			);
+			atmos.auth.getCurrentUser(
+				getCurrentUserCallback,
 				sessionId
 			);
 		}
 		else {
-			callback.call(target, null);
+			callbackInfo.fire(null);
 		}
 	}
 };
@@ -97,9 +100,9 @@ RequestInfo.prototype.getParamsAsJSON = function() {
 	return this.paramsAsJSON;
 };
 
-RequestInfo.prototype.getBodyAsJSON = function(target, callback) {
+RequestInfo.prototype.getBodyAsJSON = function(callbackInfo) {
 	if (this.bodyJSON != null) {
-		callback.call(target, this.bodyJSON);
+		callbackInfo.fire(this.bodyJSON);
 	}
 	else {
 		var body = new vertx.Buffer();
@@ -121,7 +124,7 @@ RequestInfo.prototype.getBodyAsJSON = function(target, callback) {
 					bodyJSON = {};
 				}
 				this.bodyJSON = bodyJSON;
-				callback.call(target, bodyJSON);
+				callbackInfo.fire(bodyJSON);
 			};
 			inner.call(reqInfo);
 		});
