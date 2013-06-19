@@ -7,6 +7,7 @@ load('main/net/http/request_dispatcher.js');
 load('main/managers/session_manager.js');
 load('main/managers/auth_manager.js');
 load('main/managers/user_manager.js');
+load('main/managers/messages_manager.js');
 
 var Atmosphere = function() {
 };
@@ -24,6 +25,7 @@ Atmosphere.prototype = {
 	session : getSessionManager(),
 	auth : getAuthManager(),
 	user : getUserManager(),
+	messages : getMessagesManager(),
 
 	createCallback : function(callback, callbackTarget) {
 		return new CallbackInfo(callback, callbackTarget);
@@ -52,6 +54,12 @@ Atmosphere.prototype = {
 
 		return server;
 	},
+
+	parseUTC : function(dateString) {
+		var pattern = /([1-9][0-9]{3})-([01][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})Z/;
+		var d = pattern.exec(dateString);
+		return new Date(Date.UTC(d[1],parseInt(d[2],10)-1,d[3],d[4],d[5],d[6],d[7]));
+	}
 };
 
 var atmos = new Atmosphere();
