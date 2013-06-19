@@ -16,10 +16,6 @@ MessagesManager.prototype = {
 	cnCreatedBy : 'created_by',
 	cnCreatedAt : 'created_at',
 	cnResponces : 'responses',
-	cnResponseTypeMemo : 'memo',
-	cnResponseTypeUsefull : 'usefull',
-	cnResponseTypeGood : 'good',
-	cnResponseTypeFun : 'fun',
 
 	messageTypeMessage : 'message',
 	messageTypeAnnounce : 'announce',
@@ -143,53 +139,6 @@ MessagesManager.prototype = {
 		}, this.collectionName, where, createdAtRange, sort, limit);
 	},
 
-	appendResponseInfo : function(callbackInfo, timelineElements, timelineCollection) {
-		var inCondition = new InCondition('target_id');
-		for (var i=0; i<timelineElements.length; i++) {
-			var tlElementId = timelineElements[i][MessagesManager.prototype.persistor.pk];
-			inCondition.addValue(tlElementId);
-		}
-		var responseWhere = {};
-		responseWhere['target_collection'] = timelineCollection;
-		MessagesManager.prototype.persistor.findIn(
-			function(retIn) {
-				atmos.log('in result: ' + JSON.stringify(retIn));
-				// convert array to map(key: target_id, value:array of response document)
-				var resMap = new Array();
-				var responseList = retIn['results'];
-				for (var j=0; j<responseList.length; j++) {
-					var response = responseList[j];
-					var targetId = response['target_id'];
-					if (typeof(resMap[targetId]) === 'undefined' || resMap[targetId] == null) {
-						resMap[targetId] = new Array();
-					}
-					resMap[targetId].push(response);
-				}
-	
-				// add response information to each timeline information
-				var appendedTimelineElements = new Array();
-				for (var ii=0; ii<timelineElements.length; ii++) {
-					var tlElement = timelineElements[ii];
-					var responseInfo = MessagesManager.prototype.createBlankResponseInfo();
-					var responses = resMap[tlElement[MessagesManager.prototype.persistor.pk]];
-					if (typeof(responses) != 'undefined' && responses != null) {
-						for (var iii=0; iii<responses.length; iii++) {
-							responseInfo[responses[iii]['action']].push(responses[iii]);
-						}
-					}
-					tlElement['responses'] = responseInfo;
-					appendedTimelineElements.push(tlElement);
-				}
-				if (atmos.can(callbackInfo)) {
-					callbackInfo.fire(appendedTimelineElements);
-				}
-			},
-			'response',
-			responseWhere,
-			inCondition
-		);
-	},
-
 	send : function(callbackInfo, message, messageType, toUsers, toGroups, replyTo, createdBy) {
 		if (atmos.can(message) && atmos.can(createdBy)) {
 			var dataJSON = {};
@@ -201,6 +150,9 @@ MessagesManager.prototype = {
 			dataJSON[MessagesManager.prototype.cnAddresses] = addresses;
 			dataJSON[MessagesManager.prototype.cnReplyTo] = replyTo;
 			dataJSON[MessagesManager.prototype.cnCreatedBy] = createdBy;
+
+			var blankResponseInfo = MessagesManager.prototype.createBlankResponseInfo();
+			dataJSON[MessagesManager.prototype.cnResponces] = blankResponseInfo;
 
 			MessagesManager.prototype.persistor.insert(
 				function(replyJSON) {
@@ -272,48 +224,58 @@ MessagesManager.prototype = {
 		}
 	},
 	
-	respond : function(callbackInfo, targetId, action, respondedBy) {
-		var targetCollection = this.collectionName;
-		if (atmos.constants.responseAction.contains(action)) {
+	addResponse : function(callbackInfo, targetMessageId, respondedBy, responseAction) {
+		MessagesManager.prototype.changeResponse(callbackInfo, targetMessageId, respondedBy, responseAction, 'add');
+	},
+
+	removeResponse : function(callbackInfo, targetMessageId, respondedBy, responseAction) {
+		MessagesManager.prototype.changeResponse(callbackInfo, targetMessageId, respondedBy, responseAction, 'remove');
+	},
+
+	changeResponse : function(callbackInfo, targetMessageId, respondedBy, responseAction, operation) {
+		if (atmos.constants.responseAction.contains(responseAction)) {
 			//search target message
-			MessagesManager.persistor.findOne(
+			MessagesManager.prototype.persistor.findOne(
 				function(existRet) {
 					if (existRet['status'] === 'ok' && existRet['number'] === 1) {
 						if (existRet['results'][0]['created_by'] != respondedBy) {
-							var where = {};
-							where['target_id'] = targetId;
-							where['action'] = action;
-							where['created_by'] = respondedBy;
-							MessagesManager.prototype.persistor.find(
-								function(dupRet) {
-									if (dupRet['status'] === 'ok' && dupRet['number'] === 0) {
-										var response = {};
-										response['target_collection'] = targetCollection;
-										response['target_id'] = targetId;
-										response['action'] = action;
-										MessagesManager.prototype.persistor.insert(
-											function(insRet) {
-												if (atmos.can(callbackInfo)) {
-													callbackInfo.fire(insRet);
-												}
-											},
-											MessagesManager.prototype.responseCollectionName,
-											response,
-											respondedBy
-										);
-									}
-									else {
+							var currentRespondedByList = existRet['results'][0][MessagesManager.prototype.cnResponces][responseAction];
+							if (operation === 'add' && currentRespondedByList.indexOf(respondedBy) != -1) {
+								if (atmos.can(callbackInfo)) {
+									callbackInfo.fire({"status":"error","message":"You aleady responded."});
+								}
+							}
+							else if (operation === 'remove' && currentRespondedByList.indexOf(respondedBy) === -1) {
+								if (atmos.can(callbackInfo)) {
+									callbackInfo.fire({"status":"error","message":"You do not respond this message."});
+								}
+							}
+							else {
+								var condition = {};
+								condition[MessagesManager.prototype.persistor.pk] = targetMessageId;
+						
+								var responseAddition = {};
+								responseAddition[MessagesManager.prototype.cnResponces + "." + responseAction] = respondedBy;
+						
+								var updateInfo = {};
+								if (operation === 'add') {
+									updateInfo["$addToSet"] = responseAddition;
+								}
+								else if (operation === 'remove') {
+									updateInfo["$pull"] = responseAddition;
+								}
+						
+								MessagesManager.prototype.persistor.updateByCondition(
+									function(res) {
 										if (atmos.can(callbackInfo)) {
-											callbackInfo.fire({"status":"error","message":"You aleady responded."});
+											callbackInfo.fire(res);
 										}
-									}
-								},
-								MessagesManager.prototype.responseCollectionName,
-								where,
-								null,
-								null,
-								1
-							);
+									},
+									MessagesManager.prototype.collectionName,
+									condition,
+									updateInfo
+								);
+							}
 						}
 						else {
 							if (atmos.can(callbackInfo)) {
@@ -327,8 +289,8 @@ MessagesManager.prototype = {
 						}
 					}
 				},
-				targetCollection,
-				targetId
+				MessagesManager.prototype.collectionName,
+				targetMessageId
 			);
 		}
 		else {

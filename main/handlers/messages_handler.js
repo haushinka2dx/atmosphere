@@ -11,18 +11,7 @@ Messages.prototype.constructor = Messages;
 Messages.prototype.globalTimeline = function(req) {
 	var timelineInternalCallback = atmos.createCallback(
 		function(timeline) {
-			var appendResponseCallback = atmos.createCallback(
-				function(responsedTimelineElements) {
-					timeline['results'] = responsedTimelineElements;
-					req.sendResponse(JSON.stringify(timeline));
-				},
-				this
-			);
-			this.appendResponseInfo(
-				appendResponseCallback,
-				timeline['results'],
-				this.collectionName
-			);
+			req.sendResponse(JSON.stringify(timeline));
 		},
 		this
 	);
@@ -65,18 +54,7 @@ Messages.prototype.focusedTimeline = function(req) {
 						);
 						var timelineInternalCallback = atmos.createCallback(
 							function(timeline) {
-								var appendResponseCallback = atmos.createCallback(
-									function(responsedTimelineElements) {
-										timeline['results'] = responsedTimelineElements;
-										req.sendResponse(JSON.stringify(timeline));
-									},
-									this
-								);
-								this.appendResponseInfo(
-									appendResponseCallback,
-									timeline['results'],
-									this.collectionName
-								);
+								req.sendResponse(JSON.stringify(timeline));
 							},
 							this
 						);
@@ -118,19 +96,7 @@ Messages.prototype.talkTimeline = function(req) {
 	
 			var timelineInternalCallback = atmos.createCallback(
 				function(timeline) {
-					var appendResponseCallback = atmos.createCallback(
-						function(responsedTimelineElements) {
-							timeline['results'] = responsedTimelineElements;
-							req.sendResponse(JSON.stringify(timeline));
-						},
-						this
-					);
-	
-					this.appendResponseInfo(
-						appendResponseCallback,
-						timeline['results'],
-						this.collectionName
-					);
+					req.sendResponse(JSON.stringify(timeline));
 				},
 				this
 			);
@@ -236,7 +202,71 @@ Messages.prototype.destroy = function(req) {
 };
 
 Messages.prototype.response = function(req) {
-	this.responseInternal(req);
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var getBodyAsJSONCallback = atmos.createCallback(
+				function(bodyJSON) {
+					var targetMessageId = bodyJSON['target_id'];
+					var responseAction = bodyJSON['action'];
+			
+					var responseCallback = atmos.createCallback(
+						function(res) {
+							req.sendResponse(JSON.stringify(res));
+						},
+						this
+					);
+					atmos.messages.addResponse(
+						responseCallback,
+						targetMessageId,
+						currentUserId,
+						responseAction
+					);
+				},
+				this
+			);
+			req.getBodyAsJSON(
+				getBodyAsJSONCallback
+			);
+		},
+		this
+	);
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
+	);
+};
+
+Messages.prototype.removeResponse = function(req) {
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var getBodyAsJSONCallback = atmos.createCallback(
+				function(bodyJSON) {
+					var targetMessageId = bodyJSON['target_id'];
+					var responseAction = bodyJSON['action'];
+			
+					var responseCallback = atmos.createCallback(
+						function(res) {
+							req.sendResponse(JSON.stringify(res));
+						},
+						this
+					);
+					atmos.messages.removeResponse(
+						responseCallback,
+						targetMessageId,
+						currentUserId,
+						responseAction
+					);
+				},
+				this
+			);
+			req.getBodyAsJSON(
+				getBodyAsJSONCallback
+			);
+		},
+		this
+	);
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
+	);
 };
 
 Messages.prototype.extractAddressesUsers = function(msg) {

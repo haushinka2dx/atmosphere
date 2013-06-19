@@ -40,6 +40,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pMessagesCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesDestroy] = [atmos.createCallback(messagesHandler.destroy, messagesHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesResponse] = [atmos.createCallback(messagesHandler.response, messagesHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pMessagesRemoveResponse] = [atmos.createCallback(messagesHandler.removeResponse, messagesHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pAnnounceSend] = [atmos.createCallback(announceHandler.send, announceHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pAnnounceCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsPOST[atmos.constants.pathInfo.pAnnounceDestroy] = [atmos.createCallback(announceHandler.destroy, announceHandler), true];

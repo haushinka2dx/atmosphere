@@ -24,6 +24,7 @@ PathInfo.prototype = {
 	subCategoryNameCancel : "cancel",
 	subCategoryNameDestroy : "destroy",
 	subCategoryNameResponse : "response",
+	subCategoryNameRemoveResponse : "remove_response",
 	subCategoryNameLogin : "login",
 	subCategoryNameLogout : "logout",
 	subCategoryNameWhoami : "whoami",
@@ -39,6 +40,7 @@ PathInfo.prototype.pMessagesSend = createRouteMatcherPattern(PathInfo.prototype.
 PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMessagesDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pMessagesResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameResponse);
+PathInfo.prototype.pMessagesRemoveResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameRemoveResponse);
 PathInfo.prototype.pAnnounceTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameTimeline);
 PathInfo.prototype.pAnnounceSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pAnnounceCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameCancel);
