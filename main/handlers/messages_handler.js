@@ -116,6 +116,55 @@ Messages.prototype.talkTimeline = function(req) {
 	);
 };
 
+Messages.prototype.announceTimeline = function(req) {
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			//自分が所属しているグループを取得
+			var getAllGroupsCallback = atmos.createCallback(
+				function(groupIds) {
+					if (groupIds.length === 0) {
+						req.sendResponse('You are not belonging to any groups.', 400);
+					}
+					else {
+						var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+						var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+						var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+						var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+						var groupCondition = this.persistor.createInCondition(
+							MessagesManager.prototype.cnAddresses + '.' + MessagesManager.prototype.cnAddressesGroups,
+							groupIds
+						);
+
+						var timelineInternalCallback = atmos.createCallback(
+							function(timeline) {
+								req.sendResponse(JSON.stringify(timeline));
+							},
+							this
+						);
+						atmos.messages.getMessages(
+							timelineInternalCallback,
+							cond,
+							groupCondition,
+							futureThan,
+							pastThan,
+							count
+						);
+					}
+				},
+				this
+			);
+			atmos.user.getAllGroups(
+				getAllGroupsCallback,
+				currentUserId
+			);
+		},
+		this
+	);
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
+	);
+};
+
 Messages.prototype.send = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
 		function(currentUserId) {

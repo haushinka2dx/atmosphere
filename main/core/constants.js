@@ -2,7 +2,6 @@ var PathInfo = function() {
 };
 PathInfo.prototype = {
 	categoryNameMessages : 'messages',
-	categoryNameAnnounce : 'announce',
 	categoryNamePrivate : 'private',
 	categoryNameMonolog : 'monolog',
 	categoryNameRelationship : 'relationship',
@@ -15,6 +14,7 @@ PathInfo.prototype = {
 	subCategoryNameGlobalTimeline : 'global_timeline',
 	subCategoryNameFocusedTimeline : 'focused_timeline',
 	subCategoryNameTalkTimeline : 'talk_timeline',
+	subCategoryNameAnnounceTimeline : 'announce_timeline',
 	subCategoryNameSend : 'send',
 	subCategoryNameListen : 'listen',
 	subCategoryNameListeners : 'listeners',
@@ -36,16 +36,12 @@ PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.protot
 PathInfo.prototype.pMessagesGlobalTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameGlobalTimeline);
 PathInfo.prototype.pMessagesFocusedTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameFocusedTimeline);
 PathInfo.prototype.pMessagesTalkTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTalkTimeline);
+PathInfo.prototype.pMessagesAnnounceTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameAnnounceTimeline);
 PathInfo.prototype.pMessagesSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMessagesDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pMessagesResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameResponse);
 PathInfo.prototype.pMessagesRemoveResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameRemoveResponse);
-PathInfo.prototype.pAnnounceTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameTimeline);
-PathInfo.prototype.pAnnounceSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameSend);
-PathInfo.prototype.pAnnounceCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameCancel);
-PathInfo.prototype.pAnnounceDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameDestroy);
-PathInfo.prototype.pAnnounceResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNameAnnounce, PathInfo.prototype.subCategoryNameResponse);
 PathInfo.prototype.pPrivateTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameTimeline);
 PathInfo.prototype.pPrivateSend = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pPrivateCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameCancel);

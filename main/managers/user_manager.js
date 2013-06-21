@@ -193,6 +193,64 @@ UserManager.prototype = {
 		);
 	},
 
+	getAllGroups : function(callbackInfo, userId) {
+		var getUserCallback = atmos.createCallback(
+			function(userInfo) {
+				if (atmos.can(callbackInfo)) {
+					var groupIds = new Array();
+					var systemGroupIds = userInfo[UserManager.prototype.cnSystemGroups];
+					var userGroupIds = userInfo[UserManager.prototype.cnUserGroups];
+					for (var i=0; i < systemGroupIds.length; i++) {
+						groupIds.push(systemGroupIds[i]);
+					}
+					for (var i=0; i < userGroupIds.length; i++) {
+						groupIds.push(userGroupIds[i]);
+					}
+
+					callbackInfo.fire(groupIds);
+				}
+			},
+			this
+		);
+
+		UserManager.prototype.getUser(
+			getUserCallback,
+			userId
+		);
+	},
+
+	getSystemGroups : function(callbackInfo, userId) {
+		var getUserCallback = atmos.createCallback(
+			function(userInfo) {
+				if (atmos.can(callbackInfo)) {
+					callbackInfo.fire(userInfo[UserManager.prototype.cnSystemGroups]);
+				}
+			},
+			this
+		);
+
+		UserManager.prototype.getUser(
+			getUserCallback,
+			userId
+		);
+	},
+
+	getUserGroups : function(callbackInfo, userId) {
+		var getUserCallback = atmos.createCallback(
+			function(userInfo) {
+				if (atmos.can(callbackInfo)) {
+					callbackInfo.fire(userInfo[UserManager.prototype.cnUserGroups]);
+				}
+			},
+			this
+		);
+
+		UserManager.prototype.getUser(
+			getUserCallback,
+			userId
+		);
+	},
+
 	getUser : function(callbackInfo, userId) {
 		var userCallback = atmos.createCallback(
 			function(userResult) {

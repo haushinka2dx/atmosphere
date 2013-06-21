@@ -1,7 +1,6 @@
 load('main/core/atmosphere.js');
 load('vertx.js');
 load('main/handlers/messages_handler.js');
-load('main/handlers/announce_handler.js');
 load('main/handlers/private_handler.js');
 load('main/handlers/monolog_handler.js');
 load('main/handlers/relationship_handler.js');
@@ -11,7 +10,6 @@ load('main/handlers/user_handler.js');
 /// main function
 function main() {
 	var messagesHandler = getMessagesHandler();
-	var announceHandler = getAnnounceHandler();
 	var privateHandler = getPrivateHandler();
 	var monologHandler = getMonologHandler();
 	var relationHandler = getRelationshipHandler();
@@ -24,7 +22,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pMessagesGlobalTimeline] = [atmos.createCallback(messagesHandler.globalTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMessagesFocusedTimeline] = [atmos.createCallback(messagesHandler.focusedTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMessagesTalkTimeline] = [atmos.createCallback(messagesHandler.talkTimeline, messagesHandler), true];
-	patternsGET[atmos.constants.pathInfo.pAnnounceTimeline] = [atmos.createCallback(announceHandler.timeline, announceHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMessagesAnnounceTimeline] = [atmos.createCallback(messagesHandler.announceTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [atmos.createCallback(privateHandler.timeline, privateHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [atmos.createCallback(monologHandler.timeline, monologHandler), true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
@@ -41,10 +39,6 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pMessagesDestroy] = [atmos.createCallback(messagesHandler.destroy, messagesHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesResponse] = [atmos.createCallback(messagesHandler.response, messagesHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pMessagesRemoveResponse] = [atmos.createCallback(messagesHandler.removeResponse, messagesHandler), true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceSend] = [atmos.createCallback(announceHandler.send, announceHandler), true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceDestroy] = [atmos.createCallback(announceHandler.destroy, announceHandler), true];
-	patternsPOST[atmos.constants.pathInfo.pAnnounceResponse] = [atmos.createCallback(announceHandler.response, announceHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pPrivateSend] = [atmos.createCallback(privateHandler.send, privateHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pPrivateCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsPOST[atmos.constants.pathInfo.pPrivateDestroy] = [atmos.createCallback(privateHandler.destroy, privateHandler), true];

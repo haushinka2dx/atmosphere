@@ -4,7 +4,7 @@ function Auth() {
 	CommonHandler.apply(this);
 }
 Auth.prototype = Object.create(CommonHandler.prototype);
-Auth.prototype.constructor = Announce;
+Auth.prototype.constructor = Auth;
 
 Auth.prototype.tryLogin = function(req) {
 	var getBodyAsJSONCallback = atmos.createCallback(
