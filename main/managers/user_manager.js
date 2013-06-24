@@ -1,5 +1,6 @@
 load('main/core/constants.js');
 load('main/core/persistor.js');
+load('lib/sjcl.min.js');
 
 var UserManager = function() {
 };
@@ -17,9 +18,30 @@ UserManager.prototype = {
 
 	defaultAvator : 'default_avator.png',
 
-	//TODO: requires to encrypt
-	encryptPassword : function(userId, plainPassword) {
-		return plainPassword;
+	createSalt : function(userId, plainPassword) {
+		var p = { iv : getConstants().encryptionIV, salt : getConstants().encryptionSalt };
+		var pw = userId;
+		var src = 'dummyForSalt';
+
+		//make salt
+		var saltResult = sjcl.encrypt(userId, src, p);
+		var saltResultJSON = JSON.parse(saltResult);
+
+		return saltResultJSON.ct;
+	},
+
+	encryptPassword : function(userId, plainPassword, salt) {
+		var aSalt = salt;
+		if (!atmos.can(aSalt)) {
+			aSalt = UserManager.prototype.createSalt(userId, plainPassword);
+		}
+
+		var pw = getConstants().encryptionPassword;
+		var p = { iv : getConstants().encryptionIV, salt : aSalt };
+		var encryptResult = sjcl.encrypt(pw, plainPassword, p);
+		var encryptResultJSON = JSON.parse(encryptResult);
+
+		return encryptResultJSON.ct;
 	},
 
 	regist : function(callbackInfo, userId, plainPassword, currentUserId) {

@@ -62,6 +62,33 @@ function main() {
 
 	vertx.deployModule('vertx.mongo-persistor-v1.2.1', mongoconf, 1, function() {
 		atmos.log('Mongo persistor was deployed.');
+		// TODO: set initial user
+
+		// register administrator if there is no administrator.
+		var adminUserId = getConstants().adminUserId;
+		var getUserCallback = atmos.createCallback(
+			function (userInfo) {
+				if (userInfo == null) {
+					var registCallback = atmos.createCallback(
+						function(res) {
+							atmos.log('Administrator registration result: ' + JSON.stringify(res));
+						},
+						this
+					);
+					atmos.user.regist(
+						registCallback,
+						adminUserId,
+						getConstants().adminPassword,
+						adminUserId
+					);
+				}
+			},
+			this
+		);
+		atmos.user.getUser(
+			getUserCallback,
+			adminUserId
+		);
 	});
 
 	var sessionManagerConf = {

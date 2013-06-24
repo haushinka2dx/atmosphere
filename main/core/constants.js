@@ -116,6 +116,13 @@ Constants.prototype = {
 	headerNameSessionId : "atmosphere-session-id",
 	pathInfo : getPathInfo(),
 	responseAction : getResponseAction(),
+	// TODO: This is used for encrypt the user password. Please change YOUR OWN PASSWORD!!!
+	encryptionPassword : 'TylXnUBvR7K4W7OiB0R1YQ',
+	encryptionIV : 'yiECSaQ3LHiA45A9xnEhKg',
+	encryptionSalt : 'AISjp4NgA+o',
+	// TODO: Please change admin information
+	adminUserId : 'admin',
+	adminPassword : 'password',
 };
 
 function getConstants() {
