@@ -2,7 +2,6 @@ load('main/core/atmosphere.js');
 load('vertx.js');
 load('main/handlers/messages_handler.js');
 load('main/handlers/private_handler.js');
-load('main/handlers/monolog_handler.js');
 load('main/handlers/relationship_handler.js');
 load('main/handlers/auth_handler.js');
 load('main/handlers/user_handler.js');
@@ -11,7 +10,6 @@ load('main/handlers/user_handler.js');
 function main() {
 	var messagesHandler = getMessagesHandler();
 	var privateHandler = getPrivateHandler();
-	var monologHandler = getMonologHandler();
 	var relationHandler = getRelationshipHandler();
 	var authHandler = getAuthHandler();
 	var userHandler = getUserHandler();
@@ -23,8 +21,8 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pMessagesFocusedTimeline] = [atmos.createCallback(messagesHandler.focusedTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMessagesTalkTimeline] = [atmos.createCallback(messagesHandler.talkTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMessagesAnnounceTimeline] = [atmos.createCallback(messagesHandler.announceTimeline, messagesHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMessagesMonologTimeline] = [atmos.createCallback(messagesHandler.monologTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [atmos.createCallback(privateHandler.timeline, privateHandler), true];
-	patternsGET[atmos.constants.pathInfo.pMonologTimeline] = [atmos.createCallback(monologHandler.timeline, monologHandler), true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipListeners] = [atmos.createCallback(relationHandler.listeners, relationHandler), true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipSpeakers] = [atmos.createCallback(relationHandler.speakers, relationHandler), true];
@@ -43,9 +41,6 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pPrivateCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsPOST[atmos.constants.pathInfo.pPrivateDestroy] = [atmos.createCallback(privateHandler.destroy, privateHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pPrivateResponse] = [atmos.createCallback(privateHandler.response, privateHandler), true];
-	patternsPOST[atmos.constants.pathInfo.pMonologSend] = [atmos.createCallback(monologHandler.send, monologHandler), true];
-	patternsPOST[atmos.constants.pathInfo.pMonologCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
-	patternsPOST[atmos.constants.pathInfo.pMonologDestroy] = [atmos.createCallback(monologHandler.destroy, monologHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [atmos.createCallback(relationHandler.listen, relationHandler), true];
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [atmos.createCallback(authHandler.tryLogin, authHandler), false];

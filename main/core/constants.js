@@ -15,6 +15,7 @@ PathInfo.prototype = {
 	subCategoryNameFocusedTimeline : 'focused_timeline',
 	subCategoryNameTalkTimeline : 'talk_timeline',
 	subCategoryNameAnnounceTimeline : 'announce_timeline',
+	subCategoryNameMonologTimeline : 'monolog_timeline',
 	subCategoryNameSend : 'send',
 	subCategoryNameListen : 'listen',
 	subCategoryNameListeners : 'listeners',
@@ -37,6 +38,7 @@ PathInfo.prototype.pMessagesGlobalTimeline = createRouteMatcherPattern(PathInfo.
 PathInfo.prototype.pMessagesFocusedTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameFocusedTimeline);
 PathInfo.prototype.pMessagesTalkTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTalkTimeline);
 PathInfo.prototype.pMessagesAnnounceTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameAnnounceTimeline);
+PathInfo.prototype.pMessagesMonologTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameMonologTimeline);
 PathInfo.prototype.pMessagesSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMessagesDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameDestroy);

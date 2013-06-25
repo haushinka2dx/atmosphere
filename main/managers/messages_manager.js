@@ -19,66 +19,17 @@ MessagesManager.prototype = {
 
 	messageTypeMessage : 'message',
 	messageTypeAnnounce : 'announce',
+	messageTypeMonolog : 'monolog',
 
-	getTimelineInternal : function(callbackInfo, condition, futureThan, pastThan, count) {
+	getMessages : function(callbackInfo, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
 		var where = {};
-		if (atmos.can(condition)) {
-			where = condition;
+		if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
+			var messageTypesCondition = this.persistor.createInCondition(
+				MessagesManager.prototype.cnMessageType,
+				messagesTypes
+			);
+			where = messageTypesCondition;
 		}
-	
-		var createdAtRange = new RangeCondition(MessagesManager.prototype.cnCreatedAt);
-		if (atmos.can(futureThan) && futureThan.length > 0) {
-			createdAtRange.greaterThan = atmos.parseUTC(futureThan);
-		}
-		if (atmos.can(pastThan) && pastThan.length > 0) {
-			createdAtRange.lessThan = atmos.parseUTC(pastThan);
-		}
-	
-		var limit = -1;
-		if (atmos.can(count) && count > 0) {
-			limit = count;
-		}
-	
-		// default sort new -> old
-		var sort = {};
-		sort[MessagesManager.prototype.persistor.createdAt] = -1;
-	
-		MessagesManager.prototype.persistor.find(function(ret) {
-			var messages = {};
-			if (ret['status'] === 'ok') {
-				var res = {};
-				res['status'] = 'ok';
-				res['count'] = ret['number'];
-				res['results'] = ret['results'];
-				var oldestDate = null;
-				var latestDate = null;
-				for (var ii=0; ii<ret['results'].length; ii++) {
-					var resDate = ret['results'][ii]['created_at'];
-					if (resDate) {
-						if (oldestDate == null || oldestDate > resDate) {
-							oldestDate = resDate;
-						}
-						if (latestDate == null || latestDate < resDate) {
-							latestDate = resDate;
-						}
-					}
-				}
-				res['oldest_created_at'] = oldestDate != null ? oldestDate : '';
-				res['latest_created_at'] = latestDate != null ? latestDate : '';
-	
-				messages = res;
-			}
-			else {
-				messages = ret;
-			}
-			if (atmos.can(callbackInfo)) {
-				callbackInfo.fire(messages);
-			}
-		}, this.collectionName, where, createdAtRange, sort, limit);
-	},
-
-	getMessages : function(callbackInfo, condition, additionalConditionJSON, futureThan, pastThan, count) {
-		var where = {};
 		if (atmos.can(condition)) {
 			where = condition;
 		}

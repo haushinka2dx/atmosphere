@@ -26,6 +26,7 @@ Messages.prototype.globalTimeline = function(req) {
 	sort[AtmosHandler.prototype.persistor.createdAt] = -1;
 	atmos.messages.getMessages(
 		timelineInternalCallback,
+		[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
 		cond,
 		null,
 		futureThan,
@@ -60,6 +61,7 @@ Messages.prototype.focusedTimeline = function(req) {
 						);
 						atmos.messages.getMessages(
 							timelineInternalCallback,
+							[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
 							cond,
 							additionalCondition,
 							futureThan,
@@ -102,6 +104,7 @@ Messages.prototype.talkTimeline = function(req) {
 			);
 			atmos.messages.getMessages(
 				timelineInternalCallback,
+				[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
 				cond,
 				additionalCondition,
 				futureThan,
@@ -143,6 +146,7 @@ Messages.prototype.announceTimeline = function(req) {
 						);
 						atmos.messages.getMessages(
 							timelineInternalCallback,
+							[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
 							cond,
 							groupCondition,
 							futureThan,
@@ -165,6 +169,39 @@ Messages.prototype.announceTimeline = function(req) {
 	);
 };
 
+Messages.prototype.monologTimeline = function(req) {
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+			var additionalCondition = {
+				'created_by' : currentUserId
+			};
+			var timelineInternalCallback = atmos.createCallback(
+				function(timeline) {
+					req.sendResponse(JSON.stringify(timeline));
+				},
+				this
+			);
+			atmos.messages.getMessages(
+				timelineInternalCallback,
+				[ atmos.messages.messageTypeMonolog ],
+				cond,
+				additionalCondition,
+				futureThan,
+				pastThan,
+				count
+			);
+		},
+		this
+	);
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
+	);
+};
+
 Messages.prototype.send = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
 		function(currentUserId) {
@@ -172,17 +209,19 @@ Messages.prototype.send = function(req) {
 				function(bodyJSON) {
 					var msg = bodyJSON['message'];
 					var replyTo = bodyJSON['reply_to'];
+					var messageType = bodyJSON['message_type'];
 			
 					// extract user_ids from message
 					var addressesUsers = this.extractAddressesUsers(msg);
 					var addressesGroups = this.extractAddressesGroups(msg);
 
-					var messageType = '';
-					if (addressesGroups.length > 0) {
-						messageType = atmos.messages.messageTypeAnnounce;
-					}
-					else {
-						messageType = atmos.messages.messageTypeMessage;
+					if (messageType !== atmos.messages.messageTypeMonolog) {
+						if (addressesGroups.length > 0) {
+							messageType = atmos.messages.messageTypeAnnounce;
+						}
+						else {
+							messageType = atmos.messages.messageTypeMessage;
+						}
 					}
 			
 					var sendMessageCallback = atmos.createCallback(
