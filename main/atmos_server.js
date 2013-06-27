@@ -5,6 +5,7 @@ load('main/handlers/private_handler.js');
 load('main/handlers/relationship_handler.js');
 load('main/handlers/auth_handler.js');
 load('main/handlers/user_handler.js');
+load('main/handlers/group_handler.js');
 
 /// main function
 function main() {
@@ -13,6 +14,7 @@ function main() {
 	var relationHandler = getRelationshipHandler();
 	var authHandler = getAuthHandler();
 	var userHandler = getUserHandler();
+	var groupHandler = getGroupHandler();
 
 	// url patterns and handlers for GET method
 	var patternsGET = {};
@@ -29,6 +31,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [atmos.createCallback(authHandler.logout, authHandler), true];
 	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [atmos.createCallback(authHandler.whoami, authHandler), true];
 	patternsGET[atmos.constants.pathInfo.pUserList] = [atmos.createCallback(userHandler.list, userHandler), true];
+	patternsGET[atmos.constants.pathInfo.pGroupList] = [atmos.createCallback(groupHandler.list, groupHandler), true];
 
 	// url patterns and handlers for POST method
 	var patternsPOST = {};
@@ -45,6 +48,10 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [atmos.createCallback(authHandler.tryLogin, authHandler), false];
 	patternsPOST[atmos.constants.pathInfo.pUserRegister] = [atmos.createCallback(userHandler.regist, userHandler), false];
+	patternsPOST[atmos.constants.pathInfo.pGroupRegister] = [atmos.createCallback(groupHandler.regist, groupHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pGroupDestroy] = [atmos.createCallback(groupHandler.destroy, groupHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pGroupAddMember] = [atmos.createCallback(groupHandler.addMember, groupHandler), true];
+	patternsPOST[atmos.constants.pathInfo.pGroupRemoveMember] = [atmos.createCallback(groupHandler.removeMember, groupHandler), true];
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);
 
@@ -74,7 +81,8 @@ function main() {
 						registCallback,
 						adminUserId,
 						getConstants().adminPassword,
-						adminUserId
+						adminUserId,
+						true // as admin
 					);
 				}
 			},
@@ -84,6 +92,49 @@ function main() {
 			getUserCallback,
 			adminUserId
 		);
+
+		// register special groups
+		var adminGroupIds = getConstants().adminGroupIds;
+		var addGroupFuncs = [];
+		for (var i = 0; i < adminGroupIds.length; i++) {
+			var adminGroupId = adminGroupIds[i];
+			var addGroupFunc = (function() {
+				var newGroupId = adminGroupId;
+				var newGroupType = atmos.group.groupTypeSystem;
+				var newCreatedBy = getConstants().adminUserId;
+				var func = function() {
+					var getGroupCallback = atmos.createCallback(
+						function (groupInfo) {
+							if (groupInfo == null) {
+								var registCallback = atmos.createCallback(
+									function(res) {
+										atmos.log('Administrator registration result: ' + JSON.stringify(res));
+									},
+									this
+								);
+		
+								atmos.group.regist(
+									registCallback,
+									newGroupId,
+									newGroupType,
+									newCreatedBy
+								);
+							}
+						},
+						this
+					);
+					atmos.group.getGroup(
+						getGroupCallback,
+						adminGroupId
+					);
+				}
+				return func;
+			})();
+			addGroupFuncs.push(addGroupFunc);
+		}
+		for (var j=0; j<addGroupFuncs.length; j++) {
+			addGroupFuncs[j]();
+		}
 	});
 
 	var sessionManagerConf = {

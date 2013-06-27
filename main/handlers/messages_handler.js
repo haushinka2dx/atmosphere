@@ -123,7 +123,7 @@ Messages.prototype.announceTimeline = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
 		function(currentUserId) {
 			//自分が所属しているグループを取得
-			var getAllGroupsCallback = atmos.createCallback(
+			var getGroupsCallback = atmos.createCallback(
 				function(groupIds) {
 					if (groupIds.length === 0) {
 						req.sendResponse('You are not belonging to any groups.', 400);
@@ -157,8 +157,8 @@ Messages.prototype.announceTimeline = function(req) {
 				},
 				this
 			);
-			atmos.user.getAllGroups(
-				getAllGroupsCallback,
+			atmos.user.getGroups(
+				getGroupsCallback,
 				currentUserId
 			);
 		},

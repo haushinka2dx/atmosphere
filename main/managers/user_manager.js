@@ -11,8 +11,7 @@ UserManager.prototype = {
 	cnUserId : 'username',
 	cnPassword : 'password',
 	cnAvator : 'avator',
-	cnSystemGroups : 'system_groups',
-	cnUserGroups : 'user_groups',
+	cnGroups : 'groups',
 	cnRelation : 'relationship',
 	cnRelationTypeListen : 'listen',
 
@@ -44,7 +43,7 @@ UserManager.prototype = {
 		return encryptResultJSON.ct;
 	},
 
-	regist : function(callbackInfo, userId, plainPassword, currentUserId) {
+	regist : function(callbackInfo, userId, plainPassword, currentUserId, asAdmin) {
 		//check if same userId user already exists.
 		var where = {};
 		where[UserManager.prototype.cnUserId] = userId;
@@ -56,8 +55,7 @@ UserManager.prototype = {
 					userInfo[UserManager.prototype.cnUserId] = userId;
 					userInfo[UserManager.prototype.cnPassword] = encryptedPassword;
 					userInfo[UserManager.prototype.cnAvator] = UserManager.prototype.defaultAvator;
-					userInfo[UserManager.prototype.cnSystemGroups] = [];
-					userInfo[UserManager.prototype.cnUserGroups] = [];
+					userInfo[UserManager.prototype.cnGroups] = asAdmin ? atmos.group.adminGroupIds : [];
 					var relationships = {};
 					relationships[UserManager.prototype.cnRelationTypeListen] = [];
 					userInfo[UserManager.prototype.cnRelation] = relationships;
@@ -84,51 +82,72 @@ UserManager.prototype = {
 		);
 	},
 
-	addSystemGroup : function(callbackInfo, userId, systemGroupId) {
-		UserManager.prototype.changeGroup(callbackInfo, userId, systemGroupId, 'system', 'add');
+	addGroup : function(callbackInfo, userId, groupId, currentUserId) {
+		UserManager.prototype.changeGroup(callbackInfo, userId, groupId, currentUserId, 'add');
 	},
 
-	removeSystemGroup : function(callbackInfo, userId, systemGroupId) {
-		UserManager.prototype.changeGroup(callbackInfo, userId, systemGroupId, 'system', 'remove');
+	removeGroup : function(callbackInfo, userId, groupId, currentUserId) {
+		UserManager.prototype.changeGroup(callbackInfo, userId, groupId, currentUserId, 'remove');
 	},
 
-	addUserGroup : function(callbackInfo, userId, userGroupId) {
-		UserManager.prototype.changeGroup(callbackInfo, userId, userGroupId, 'user', 'add');
-	},
-
-	removeUserGroup : function(callbackInfo, userId, userGroupId) {
-		UserManager.prototype.changeGroup(callbackInfo, userId, userGroupId, 'user', 'remove');
-	},
-
-	changeGroup : function(callbackInfo, userId, groupId, groupType, operation) {
-		var condition = {};
-		condition[UserManager.prototype.cnUserId] = userId;
-
-		var groupAddition = {};
-		if (groupType === 'system') {
-			groupAddition[UserManager.prototype.cnSystemGroups] = groupId;
-		}
-		else {
-			groupAddition[UserManager.prototype.cnUserGroups] = groupId;
-		}
-
-		var updateInfo = {};
-		if (operation === 'add') {
-			updateInfo["$addToSet"] = groupAddition;
-		}
-		else if (operation === 'remove') {
-			updateInfo["$pull"] = speakerAddition;
-		}
-
-		UserManager.prototype.persistor.updateByCondition(
-			function(res) {
-				if (atmos.can(callbackInfo)) {
-					callbackInfo.fire(res);
+	changeGroup : function(callbackInfo, userId, groupId, currentUserId, operation) {
+		var groupInfoCallback = atmos.createCallback(
+			function(groupInfo) {
+				if (atmos.can(groupInfo)) {
+					// the user having administrator privilege can manipulate group information if the target group is system group
+					var hasPrivilegeCallback = atmos.createCallback(
+						function(hasPrivilege) {
+							if (groupInfo[atmos.group.cnGroupType] !== atmos.group.groupTypeSystem || hasPrivilege) {
+								var condition = {};
+								condition[UserManager.prototype.cnUserId] = userId;
+						
+								var groupAddition = {};
+								groupAddition[UserManager.prototype.cnGroups] = groupId;
+						
+								var updateInfo = {};
+								if (operation === 'add') {
+									updateInfo["$addToSet"] = groupAddition;
+								}
+								else if (operation === 'remove') {
+									updateInfo["$pull"] = groupAddition;
+								}
+						
+								UserManager.prototype.persistor.updateByCondition(
+									function(res) {
+										if (atmos.can(callbackInfo)) {
+											callbackInfo.fire(res);
+										}
+									},
+									UserManager.prototype.collectionName,
+									condition,
+									updateInfo
+								);
+							}
+							else {
+								if (atmos.can(callbackInfo)) {
+									callbackInfo.fire({"status":"error", "message":"You have no privilege to manipulate the system group."});
+								}
+							}
+						},
+						this
+					);
+					UserManager.prototype.hasAdministratorPrivilege(
+						hasPrivilegeCallback,
+						currentUserId
+					);
+				}
+				else {
+					if (atmos.can(callbackInfo)) {
+						callbackInfo.fire({"status":"error", "message":"There is no group which id is '" + groupId + "'."});
+					}
 				}
 			},
-			UserManager.prototype.collectionName,
-			condition,
-			updateInfo
+			this
+		);
+
+		atmos.group.getGroup(
+			groupInfoCallback,
+			groupId
 		);
 	},
 
@@ -215,53 +234,12 @@ UserManager.prototype = {
 		);
 	},
 
-	getAllGroups : function(callbackInfo, userId) {
+	getGroups : function(callbackInfo, userId) {
 		var getUserCallback = atmos.createCallback(
 			function(userInfo) {
 				if (atmos.can(callbackInfo)) {
-					var groupIds = new Array();
-					var systemGroupIds = userInfo[UserManager.prototype.cnSystemGroups];
-					var userGroupIds = userInfo[UserManager.prototype.cnUserGroups];
-					for (var i=0; i < systemGroupIds.length; i++) {
-						groupIds.push(systemGroupIds[i]);
-					}
-					for (var i=0; i < userGroupIds.length; i++) {
-						groupIds.push(userGroupIds[i]);
-					}
-
+					var groupIds = userInfo[UserManager.prototype.cnGroups];
 					callbackInfo.fire(groupIds);
-				}
-			},
-			this
-		);
-
-		UserManager.prototype.getUser(
-			getUserCallback,
-			userId
-		);
-	},
-
-	getSystemGroups : function(callbackInfo, userId) {
-		var getUserCallback = atmos.createCallback(
-			function(userInfo) {
-				if (atmos.can(callbackInfo)) {
-					callbackInfo.fire(userInfo[UserManager.prototype.cnSystemGroups]);
-				}
-			},
-			this
-		);
-
-		UserManager.prototype.getUser(
-			getUserCallback,
-			userId
-		);
-	},
-
-	getUserGroups : function(callbackInfo, userId) {
-		var getUserCallback = atmos.createCallback(
-			function(userInfo) {
-				if (atmos.can(callbackInfo)) {
-					callbackInfo.fire(userInfo[UserManager.prototype.cnUserGroups]);
 				}
 			},
 			this
@@ -342,6 +320,44 @@ UserManager.prototype = {
 		);
 	},
 
+	hasAdministratorPrivilege : function(callbackInfo, userId) {
+		var getUserCallback = atmos.createCallback(
+			function(userInfo) {
+				if (userInfo == null) {
+					if (atmos.can(callbackInfo)) {
+						callbackInfo.fire(false);
+					}
+				}
+				else {
+					var result = false;
+					var adminGroupIds = atmos.group.adminGroupIds;
+					var userBelongingGroupIds = userInfo[UserManager.prototype.cnGroups];
+					for (var i=0; i<adminGroupIds.length; i++) {
+						var testAdminGroupId = adminGroupIds[i];
+						for (var j=0; j<userBelongingGroupIds.length; j++) {
+							if (testAdminGroupId === userBelongingGroupIds[j]) {
+								result = true;
+								break;
+							}
+						}
+						if (result === true) {
+							break;
+						}
+					}
+					if (atmos.can(callbackInfo)) {
+						callbackInfo.fire(result);
+					}
+				}
+			},
+			this
+		);
+
+		UserManager.prototype.getUser(
+			getUserCallback,
+			userId
+		);
+	},
+
 	createResult : function(ret) {
 		if (ret['status'] === 'ok') {
 			var res = {};
@@ -379,8 +395,7 @@ UserManager.prototype = {
 			"user_id" : userInfo[UserManager.prototype.cnUserId],
 		};
 		safeUserInfo[UserManager.prototype.cnAvator] = userInfo[UserManager.prototype.cnAvator];
-		safeUserInfo[UserManager.prototype.cnSystemGroups] = userInfo[UserManager.prototype.cnSystemGroups];
-		safeUserInfo[UserManager.prototype.cnUserGroups] = userInfo[UserManager.prototype.cnUserGroups];
+		safeUserInfo[UserManager.prototype.cnGroups] = userInfo[UserManager.prototype.cnGroups];
 		safeUserInfo[UserManager.prototype.cnRelation] = userInfo[UserManager.prototype.cnRelation];
 		return safeUserInfo;
 	},

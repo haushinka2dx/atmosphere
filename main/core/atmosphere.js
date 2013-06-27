@@ -7,6 +7,7 @@ load('main/net/http/request_dispatcher.js');
 load('main/managers/session_manager.js');
 load('main/managers/auth_manager.js');
 load('main/managers/user_manager.js');
+load('main/managers/group_manager.js');
 load('main/managers/messages_manager.js');
 
 var Atmosphere = function() {
@@ -25,6 +26,7 @@ Atmosphere.prototype = {
 	session : getSessionManager(),
 	auth : getAuthManager(),
 	user : getUserManager(),
+	group : getGroupManager(),
 	messages : getMessagesManager(),
 
 	createCallback : function(callback, callbackTarget) {

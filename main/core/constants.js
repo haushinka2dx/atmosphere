@@ -3,7 +3,6 @@ var PathInfo = function() {
 PathInfo.prototype = {
 	categoryNameMessages : 'messages',
 	categoryNamePrivate : 'private',
-	categoryNameMonolog : 'monolog',
 	categoryNameRelationship : 'relationship',
 	categoryNameRead : 'read',
 	categoryNameAuth : 'auth',
@@ -31,6 +30,8 @@ PathInfo.prototype = {
 	subCategoryNameWhoami : "whoami",
 	subCategoryNameRegister : "register",
 	subCategoryNameList : "list",
+	subCategoryNameAddMember : "add_member",
+	subCategoryNameRemoveMember : "remove_member",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -49,10 +50,6 @@ PathInfo.prototype.pPrivateSend = createRouteMatcherPattern(PathInfo.prototype.c
 PathInfo.prototype.pPrivateCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pPrivateDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pPrivateResponse = createRouteMatcherPattern(PathInfo.prototype.categoryNamePrivate, PathInfo.prototype.subCategoryNameResponse);
-PathInfo.prototype.pMonologTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameTimeline);
-PathInfo.prototype.pMonologSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameSend);
-PathInfo.prototype.pMonologCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameCancel);
-PathInfo.prototype.pMonologDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMonolog, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pRelationshipStatus = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameStatus);
 PathInfo.prototype.pRelationshipListen = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListen);
 PathInfo.prototype.pRelationshipListeners = createRouteMatcherPattern(PathInfo.prototype.categoryNameRelationship, PathInfo.prototype.subCategoryNameListeners);
@@ -63,6 +60,11 @@ PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.ca
 PathInfo.prototype.pAuthWhoami = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameWhoami);
 PathInfo.prototype.pUserList = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameList);
 PathInfo.prototype.pUserRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameRegister);
+PathInfo.prototype.pGroupList = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameList);
+PathInfo.prototype.pGroupRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameRegister);
+PathInfo.prototype.pGroupDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameDestroy);
+PathInfo.prototype.pGroupAddMember = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameAddMember);
+PathInfo.prototype.pGroupRemoveMember = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameRemoveMember);
 
 function getPathInfo() {
 	var p = new PathInfo();
@@ -125,6 +127,8 @@ Constants.prototype = {
 	// TODO: Please change admin information
 	adminUserId : 'admin',
 	adminPassword : 'password',
+
+	adminGroupIds : [ 'admin', 'infra' ],
 };
 
 function getConstants() {
