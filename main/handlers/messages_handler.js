@@ -214,6 +214,7 @@ Messages.prototype.send = function(req) {
 					// extract user_ids from message
 					var addressesUsers = this.extractAddressesUsers(msg);
 					var addressesGroups = this.extractAddressesGroups(msg);
+					var hashtags = this.extractHashtags(msg);
 
 					if (messageType !== atmos.messages.messageTypeMonolog) {
 						if (addressesGroups.length > 0) {
@@ -236,6 +237,7 @@ Messages.prototype.send = function(req) {
 						messageType,
 						addressesUsers,
 						addressesGroups,
+						hashtags,
 						replyTo,
 						currentUserId
 					);
@@ -377,6 +379,17 @@ Messages.prototype.extractAddressesGroups = function(msg) {
 		addressList.push(address[1]);
 	}
 	return addressList;
+};
+
+Messages.prototype.extractHashtags = function(msg) {
+	var hashtagList = new Array();
+	var pattern = /[^#]#([^#@ \n]+)/g;
+	var tempMsg = ' ' + msg + ' ';
+	var address;
+	while (hashtag = pattern.exec(tempMsg)) {
+		hashtagList.push(hashtag[1]);
+	}
+	return hashtagList;
 };
 
 function getMessagesHandler() {

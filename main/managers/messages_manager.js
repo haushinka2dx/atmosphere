@@ -12,6 +12,7 @@ MessagesManager.prototype = {
 	cnAddresses : 'addresses',
 	cnAddressesUsers : 'users',
 	cnAddressesGroups : 'groups',
+	cnHashtags : 'hashtags',
 	cnReplyTo : 'reply_to',
 	cnCreatedBy : 'created_by',
 	cnCreatedAt : 'created_at',
@@ -90,7 +91,7 @@ MessagesManager.prototype = {
 		}, this.collectionName, where, createdAtRange, sort, limit);
 	},
 
-	send : function(callbackInfo, message, messageType, toUsers, toGroups, replyTo, createdBy) {
+	send : function(callbackInfo, message, messageType, toUsers, toGroups, hashtags, replyTo, createdBy) {
 		if (atmos.can(message) && atmos.can(createdBy)) {
 			var dataJSON = {};
 			dataJSON[MessagesManager.prototype.cnMessage] = message;
@@ -99,6 +100,7 @@ MessagesManager.prototype = {
 			addresses[MessagesManager.prototype.cnAddressesUsers] = toUsers;
 			addresses[MessagesManager.prototype.cnAddressesGroups] = toGroups;
 			dataJSON[MessagesManager.prototype.cnAddresses] = addresses;
+			dataJSON[MessagesManager.prototype.cnHashtags] = hashtags;
 			dataJSON[MessagesManager.prototype.cnReplyTo] = replyTo;
 			dataJSON[MessagesManager.prototype.cnCreatedBy] = createdBy;
 
