@@ -26,29 +26,29 @@ MessagesManager.prototype = {
 	getMessages : function(callbackInfo, currentUserId, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
 		var mustConditionCallback = atmos.createCallback(
 			function(mustCondition) {
-				var where = {};
-				if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
-					var messageTypesCondition = this.persistor.createInCondition(
-						MessagesManager.prototype.cnMessageType,
-						messagesTypes
-					);
-					where = messageTypesCondition;
-				}
-				if (atmos.can(condition)) {
-					where = condition;
-				}
-				if (atmos.can(additionalConditionJSON)) {
-					for (var condKey in additionalConditionJSON) {
-						where[condKey] = additionalConditionJSON[condKey];
-					}
-				}
+//				var where = {};
+//				if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
+//					var messageTypesCondition = this.persistor.createInCondition(
+//						MessagesManager.prototype.cnMessageType,
+//						messagesTypes
+//					);
+//					where = messageTypesCondition;
+//				}
+//				if (atmos.can(condition)) {
+//					where = condition;
+//				}
+//				if (atmos.can(additionalConditionJSON)) {
+//					for (var condKey in additionalConditionJSON) {
+//						where[condKey] = additionalConditionJSON[condKey];
+//					}
+//				}
 
 				var conditionWithMustInners = [];
-				if (Object.keys(mustCondition).length > 0) {
+				if (atmos.can(mustCondition) && Object.keys(mustCondition).length > 0) {
 					conditionWithMustInners.push(mustCondition);
 				}
-				if (Object.keys(where).length > 0) {
-					conditionWithMustInners.push(where);
+				if (atmos.can(condition) && Object.keys(condition).length > 0) {
+					conditionWithMustInners.push(condition);
 				}
 				var conditionWithMust = {};
 				if (conditionWithMustInners.length > 0) {
@@ -58,8 +58,8 @@ MessagesManager.prototype = {
 				MessagesManager.prototype.getMessagesDirectly(
 					callbackInfo,
 					messagesTypes,
-					where,
-					null,
+					conditionWithMust,
+					additionalConditionJSON,
 					futureThan,
 					pastThan,
 					count
@@ -84,7 +84,9 @@ MessagesManager.prototype = {
 			where = messageTypesCondition;
 		}
 		if (atmos.can(condition)) {
-			where = condition;
+			for (var condKey in condition) {
+				where[condKey] = condition[condKey];
+			}
 		}
 		if (atmos.can(additionalConditionJSON)) {
 			for (var condKey in additionalConditionJSON) {
