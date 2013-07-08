@@ -20,9 +20,61 @@ MessagesManager.prototype = {
 
 	messageTypeMessage : 'message',
 	messageTypeAnnounce : 'announce',
+	messageTypeAnnouncePlus : 'announce_plus',
 	messageTypeMonolog : 'monolog',
 
-	getMessages : function(callbackInfo, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
+	getMessages : function(callbackInfo, currentUserId, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
+		var mustConditionCallback = atmos.createCallback(
+			function(mustCondition) {
+				var where = {};
+				if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
+					var messageTypesCondition = this.persistor.createInCondition(
+						MessagesManager.prototype.cnMessageType,
+						messagesTypes
+					);
+					where = messageTypesCondition;
+				}
+				if (atmos.can(condition)) {
+					where = condition;
+				}
+				if (atmos.can(additionalConditionJSON)) {
+					for (var condKey in additionalConditionJSON) {
+						where[condKey] = additionalConditionJSON[condKey];
+					}
+				}
+
+				var conditionWithMustInners = [];
+				if (Object.keys(mustCondition).length > 0) {
+					conditionWithMustInners.push(mustCondition);
+				}
+				if (Object.keys(where).length > 0) {
+					conditionWithMustInners.push(where);
+				}
+				var conditionWithMust = {};
+				if (conditionWithMustInners.length > 0) {
+					conditionWithMust["$and"] = conditionWithMustInners;
+				}
+			
+				MessagesManager.prototype.getMessagesDirectly(
+					callbackInfo,
+					messagesTypes,
+					where,
+					null,
+					futureThan,
+					pastThan,
+					count
+				);
+			},
+			this
+		);
+
+		MessagesManager.prototype.createMustCondition(
+			mustConditionCallback,
+			currentUserId
+		);
+	},
+
+	getMessagesDirectly : function(callbackInfo, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
 		var where = {};
 		if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
 			var messageTypesCondition = this.persistor.createInCondition(
@@ -89,6 +141,87 @@ MessagesManager.prototype = {
 				}
 			}
 		}, this.collectionName, where, createdAtRange, sort, limit);
+	},
+
+	createMustCondition : function(callbackInfo, currentUserId) {
+		if (atmos.can(currentUserId)) {
+			var groupCallback = atmos.createCallback(
+				function(groupIds) {
+					// 自分が発信したものの場合
+					// 　→ 制限なし
+					var fromMyself = {};
+					fromMyself[MessagesManager.prototype.cnCreatedBy] = currentUserId;
+					// 他人が発信したものの場合
+					// 　→ atmos.pushlishDelaySeconds の時間が経過したもののみを取得する
+					var fromOtherCondition = MessagesManager.prototype.persistor.createNotEqualCondition(MessagesManager.prototype.cnCreatedBy, currentUserId);
+					var fromOtherDelayRangeCondition = new RangeCondition(MessagesManager.prototype.cnCreatedAt);
+					fromOtherDelayRangeCondition.lessThan = atmos.referenceDateTime();
+					var fromOtherDelayCondition = {};
+					fromOtherDelayCondition[MessagesManager.prototype.cnCreatedAt] = fromOtherDelayRangeCondition.toJSON();
+					var fromOtherMustConditions = [
+						fromOtherCondition,
+						fromOtherDelayCondition
+					];
+					var fromOtherBaseCondition = {"$and" : fromOtherMustConditions};
+					// messageの場合
+					// 　→制限なし
+					var messageMustCondition = MessagesManager.prototype.persistor.createEqualCondition(MessagesManager.prototype.cnMessageType, MessagesManager.prototype.messageTypeMessage);
+					// announceの場合
+					// 　→ 自分が所属しているグループが宛先になっているもののみ
+					var messageTypeAnnounceCondition = MessagesManager.prototype.persistor.createEqualCondition(MessagesManager.prototype.cnMessageType, MessagesManager.prototype.messageTypeAnnounce);
+					var includingMyGroupsCondition = MessagesManager.prototype.persistor.createInCondition(MessagesManager.prototype.cnAddresses + "." + MessagesManager.prototype.cnAddressesGroups, groupIds);
+					var announceConditions = [
+						messageTypeAnnounceCondition,
+						includingMyGroupsCondition
+					];
+					var announceMustCondition = {"$and" : announceConditions};
+					// announce_plus の場合
+					// 　→ 自分が所属しているグループが宛先になっているもののみ
+					// 　　OR 自分が宛先に含まれているもののみ
+					var messageTypeAnnouncePlusCondition = MessagesManager.prototype.persistor.createEqualCondition(MessagesManager.prototype.cnMessageType, MessagesManager.prototype.messageTypeAnnouncePlus);
+					var includingMyselfCondition = MessagesManager.prototype.persistor.createInCondition(MessagesManager.prototype.cnAddresses + "." + MessagesManager.prototype.cnAddressesUsers, [ currentUserId ]);
+					var includingConditions = [ includingMyGroupsCondition, includingMyselfCondition ];
+					var includingCondition = { "$or" : includingConditions };
+					var announcePlusConditions = [
+						messageTypeAnnouncePlusCondition,
+						includingCondition
+					];
+					var announcePlusMustCondition = {"$and" : announcePlusConditions};
+	
+					var fromOtherMessageTypesCondition = {"$or" : [messageMustCondition, announceMustCondition, announcePlusMustCondition]};
+					var fromOtherMustCondition = {"$and": [fromOtherBaseCondition, fromOtherMessageTypesCondition]};
+					// monolog の場合
+					// 　→ 自分が発信したもののみに含まれるので明示的な条件は不要
+	
+					var mustConditions = [ fromMyself, fromOtherMustCondition];
+					var mustCondition = { "$or" : mustConditions };
+					if (atmos.can(callbackInfo)) {
+						callbackInfo.fire(mustCondition);
+					}
+				},
+				this
+			);
+	
+			atmos.user.getGroups(
+				groupCallback,
+				currentUserId
+			);
+		}
+		else {
+			var messageTypeCondition = MessagesManager.prototype.persistor.createEqualCondition(MessagesManager.prototype.cnMessageType, MessagesManager.prototype.messageTypeMessage);
+			var delayRangeCondition = new RangeCondition(MessagesManager.prototype.cnCreatedAt);
+			delayRangeCondition.lessThan = atmos.referenceDateTime();
+			var delayCondition = {};
+			delayCondition[MessagesManager.prototype.cnCreatedAt] = delayRangeCondition.toJSON();
+			var mustConditions = [
+				messageTypeCondition,
+				delayCondition
+			];
+			var mustCondition = {"$and" : mustConditions};
+			if (atmos.can(callbackInfo)) {
+				callbackInfo.fire(mustCondition);
+			}
+		}
 	},
 
 	send : function(callbackInfo, message, messageType, toUsers, toGroups, hashtags, replyTo, createdBy) {

@@ -175,6 +175,25 @@ Persistor.prototype = {
 			return null;
 		}
 	},
+
+	createEqualCondition : function(columnName, value) {
+		var cond = {};
+		cond[columnName] = value;
+		return cond;
+	},
+
+	createNotEqualCondition : function(columnName, value) {
+		var inner = { "$ne" : value };
+		var cond = {};
+		cond[columnName] = inner;
+		return cond;
+	},
+
+	createNotCondition : function(orgCondition) {
+		var notCond = {};
+		notCond["$not"] = orgCondition;
+		return notCond;
+	},
 };
 
 function getPersistor() {
@@ -194,6 +213,7 @@ RangeCondition.prototype = {
 	toJSON : function() {
 		var condition = {};
 		if (this.greaterThan != null) {
+			//TODO: カラム名入れるべし
 			condition[this.gt] = this.greaterThan;
 		}
 		if (this.lessThan != null) {

@@ -24,6 +24,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pMessagesTalkTimeline] = [atmos.createCallback(messagesHandler.talkTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMessagesAnnounceTimeline] = [atmos.createCallback(messagesHandler.announceTimeline, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pMessagesMonologTimeline] = [atmos.createCallback(messagesHandler.monologTimeline, messagesHandler), true];
+	patternsGET[atmos.constants.pathInfo.pMessagesSearch] = [atmos.createCallback(messagesHandler.search, messagesHandler), true];
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [atmos.createCallback(privateHandler.timeline, privateHandler), true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [atmos.createCallback(function(req) { req.response.end(); }, null), true];
 	patternsGET[atmos.constants.pathInfo.pRelationshipListeners] = [atmos.createCallback(relationHandler.listeners, relationHandler), true];

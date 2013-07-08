@@ -15,6 +15,7 @@ PathInfo.prototype = {
 	subCategoryNameTalkTimeline : 'talk_timeline',
 	subCategoryNameAnnounceTimeline : 'announce_timeline',
 	subCategoryNameMonologTimeline : 'monolog_timeline',
+	subCategoryNameSearch : 'search',
 	subCategoryNameSend : 'send',
 	subCategoryNameListen : 'listen',
 	subCategoryNameListeners : 'listeners',
@@ -40,6 +41,7 @@ PathInfo.prototype.pMessagesFocusedTimeline = createRouteMatcherPattern(PathInfo
 PathInfo.prototype.pMessagesTalkTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTalkTimeline);
 PathInfo.prototype.pMessagesAnnounceTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameAnnounceTimeline);
 PathInfo.prototype.pMessagesMonologTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameMonologTimeline);
+PathInfo.prototype.pMessagesSearch = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSearch);
 PathInfo.prototype.pMessagesSend = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameSend);
 PathInfo.prototype.pMessagesCancel = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameCancel);
 PathInfo.prototype.pMessagesDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameDestroy);
@@ -129,6 +131,8 @@ Constants.prototype = {
 	adminPassword : 'password',
 
 	adminGroupIds : [ 'admin', 'infra' ],
+
+	publishDelaySeconds : 5,
 };
 
 function getConstants() {

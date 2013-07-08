@@ -57,6 +57,11 @@ Atmosphere.prototype = {
 		return server;
 	},
 
+	referenceDateTime : function() {
+		var current = Date.now();
+		return new Date(current - (Atmosphere.prototype.constants.publishDelaySeconds * 1000));
+	},
+
 	parseUTC : function(dateString) {
 		var pattern = /([1-9][0-9]{3})-([01][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})Z/;
 		var d = pattern.exec(dateString);
