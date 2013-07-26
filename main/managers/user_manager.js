@@ -117,6 +117,42 @@ UserManager.prototype = {
 										if (atmos.can(callbackInfo)) {
 											callbackInfo.fire(res);
 										}
+										if (res['status'] === 'ok') {
+											if (operation === 'add') {
+												var eventAction = EventAction.prototype.addGroupMember;
+											}
+											else {
+												var eventAction = EventAction.prototype.removeGroupMember;
+											}
+
+											// 追加または削除対象となった人は必ず追加
+											var targetUserIds = [ userId ];
+											// ユーザーグループの場合はグループオーナーを必ず追加
+											if (groupInfo[atmos.group.cnGroupType] === atmos.group.groupTypeUser) {
+												targetUserIds.push(groupInfo[atmos.group.cnCreatedBy]);
+											}
+											// グループメンバーを追加
+											var getGroupMemberCallback = atmos.createCallback(
+												function(memberUserResult) {
+													if (memberUserResult['status'] === 'ok') {
+														memberUserResult['results'].forEach(function(memberInfo, index, array) {
+															targetUserIds.push(memberInfo['user_id']);
+														});
+													}
+													targetUserIds = atmos.uniqueArray(targetUserIds);
+													var notifyInfo = {};
+													notifyInfo['group_id'] = groupId;
+													notifyInfo['target_user_id'] = userId;
+													var eventInfo = new EventInfo(eventAction, notifyInfo, currentUserId, targetUserIds);
+													atmos.notice.notify(eventInfo);
+												},
+												this
+											);
+											UserManager.prototype.getGroupMembers(
+												getGroupMemberCallback,
+												[ groupId ]
+											);
+										}
 									},
 									UserManager.prototype.collectionName,
 									condition,
@@ -317,6 +353,21 @@ UserManager.prototype = {
 			userIdRange,
 			sort,
 			limit
+		);
+	},
+
+	getGroupMembers : function(callbackInfo, groupIds) {
+		
+		var getUsersCallback = atmos.createCallback(
+			function(usersResult) {
+				callbackInfo.fire(usersResult);
+			},
+			this
+		);
+		var groupsIn = UserManager.prototype.persistor.createInCondition(UserManager.prototype.cnGroups, groupIds);
+		UserManager.prototype.getUsers(
+			getUsersCallback, 
+			groupsIn
 		);
 	},
 

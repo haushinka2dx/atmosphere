@@ -160,8 +160,10 @@ function main() {
 		atmos.log('Auth Manager was deployed.');
 	});
 
-	//var sockjsServer = vertx.createSockJSServer(server);
-	server.listen(atmos.constants.listenPort, atmos.constants.hostname);
+	server.listen(atmos.constants.restAPIListenPort, atmos.constants.restAPIHostname);
+
+	var sockJSServer = atmos.createSockJSServer();
+	sockJSServer.listen(atmos.constants.streamingListenPort, atmos.constants.streamingHostname);
 }
 
 main();

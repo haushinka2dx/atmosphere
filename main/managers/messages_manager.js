@@ -1,5 +1,6 @@
 load('main/core/constants.js');
 load('main/core/persistor.js');
+load('main/event/event_info.js');
 
 var MessagesManager = function() {
 };
@@ -7,6 +8,7 @@ MessagesManager.prototype = {
 	collectionName : 'messages',
 	persistor : getPersistor(),
 
+	cnMessageId : getPersistor().pk,
 	cnMessageType : 'message_type',
 	cnMessage : 'message',
 	cnAddresses : 'addresses',
@@ -247,6 +249,17 @@ MessagesManager.prototype = {
 					if (atmos.can(callbackInfo)) {
 						callbackInfo.fire(replyJSON);
 					}
+
+					var createEventInfoCallback = atmos.createCallback(
+						function(eventInfo) {
+							atmos.notice.notify(eventInfo);
+						},
+						this
+					);
+					MessagesManager.prototype.createSentMessageEventInfo(
+						createEventInfoCallback,
+						dataJSON
+					);
 				},
 				this.collectionName,
 				dataJSON,
@@ -258,6 +271,99 @@ MessagesManager.prototype = {
 				callbackInfo.fire({"status":"error", "message":"'message' and 'createdBy' are must not be null."});
 			}
 		}
+	},
+
+	createNotifyEventInfo : function(callbackInfo, action, targetMsg, includeFromUser, alternativeFromUserId) {
+		// message : all
+		// announce : addresses(group members)
+		// announcePlus : addresses(group members and users)
+		// monolog : user only
+		
+		var fromUserId = atmos.can(alternativeFromUserId) ? alternativeFromUserId : targetMsg[MessagesManager.prototype.cnCreatedBy];
+		switch (targetMsg[MessagesManager.prototype.cnMessageType]) {
+			case MessagesManager.prototype.messageTypeMessage:
+				var eventInfo = new EventInfo(action, targetMsg, fromUserId, []);
+				callbackInfo.fire(eventInfo);
+				break;
+			case MessagesManager.prototype.messageTypeAnnounce:
+				var destUserIds = [];
+				if (includeFromUser) {
+					destUserIds.push(targetMsg[MessagesManager.prototype.cnCreatedBy]);
+				}
+				var addressesGroupIds = targetMsg[MessagesManager.prototype.cnAddresses][MessagesManager.prototype.cnAddressesGroups];
+				var getGroupMembersCallback = atmos.createCallback(
+					function(groupMembersResult) {
+						if (groupMembersResult['count'] > 0) {
+							groupMembersResult['results'].forEach(function(groupMember, index, array) {
+								destUserIds.push(groupMember['user_id']);
+							});
+						}
+	
+						// remove duplicated users
+						destUserIds = atmos.uniqueArray(destUserIds);
+	
+						var eventInfo = new EventInfo(action, targetMsg, fromUserId, destUserIds);
+						callbackInfo.fire(eventInfo);
+					},
+					this
+				);
+				atmos.user.getGroupMembers(
+					getGroupMembersCallback, 
+					addressesGroupIds
+				);
+				break;
+			case MessagesManager.prototype.messageTypeAnnouncePlus:
+				var destUserIds = [];
+				if (includeFromUser) {
+					destUserIds.push(targetMsg[MessagesManager.prototype.cnCreatedBy]);
+				}
+				var addressesUserIds = targetMsg[MessagesManager.prototype.cnAddresses][MessagesManager.prototype.cnAddressesUsers];
+				destUserIds = destUserIds.concat(addressesUserIds);
+				var addressesGroupIds = targetMsg[MessagesManager.prototype.cnAddresses][MessagesManager.prototype.cnAddressesGroups];
+				var getGroupMembersCallback = atmos.createCallback(
+					function(groupMembersResult) {
+						if (groupMembersResult['count'] > 0) {
+							groupMembersResult['results'].forEach(function(groupMember, index, array) {
+								destUserIds.push(groupMember['user_id']);
+							});
+						}
+		
+						// remove duplicated users
+						destUserIds = atmos.uniqueArray(destUserIds);
+		
+						var eventInfo = new EventInfo(action, targetMsg, fromUserId, destUserIds);
+						callbackInfo.fire(eventInfo);
+					},
+					this
+				);
+				atmos.user.getGroupMembers(
+					getGroupMembersCallback, 
+					addressesGroupIds
+				);
+				break;
+			case MessagesManager.prototype.messageTypeMonolog:
+				var destUserIds = [ targetMsg[MessagesManager.prototype.cnCreatedBy] ];
+				if (includeFromUser) {
+					destUserIds.push(targetMsg[MessagesManager.prototype.cnCreatedBy]);
+				}
+				// remove duplicated users
+				destUserIds = atmos.uniqueArray(destUserIds);
+				var eventInfo = new EventInfo(action, targetMsg, fromUserId, destUserIds);
+				callbackInfo.fire(eventInfo);
+				break;
+			default:
+				//no action
+				callbackInfo.fire(null);
+				break;
+		}
+	},
+
+	createSentMessageEventInfo : function(callbackInfo, msgSent) {
+		MessagesManager.prototype.createNotifyEventInfo(callbackInfo, EventAction.prototype.sendMessage, msgSent, false, null);
+	},
+	
+	createSentResponseEventInfo : function(callbackInfo, targetMsg, responderUserId) {
+		MessagesManager.prototype.createNotifyEventInfo(callbackInfo, EventAction.prototype.sendResponse, targetMsg, true, responderUserId);
 	},
 	
 	destroy : function(callbackInfo, id, currentUserId) {
@@ -326,8 +432,9 @@ MessagesManager.prototype = {
 			MessagesManager.prototype.persistor.findOne(
 				function(existRet) {
 					if (existRet['status'] === 'ok' && existRet['number'] === 1) {
-						if (existRet['results'][0]['created_by'] != respondedBy) {
-							var currentRespondedByList = existRet['results'][0][MessagesManager.prototype.cnResponces][responseAction];
+						var targetMsg = existRet['results'][0];
+						if (targetMsg['created_by'] != respondedBy) {
+							var currentRespondedByList = targetMsg[MessagesManager.prototype.cnResponces][responseAction];
 							if (operation === 'add' && currentRespondedByList.indexOf(respondedBy) != -1) {
 								if (atmos.can(callbackInfo)) {
 									callbackInfo.fire({"status":"error","message":"You aleady responded."});
@@ -357,6 +464,24 @@ MessagesManager.prototype = {
 									function(res) {
 										if (atmos.can(callbackInfo)) {
 											callbackInfo.fire(res);
+											if (operation === 'add') {
+												var createEventInfoCallback = atmos.createCallback(
+													function(eventInfo) {
+														eventInfo.info = {
+															target_msg_id : targetMessageId,
+															action : responseAction,
+														};
+
+														atmos.notice.notify(eventInfo);
+													},
+													this
+												);
+												MessagesManager.prototype.createSentResponseEventInfo(
+													createEventInfoCallback,
+													targetMsg,
+													respondedBy
+												);
+											}
 										}
 									},
 									MessagesManager.prototype.collectionName,

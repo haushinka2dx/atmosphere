@@ -137,6 +137,7 @@ RequestInfo.prototype.sendResponse = function(body, statusCode) {
 	}
 	this.req.response.putAllHeaders({
 		'Content-Type' : 'application/json; charset=UTF-8',
+		'Access-Control-Allow-Origin' : '*',
 	});
 	if (this.sessionId) {
 		this.req.response.putHeader(this.headerNameSessionId, this.sessionId);

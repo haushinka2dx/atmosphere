@@ -194,6 +194,20 @@ Persistor.prototype = {
 		notCond["$not"] = orgCondition;
 		return notCond;
 	},
+
+	joinConditions : function(joint, conditions) {
+		var cond = {};
+		cond[joint] = conditions;
+		return cond;
+	},
+
+	joinConditionsAnd : function(conditions) {
+		return Persistor.prototype.joinConditions("$and", conditions);
+	},
+
+	joinConditionsOr : function(conditions) {
+		return Persistor.prototype.joinConditions("$or", conditions);
+	},
 };
 
 function getPersistor() {

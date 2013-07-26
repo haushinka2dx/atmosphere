@@ -16,6 +16,7 @@ Messages.prototype.pnHashtags = 'hashtags';
 Messages.prototype.pnCreatedBy = 'created_by';
 Messages.prototype.pnKeywords = 'keywords';
 Messages.prototype.pnResponses = 'responses';
+Messages.prototype.pnMessageIds = 'message_ids';
 
 Messages.prototype.globalTimeline = function(req) {
 	var timelineInternalCallback = atmos.createCallback(
@@ -103,10 +104,9 @@ Messages.prototype.talkTimeline = function(req) {
 			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
-			var addressesIn = {};
-			addressesIn['$in'] = [ currentUserId ];
-			var additionalCondition = {};
-			additionalCondition['addresses.users'] = addressesIn;
+			var toMyself = this.persistor.createInCondition('addresses.users', [ currentUserId ]);
+			var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
+			var fromMyselfOrToMyself = this.persistor.joinConditionsOr( [ fromMyself, toMyself ] );
 	
 			var timelineInternalCallback = atmos.createCallback(
 				function(timeline) {
@@ -119,7 +119,7 @@ Messages.prototype.talkTimeline = function(req) {
 				currentUserId,
 				[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnouncePlus ],
 				cond,
-				additionalCondition,
+				fromMyselfOrToMyself,
 				futureThan,
 				pastThan,
 				count
@@ -150,6 +150,8 @@ Messages.prototype.announceTimeline = function(req) {
 							MessagesManager.prototype.cnAddresses + '.' + MessagesManager.prototype.cnAddressesGroups,
 							groupIds
 						);
+						var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
+						var fromMyselfOrMyGroup = this.persistor.joinConditionsOr( [ fromMyself, groupCondition ] );
 
 						var timelineInternalCallback = atmos.createCallback(
 							function(timeline) {
@@ -162,7 +164,7 @@ Messages.prototype.announceTimeline = function(req) {
 							currentUserId,
 							[ atmos.messages.messageTypeAnnounce, atmos.messages.messageTypeAnnouncePlus ],
 							cond,
-							groupCondition,
+							fromMyselfOrMyGroup,
 							futureThan,
 							pastThan,
 							count
@@ -240,6 +242,8 @@ Messages.prototype.search = function(req) {
 			atmos.log("keywords: " + keywords);
 			var responses = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnResponses));
 			atmos.log("responses: " + responses);
+			var messageIds = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
+			atmos.log("messageIds: " + messageIds);
 
 			var innerConditions = [];
 			if (addressUsers.length > 0) {
@@ -280,6 +284,9 @@ Messages.prototype.search = function(req) {
 					responseCondition['$or'] = responseInner;
 					innerConditions.push(responseCondition);
 				}
+			}
+			if (messageIds.length > 0) {
+				innerConditions.push(atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds));
 			}
 
 			var joint = andOr == 'or' ? "$or" : "$and";

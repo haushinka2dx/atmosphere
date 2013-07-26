@@ -106,8 +106,10 @@ function getResponseAction() {
 var Constants = function() {
 };
 Constants.prototype = {
-	hostname : "localhost",
-	listenPort : 9999,
+	restAPIHostname : "localhost",
+	restAPIListenPort : 9999,
+	streamingHostname : "localhost",
+	streamingListenPort : 9998,
 	persistorAddress : "atmos_persistor",
 	persistorHostname : "localhost",
 	persistorPort : 27017,
