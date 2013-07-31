@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 
 function ListenerInfo(sockJSSocket, userId, eventBusAddress) {
 	this.sock = sockJSSocket;
@@ -12,5 +12,5 @@ ListenerInfo.prototype.constructor = ListenerInfo;
 ListenerInfo.prototype.notify = function(msg) {
 	var msgJSON = JSON.parse(msg);
 	msgJSON['from_myself'] = msgJSON['from'] === this.userId;
-	this.sock.writeBuffer(new vertx.Buffer(JSON.stringify(msgJSON)));
+	this.sock.write(new vertx.Buffer(JSON.stringify(msgJSON)));
 }

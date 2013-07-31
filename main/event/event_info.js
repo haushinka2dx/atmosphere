@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 
 function EventAction() {};
 EventAction.prototype.constructor = EventAction;

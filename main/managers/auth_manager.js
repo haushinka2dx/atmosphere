@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 load('main/core/constants.js');
 
 var AuthManager = function() {
@@ -23,7 +23,7 @@ AuthManager.prototype = {
 				"password" : password
 			},
 			function(res) {
-				atmos.log('auth-mgr-result: ' + JSON.stringify(res));
+				atmos.log('mod-auth-mgr-result: ' + JSON.stringify(res));
 				var atmosSessionId = null;
 				var atmosUserId = null;
 				if (res['status'] === 'ok') {

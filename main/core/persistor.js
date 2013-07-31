@@ -1,4 +1,5 @@
-load('vertx.js');
+var vertx = require('vertx');
+var eventBus = require('vertx/event_bus');
 load('main/util/atmos_debug.js');
 load('main/core/constants.js');
 

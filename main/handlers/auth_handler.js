@@ -14,9 +14,10 @@ Auth.prototype.tryLogin = function(req) {
 			var encryptedPassword = atmos.user.encryptPassword(userId, password);
 			atmos.session.start(function(sessionId) {
 				req.sessionId = sessionId;
-				atmos.log('SessionID: ' + sessionId);
+				atmos.log('[AuthHandler]Session started.  SessionID: ' + sessionId);
 				atmos.auth.login(
 					function(res) {
+						atmos.log('[AuthHandler]AuthManager.login result: ' + JSON.stringify(res));
 						var response;
 						if (res) {
 							response = { 'status' : 'login successful', 'session_id' : sessionId };

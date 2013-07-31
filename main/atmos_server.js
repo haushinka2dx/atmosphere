@@ -1,5 +1,4 @@
 load('main/core/atmosphere.js');
-load('vertx.js');
 load('main/handlers/messages_handler.js');
 load('main/handlers/private_handler.js');
 load('main/handlers/relationship_handler.js');
@@ -9,6 +8,8 @@ load('main/handlers/group_handler.js');
 
 /// main function
 function main() {
+	var vertx = require('vertx');
+	var container = require('vertx/container');
 	var messagesHandler = getMessagesHandler();
 	var privateHandler = getPrivateHandler();
 	var relationHandler = getRelationshipHandler();
@@ -63,7 +64,7 @@ function main() {
 		"db_name": atmos.constants.persistorDbName
 	};
 
-	vertx.deployModule('vertx.mongo-persistor-v1.2.1', mongoconf, 1, function() {
+	container.deployModule('io.vertx~mod-mongo-persistor~2.0.0-final', mongoconf, 1, function() {
 		atmos.log('Mongo persistor was deployed.');
 		// TODO: set initial user
 
@@ -145,7 +146,7 @@ function main() {
 		"prefix" : atmos.constants.sessionIdPrefix,
 	};
 
-	vertx.deployModule('com.campudus.session-manager-v1.2.1', sessionManagerConf, 1, function() {
+	container.deployModule('com.campudus.session-manager-v1.2.1', sessionManagerConf, 1, function() {
 		atmos.log('Session Manager was deployed.');
 	});
 
@@ -156,7 +157,7 @@ function main() {
 		"session_timeout" : atmos.constants.authTimeoutMilliseconds,
 	};
 
-	vertx.deployModule('vertx.auth-mgr-v1.1', authManagerConf, 1, function() {
+	container.deployModule('io.vertx~mod-auth-mgr~2.0.0-final', authManagerConf, 1, function() {
 		atmos.log('Auth Manager was deployed.');
 	});
 

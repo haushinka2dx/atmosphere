@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 load('main/core/constants.js');
 
 function RequestInfo(req) {
@@ -10,8 +10,14 @@ RequestInfo.prototype.constructor = RequestInfo;
 RequestInfo.prototype.headerNameSessionId = getConstants().headerNameSessionId;
 
 RequestInfo.prototype.getSessionId = function() {
-	if (this.sessionId == null) {
-		this.sessionId = this.req.headers()[this.headerNameSessionId];
+	if (!atmos.can(this.sessionId)) {
+		var that = this;
+		this.req.headers().forEach(function(key, value) {
+			if (key === that.headerNameSessionId) {
+				that.sessionId = value;
+				return;
+			}
+		});
 	}
 	return this.sessionId;
 };
@@ -22,7 +28,7 @@ RequestInfo.prototype.getCurrentUserId = function(callbackInfo) {
 	}
 	else {
 		var sessionId = this.getSessionId();
-		if (sessionId != null) {
+		if (atmos.can(sessionId)) {
 			var getCurrentUserCallback = atmos.createCallback(
 				function(userId) {
 					if (userId != null) {
@@ -135,10 +141,8 @@ RequestInfo.prototype.sendResponse = function(body, statusCode) {
 	if (typeof (statusCode) != 'undefined' && statusCode != null) {
 		this.req.response.statusCode = statusCode;
 	}
-	this.req.response.putAllHeaders({
-		'Content-Type' : 'application/json; charset=UTF-8',
-		'Access-Control-Allow-Origin' : '*',
-	});
+	this.req.response.putHeader('Content-Type', 'application/json; charset=UTF-8')
+					.putHeader('Access-Control-Allow-Origin', '*');
 	if (this.sessionId) {
 		this.req.response.putHeader(this.headerNameSessionId, this.sessionId);
 	}

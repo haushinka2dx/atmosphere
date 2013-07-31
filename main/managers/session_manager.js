@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 load('main/core/constants.js');
 
 var SessionManager = function() {

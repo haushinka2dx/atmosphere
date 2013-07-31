@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 load('main/event/listener_info.js');
 
 function ListenerMap() {

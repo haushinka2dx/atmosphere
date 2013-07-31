@@ -138,38 +138,38 @@ Messages.prototype.announceTimeline = function(req) {
 			//自分が所属しているグループを取得
 			var getGroupsCallback = atmos.createCallback(
 				function(groupIds) {
-					if (groupIds.length === 0) {
-						req.sendResponse('You are not belonging to any groups.', 400);
-					}
-					else {
-						var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
-						var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
-						var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
-						var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+					var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+					var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+					var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+					var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+					var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
+					if (groupIds.length > 0) {
 						var groupCondition = this.persistor.createInCondition(
 							MessagesManager.prototype.cnAddresses + '.' + MessagesManager.prototype.cnAddressesGroups,
 							groupIds
 						);
-						var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
 						var fromMyselfOrMyGroup = this.persistor.joinConditionsOr( [ fromMyself, groupCondition ] );
-
-						var timelineInternalCallback = atmos.createCallback(
-							function(timeline) {
-								req.sendResponse(JSON.stringify(timeline));
-							},
-							this
-						);
-						atmos.messages.getMessages(
-							timelineInternalCallback,
-							currentUserId,
-							[ atmos.messages.messageTypeAnnounce, atmos.messages.messageTypeAnnouncePlus ],
-							cond,
-							fromMyselfOrMyGroup,
-							futureThan,
-							pastThan,
-							count
-						);
 					}
+					else {
+						var fromMyselfOrMyGroup = fromMyself;
+					}
+
+					var timelineInternalCallback = atmos.createCallback(
+						function(timeline) {
+							req.sendResponse(JSON.stringify(timeline));
+						},
+						this
+					);
+					atmos.messages.getMessages(
+						timelineInternalCallback,
+						currentUserId,
+						[ atmos.messages.messageTypeAnnounce, atmos.messages.messageTypeAnnouncePlus ],
+						cond,
+						fromMyselfOrMyGroup,
+						futureThan,
+						pastThan,
+						count
+					);
 				},
 				this
 			);

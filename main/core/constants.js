@@ -113,7 +113,7 @@ Constants.prototype = {
 	persistorAddress : "atmos_persistor",
 	persistorHostname : "localhost",
 	persistorPort : 27017,
-	persistorDbName : "atmosphere",
+	persistorDbName : "atmosphere2",
 	sessionManagerAddress : "atmos_session_manager",
 	sessionTimeoutMilliseconds : 10 * 60 * 1000,
 	sessionCleanedNotifyAddress : null,
