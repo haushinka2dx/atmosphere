@@ -56,7 +56,8 @@ Atmosphere.prototype = {
 			notFoundHandler = function(req) {
 				Atmosphere.prototype.log('noMatch');
 				dump_request(Atmosphere.prototype.logger, req);
-				req.response.statusCode = 404;
+				req.response.statusCode(404);
+				req.response.statusMessage('No such API');
 				req.response.end();
 			};
 		}
@@ -138,6 +139,12 @@ Atmosphere.prototype = {
 			});
 		}
 		return uArray;
+	},
+
+	createTemporaryFilePath : function(extension) {
+		var extName = atmos.can(extension) ? extension : 'tmp';
+		var filename = java.util.UUID.randomUUID() + '.' + extName;
+		return atmos.constants.temporaryPath + filename;
 	},
 };
 

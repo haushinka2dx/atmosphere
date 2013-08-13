@@ -187,7 +187,6 @@ AtmosHandler.prototype.appendResponseInfo = function(callbackInfo, timelineEleme
 
 AtmosHandler.prototype.sendInternal = function(req, dataJSON) {
 	if (Object.keys(dataJSON).length > 0) {
-		var sessionId = req.getSessionId();
 		var getCurrentUserIdCallback = atmos.createCallback(
 			function(currentUserId) {
 				AtmosHandler.prototype.persistor.insert(
@@ -242,7 +241,6 @@ AtmosHandler.prototype.responseInternal = function(req) {
 		function(bodyJSON) {
 			var targetId = bodyJSON['target_id'];
 			var action = bodyJSON['action'];
-			var sessionId = req.getSessionId();
 			var getCurrentUserIdCallback = atmos.createCallback(
 				function(currentUserId) {
 					if (atmos.constants.responseAction.contains(action)) {

@@ -23,7 +23,6 @@ AuthManager.prototype = {
 				"password" : password
 			},
 			function(res) {
-				atmos.log('mod-auth-mgr-result: ' + JSON.stringify(res));
 				var atmosSessionId = null;
 				var atmosUserId = null;
 				if (res['status'] === 'ok') {

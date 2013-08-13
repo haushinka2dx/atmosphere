@@ -14,6 +14,7 @@ UserHandler.prototype.paramNameNewUserId = 'new_user_id';
 UserHandler.prototype.paramNameNewUserPassword = 'new_user_password';
 UserHandler.prototype.paramNameBeforeUserId = "before_user_id";
 UserHandler.prototype.paramNameAfterUserId = "after_user_id";
+UserHandler.prototype.paramNameTargetUserId = "user_id";
 
 UserHandler.prototype.regist = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
@@ -52,6 +53,63 @@ UserHandler.prototype.regist = function(req) {
 	req.getCurrentUserId(
 		getCurrentUserIdCallback
 	);
+};
+
+UserHandler.prototype.changeAvator = function(req) {
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var getUploadedFilesCallback = atmos.createCallback(
+				function(uploadedFiles) {
+					atmos.log('uploadedFiles on user_handler: ' + JSON.stringify(uploadedFiles));
+					var changeAvatorCallback = atmos.createCallback(
+						function(changeAvatorResult) {
+							req.sendResponse(JSON.stringify(changeAvatorResult));
+						},
+						this
+					);
+					atmos.user.changeAvator(
+						changeAvatorCallback,
+						currentUserId,
+						uploadedFiles['profileImage']['dataPath']
+					);
+				},
+				this
+			);
+			req.getUploadedFiles(
+				getUploadedFilesCallback
+			);
+		},
+		this
+	);
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
+	);
+};
+
+UserHandler.prototype.avator = function(req) {
+	var targetUserId = req.getQueryValue(UserHandler.prototype.paramNameTargetUserId);
+	atmos.log('UserHandler#avator targetUserId: ' + targetUserId);
+	if (atmos.can(targetUserId)) {
+		var getUserCallback = atmos.createCallback(
+			function(targetUserInfo) {
+				if (atmos.can(targetUserInfo)) {
+					var avatorPath = targetUserInfo[atmos.user.cnAvator];
+					req.sendFile(avatorPath);
+				}
+				else {
+					req.sendResponse('no user', 404);
+				}
+			},
+			this
+		);
+		atmos.user.getUser(
+			getUserCallback,
+			targetUserId
+		);
+	}
+	else {
+		req.sendResponse("'" + UserHandler.prototype.paramNameTargetUserId + "' is must be assigned.", 400);
+	}
 };
 
 UserHandler.prototype.list = function(req) {

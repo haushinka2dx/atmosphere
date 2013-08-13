@@ -15,7 +15,7 @@ UserManager.prototype = {
 	cnRelation : 'relationship',
 	cnRelationTypeListen : 'listen',
 
-	defaultAvator : 'default_avator.png',
+	defaultAvator : 'images/avator/default_avator.png',
 
 	createSalt : function(userId, plainPassword) {
 		var p = { iv : getConstants().encryptionIV, salt : getConstants().encryptionSalt };
@@ -285,6 +285,43 @@ UserManager.prototype = {
 			getUserCallback,
 			userId
 		);
+	},
+
+	changeAvator : function(callbackInfo, userId, temporaryAvatorFilePath) {
+		// move avator file from temporary directory to formally directory
+		var filenameParts = temporaryAvatorFilePath.split('/');
+		var filename = filenameParts.length > 0 ? filenameParts[filenameParts.length - 1] : temporaryAvatorFilePath;
+		var avatorUserDir = atmos.constants.avatorBasePath + userId + '/';
+		vertx.fileSystem.mkDir(avatorUserDir, true, function(errMkdir, res) {
+			var avatorPath = avatorUserDir + filename;
+			vertx.fileSystem.move(temporaryAvatorFilePath, avatorPath, function(errorOccured) {
+				if (!errorOccured) {
+					// set avator file path to user information
+					var condition = {};
+					condition[UserManager.prototype.cnUserId] = userId;
+	
+					var updateInfoInner = {};
+					updateInfoInner[UserManager.prototype.cnAvator] = avatorPath;
+					var updateInfo = {};
+					updateInfo['$set'] = updateInfoInner;
+	
+					UserManager.prototype.persistor.updateByCondition(
+						function(res) {
+							if (atmos.can(callbackInfo)) {
+								callbackInfo.fire(res);
+							}
+							// does not notify currently.
+						},
+						UserManager.prototype.collectionName,
+						condition,
+						updateInfo
+					);
+				}
+				else {
+					callbackInfo.fire({"status":"error"});
+				}
+			});
+		});
 	},
 
 	getUser : function(callbackInfo, userId) {
