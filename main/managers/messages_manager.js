@@ -96,7 +96,7 @@ MessagesManager.prototype = {
 			}
 		}
 	
-		var createdAtRange = new RangeCondition(MessagesManager.prototype.createdAt);
+		var createdAtRange = new RangeCondition(MessagesManager.prototype.persistor.createdAt);
 		if (atmos.can(futureThan) && futureThan.length > 0) {
 			createdAtRange.greaterThan = atmos.parseUTC(futureThan);
 		}
