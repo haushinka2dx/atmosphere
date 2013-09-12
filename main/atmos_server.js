@@ -57,6 +57,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [atmos.createCallback(authHandler.tryLogin, authHandler), notRequireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pUserRegister] = [atmos.createCallback(userHandler.regist, userHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pUserChangeAvator] = [atmos.createCallback(userHandler.changeAvator, userHandler), requireAuth, isMultipart];
+	patternsPOST[atmos.constants.pathInfo.pUserChangePassword] = [atmos.createCallback(userHandler.changePassword, userHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pGroupRegister] = [atmos.createCallback(groupHandler.regist, groupHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pGroupDestroy] = [atmos.createCallback(groupHandler.destroy, groupHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pGroupAddMember] = [atmos.createCallback(groupHandler.addMember, groupHandler), requireAuth, normal];

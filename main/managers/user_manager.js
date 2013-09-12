@@ -82,6 +82,47 @@ UserManager.prototype = {
 		);
 	},
 
+	changePassword : function(callbackInfo, userId, currentPassword, newPassword) {
+		var encryptedCurrentPassword = UserManager.prototype.encryptPassword(userId, currentPassword);
+		var encryptedNewPassword = UserManager.prototype.encryptPassword(userId, newPassword);
+
+		//check if same userId user already exists.
+		var where = {};
+		where[UserManager.prototype.cnUserId] = userId;
+		UserManager.prototype.persistor.find(
+			function(currentInfo) {
+				if (currentInfo[UserManager.prototype.persistor.numOfResult] === 1
+				   && currentInfo['results'][0][UserManager.prototype.cnPassword] === encryptedCurrentPassword) {
+
+					var condition = {};
+					condition[UserManager.prototype.cnUserId] = userId;
+					var updateInfoInner = {};
+					updateInfoInner[UserManager.prototype.cnPassword] = encryptedNewPassword;
+					var updateInfo = {};
+					updateInfo["$set"] = updateInfoInner;;
+		
+					UserManager.prototype.persistor.updateByCondition(
+						function(res) {
+							if (atmos.can(callbackInfo)) {
+								callbackInfo.fire(res);
+							}
+						},
+						UserManager.prototype.collectionName,
+						condition,
+						updateInfo
+					);
+				}
+				else {
+					if (atmos.can(callbackInfo)) {
+						callbackInfo.fire({"status":"error", "message":"There is no user or password does not match."});
+					}
+				}
+			},
+			UserManager.prototype.collectionName,
+			where
+		);
+	},
+
 	addGroup : function(callbackInfo, userId, groupId, currentUserId) {
 		UserManager.prototype.changeGroup(callbackInfo, userId, groupId, currentUserId, 'add');
 	},
