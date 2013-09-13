@@ -506,7 +506,7 @@ Messages.prototype.extractAddressesUsers = function(msg) {
 
 Messages.prototype.extractAddressesGroups = function(msg) {
 	var addressList = new Array();
-	var pattern = /[^@.\-_a-zA-Z0-9]@@([a-zA-Z0-9.\-_]+)/g;
+	var pattern = /[^$.\-_a-zA-Z0-9]\$([a-zA-Z0-9.\-_]+)/g;
 	var tempMsg = ' ' + msg + ' ';
 	var address;
 	while (address = pattern.exec(tempMsg)) {
