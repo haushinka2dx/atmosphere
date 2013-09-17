@@ -19,31 +19,39 @@ Messages.prototype.pnResponses = 'responses';
 Messages.prototype.pnMessageIds = 'message_ids';
 
 Messages.prototype.globalTimeline = function(req) {
-	var timelineInternalCallback = atmos.createCallback(
-		function(timeline) {
-			req.sendResponse(JSON.stringify(timeline));
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var timelineInternalCallback = atmos.createCallback(
+				function(timeline) {
+					req.sendResponse(JSON.stringify(timeline));
+				},
+				this
+			);
+		
+			var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+		
+			// default sort new -> old
+			var sort = {};
+			sort[AtmosHandler.prototype.persistor.createdAt] = -1;
+			atmos.messages.getMessages(
+				timelineInternalCallback,
+				currentUserId,
+				//[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
+				null,
+				cond,
+				null,
+				futureThan,
+				pastThan,
+				count
+			);
 		},
 		this
 	);
-
-	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
-	var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
-	var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
-	var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
-
-	// default sort new -> old
-	var sort = {};
-	sort[AtmosHandler.prototype.persistor.createdAt] = -1;
-	atmos.messages.getMessages(
-		timelineInternalCallback,
-		null,
-		//[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
-		null,
-		cond,
-		null,
-		futureThan,
-		pastThan,
-		count
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
 	);
 };
 
