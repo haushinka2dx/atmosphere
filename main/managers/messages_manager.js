@@ -25,6 +25,8 @@ MessagesManager.prototype = {
 	messageTypeAnnouncePlus : 'announce_plus',
 	messageTypeMonolog : 'monolog',
 
+	maxMessagesCountPerRequest : 200,
+
 	getMessages : function(callbackInfo, currentUserId, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
 		var mustConditionCallback = atmos.createCallback(
 			function(mustCondition) {
@@ -104,7 +106,7 @@ MessagesManager.prototype = {
 			createdAtRange.lessThan = atmos.parseUTC(pastThan);
 		}
 	
-		var limit = -1;
+		var limit = MessagesManager.prototype.maxMessagesCountPerRequest;
 		if (atmos.can(count) && count > 0) {
 			limit = count;
 		}
