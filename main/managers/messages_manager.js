@@ -368,6 +368,10 @@ MessagesManager.prototype = {
 		MessagesManager.prototype.createNotifyEventInfo(callbackInfo, EventAction.prototype.sendResponse, targetMsg, true, responderUserId);
 	},
 	
+	createRemovedMessageEventInfo : function(callbackInfo, msgRemoved) {
+		MessagesManager.prototype.createNotifyEventInfo(callbackInfo, EventAction.prototype.removedMessage, msgRemoved, false, null);
+	},
+
 	destroy : function(callbackInfo, id, currentUserId) {
 		if (atmos.can(id)) {
 			//削除対象を取得してログインユーザーのメッセージかどうかをチェックする
@@ -382,6 +386,18 @@ MessagesManager.prototype = {
 										function(replyJSON) {
 											if (atmos.can(callbackInfo)) {
 												callbackInfo.fire(replyJSON);
+											}
+											if (replyJSON.status === 'ok') {
+												var createEventInfoCallback = atmos.createCallback(
+													function(eventInfo) {
+														atmos.notice.notify(eventInfo);
+													},
+													this
+												);
+												MessagesManager.prototype.createRemovedMessageEventInfo (
+													createEventInfoCallback,
+													targetMessage
+												);
 											}
 										},
 										MessagesManager.prototype.collectionName,
