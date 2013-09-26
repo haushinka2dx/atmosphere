@@ -17,6 +17,7 @@ Messages.prototype.pnCreatedBy = 'created_by';
 Messages.prototype.pnKeywords = 'keywords';
 Messages.prototype.pnResponses = 'responses';
 Messages.prototype.pnMessageIds = 'message_ids';
+Messages.prototype.pnReplyToMessageId = 'reply_to_message_id';
 
 Messages.prototype.globalTimeline = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
@@ -252,6 +253,8 @@ Messages.prototype.search = function(req) {
 			atmos.log("responses: " + responses);
 			var messageIds = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 			atmos.log("messageIds: " + messageIds);
+			var replyToMessageId = req.getQueryValue(Messages.prototype.pnReplyToMessageId);
+			atmos.log("replyToMessageId: " + replyToMessageId);
 
 			var innerConditions = [];
 			if (addressUsers.length > 0) {
@@ -295,6 +298,9 @@ Messages.prototype.search = function(req) {
 			}
 			if (messageIds.length > 0) {
 				innerConditions.push(atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds));
+			}
+			if (atmos.can(replyToMessageId)) {
+				innerConditions.push(atmos.persistor.createEqualCondition(atmos.messages.cnReplyTo, replyToMessageId));
 			}
 
 			var joint = andOr == 'or' ? "$or" : "$and";
