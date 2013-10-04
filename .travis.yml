@@ -1,0 +1,3 @@
+script: ./run-spec.sh
+notifications:
+  email: false
