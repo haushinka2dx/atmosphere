@@ -1,0 +1,4 @@
+{
+	"main": "main/atmos_server.js",
+	"auto-redeploy": true
+}

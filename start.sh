@@ -1,3 +1,3 @@
 #!/bin/sh
 
-vertx run main/atmos_server.js -Xmx512m &
+vertx runmod haushinka2dx~atmosphere~1.0 -Xmx512m &
