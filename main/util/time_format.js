@@ -1,18 +1,17 @@
-//現在時刻取得（yyyy/mm/dd hh:mm:ss）
+// TODO 関数定義がグローバル汚染
+
+// return "yyyy/mm/dd hh:mm:ss"
+function getFormatedTime(date) {
+	return "" + date.getFullYear() + "/" + padZero(date.getMonth() + 1) + "/" + padZero(date.getDate()) + " " + padZero(date.getHours()) + ":" + padZero(date.getMinutes()) + ":"
+			+ padZero(date.getSeconds());
+}
+
+//現在時刻取得(yyyy/mm/dd hh:mm:ss)
 function getCurrentTime() {
-	var now = new Date();
-	var res = "" + now.getFullYear() + "/" + padZero(now.getMonth() + 1) + "/" + padZero(now.getDate()) + " " + padZero(now.getHours()) + ":" + padZero(now.getMinutes()) + ":"
-			+ padZero(now.getSeconds());
-	return res;
+	return getFormatedTime(new Date());
 }
 
 // 先頭ゼロ付加
 function padZero(num) {
-	var result;
-	if (num < 10) {
-		result = "0" + num;
-	} else {
-		result = "" + num;
-	}
-	return result;
+	return num < 10 ? "0" + num : "" + num;
 }
