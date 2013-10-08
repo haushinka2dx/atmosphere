@@ -2,7 +2,7 @@
 
 // return "yyyy/mm/dd hh:mm:ss"
 function getFormatedTime(date) {
-	return "" + date.getFullYear() + "/" + padZero(date.getMonth() + 1) + "/" + padZero(date.getDate()) + " " + padZero(date.getHours()) + ":" + padZero(date.getMinutes()) + ":"
+	return date.getFullYear() + "/" + padZero(date.getMonth() + 1) + "/" + padZero(date.getDate()) + " " + padZero(date.getHours()) + ":" + padZero(date.getMinutes()) + ":"
 			+ padZero(date.getSeconds());
 }
 
