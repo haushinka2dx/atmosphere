@@ -127,6 +127,7 @@ Constants.prototype = {
 	authManagerAddress : "atmos_auth_manager",
 	authTimeoutMilliseconds : 10 * 60 * 1000,
 	authCollectionName : "users",
+	maxConnectionsPerUser : 10,
 	headerNameSessionId : "atmosphere-session-id",
 	pathInfo : getPathInfo(),
 	responseAction : getResponseAction(),
