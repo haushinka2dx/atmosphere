@@ -1,18 +1,20 @@
 load('main/util/time_format.js');
 
 function plog(logger, msg) {
-	var message = '[' + getCurrentTime() + '] ' + msg;
-	logger.info(message);
-	// logger.debug(message);
+	if (typeof(logger) != 'undefined' && logger != null) {
+		var message = '[' + getCurrentTime() + '] ' + msg;
+		logger.info(message);
+		// logger.debug(message);
+	}
 }
 
 function dump_request(logger, req, enableHeaders, enableParameters, enableBody) {
-	plog(logger, 'Http request has received. uri[' + req.uri + '] path[' + req.path + '] query[' + req.query + ']');
+	plog(logger, 'Http request has received. method[' + req.method() + '] uri[' + req.uri() + '] path[' + req.path() + '] query[' + req.query() + ']');
 	if (enableHeaders) {
 		plog(logger, '  Headers:');
-		for ( var keyname in req.headers()) {
-			plog(logger, '    ' + keyname + ': ' + req.headers()[keyname]);
-		}
+		req.headers().forEach(function(keyname, value) {
+			plog(logger, '    ' + keyname + ': ' + value);
+		});
 	}
 
 	if (enableParameters) {

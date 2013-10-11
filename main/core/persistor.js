@@ -1,4 +1,5 @@
-load('vertx.js');
+var vertx = require('vertx');
+var eventBus = require('vertx/event_bus');
 load('main/util/atmos_debug.js');
 load('main/core/constants.js');
 
@@ -22,6 +23,16 @@ Persistor.prototype = {
 	condGreaterThan : "$gt",
 	condIn : "$in",
 
+	createReplyHandler : function(processor) {
+		var resultProcessor = processor;
+		return function(reply, replier) {
+			resultProcessor(reply);
+			if (reply.status === 'more-exist') {
+				replier({}, Persistor.prototype.createReplyHandler(resultProcessor));
+			}
+		}
+	},
+
 	find : function(callback, collName, where, rangeCondition, sort, limit) {
 		if (typeof(rangeCondition) != 'undefined' && rangeCondition != null) {
 			var rangeConditionJSON = rangeCondition.toJSON();
@@ -44,10 +55,33 @@ Persistor.prototype = {
 		}
 		atmos.log("find msg: " + JSON.stringify(ebMsg));
 
+		var processor = (function(){
+			var finalCallback = callback;
+			var results = [];
+			return function(res) {
+				if (res.status !== 'error') {
+					for (var i=0; i<res.results.length; i++) {
+						results.push(res.results[i]);
+					}
+					if (res.status !== 'more-exist') {
+						var result = {
+							status : 'ok',
+							number : results.length,
+							results : results
+						};
+						callback(result);
+					}
+				}
+				else {
+					callback(res);
+				}
+			}
+		})();
+
 		Persistor.prototype.eb().send(
 			Persistor.prototype.pa,
 			ebMsg,
-			callback
+			Persistor.prototype.createReplyHandler(processor)
 		);
 	},
 
@@ -95,10 +129,33 @@ Persistor.prototype = {
 		}
 		atmos.log("find msg: " + JSON.stringify(ebMsg));
 
+		var processor = (function(){
+			var finalCallback = callback;
+			var results = [];
+			return function(res) {
+				if (res.status !== 'error') {
+					for (var i=0; i<res.results.length; i++) {
+						results.push(res.results[i]);
+					}
+					if (res.status !== 'more-exist') {
+						var result = {
+							status : 'ok',
+							number : results.length,
+							results : results
+						};
+						callback(result);
+					}
+				}
+				else {
+					callback(res);
+				}
+			}
+		})();
+
 		Persistor.prototype.eb().send(
 			Persistor.prototype.pa,
 			ebMsg,
-			callback
+			Persistor.prototype.createReplyHandler(processor)
 		);
 	},
 

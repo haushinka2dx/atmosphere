@@ -17,33 +17,42 @@ Messages.prototype.pnCreatedBy = 'created_by';
 Messages.prototype.pnKeywords = 'keywords';
 Messages.prototype.pnResponses = 'responses';
 Messages.prototype.pnMessageIds = 'message_ids';
+Messages.prototype.pnReplyToMessageId = 'reply_to_message_id';
 
 Messages.prototype.globalTimeline = function(req) {
-	var timelineInternalCallback = atmos.createCallback(
-		function(timeline) {
-			req.sendResponse(JSON.stringify(timeline));
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var timelineInternalCallback = atmos.createCallback(
+				function(timeline) {
+					req.sendResponse(JSON.stringify(timeline));
+				},
+				this
+			);
+		
+			var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+		
+			// default sort new -> old
+			var sort = {};
+			sort[AtmosHandler.prototype.persistor.createdAt] = -1;
+			atmos.messages.getMessages(
+				timelineInternalCallback,
+				currentUserId,
+				//[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
+				null,
+				cond,
+				null,
+				futureThan,
+				pastThan,
+				count
+			);
 		},
 		this
 	);
-
-	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
-	var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
-	var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
-	var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
-
-	// default sort new -> old
-	var sort = {};
-	sort[AtmosHandler.prototype.persistor.createdAt] = -1;
-	atmos.messages.getMessages(
-		timelineInternalCallback,
-		null,
-		//[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
-		null,
-		cond,
-		null,
-		futureThan,
-		pastThan,
-		count
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
 	);
 };
 
@@ -138,38 +147,38 @@ Messages.prototype.announceTimeline = function(req) {
 			//自分が所属しているグループを取得
 			var getGroupsCallback = atmos.createCallback(
 				function(groupIds) {
-					if (groupIds.length === 0) {
-						req.sendResponse('You are not belonging to any groups.', 400);
-					}
-					else {
-						var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
-						var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
-						var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
-						var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+					var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+					var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
+					var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
+					var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+					var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
+					if (groupIds.length > 0) {
 						var groupCondition = this.persistor.createInCondition(
 							MessagesManager.prototype.cnAddresses + '.' + MessagesManager.prototype.cnAddressesGroups,
 							groupIds
 						);
-						var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
 						var fromMyselfOrMyGroup = this.persistor.joinConditionsOr( [ fromMyself, groupCondition ] );
-
-						var timelineInternalCallback = atmos.createCallback(
-							function(timeline) {
-								req.sendResponse(JSON.stringify(timeline));
-							},
-							this
-						);
-						atmos.messages.getMessages(
-							timelineInternalCallback,
-							currentUserId,
-							[ atmos.messages.messageTypeAnnounce, atmos.messages.messageTypeAnnouncePlus ],
-							cond,
-							fromMyselfOrMyGroup,
-							futureThan,
-							pastThan,
-							count
-						);
 					}
+					else {
+						var fromMyselfOrMyGroup = fromMyself;
+					}
+
+					var timelineInternalCallback = atmos.createCallback(
+						function(timeline) {
+							req.sendResponse(JSON.stringify(timeline));
+						},
+						this
+					);
+					atmos.messages.getMessages(
+						timelineInternalCallback,
+						currentUserId,
+						[ atmos.messages.messageTypeAnnounce, atmos.messages.messageTypeAnnouncePlus ],
+						cond,
+						fromMyselfOrMyGroup,
+						futureThan,
+						pastThan,
+						count
+					);
 				},
 				this
 			);
@@ -244,6 +253,8 @@ Messages.prototype.search = function(req) {
 			atmos.log("responses: " + responses);
 			var messageIds = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 			atmos.log("messageIds: " + messageIds);
+			var replyToMessageId = req.getQueryValue(Messages.prototype.pnReplyToMessageId);
+			atmos.log("replyToMessageId: " + replyToMessageId);
 
 			var innerConditions = [];
 			if (addressUsers.length > 0) {
@@ -287,6 +298,9 @@ Messages.prototype.search = function(req) {
 			}
 			if (messageIds.length > 0) {
 				innerConditions.push(atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds));
+			}
+			if (atmos.can(replyToMessageId)) {
+				innerConditions.push(atmos.persistor.createEqualCondition(atmos.messages.cnReplyTo, replyToMessageId));
 			}
 
 			var joint = andOr == 'or' ? "$or" : "$and";
@@ -506,7 +520,7 @@ Messages.prototype.extractAddressesUsers = function(msg) {
 
 Messages.prototype.extractAddressesGroups = function(msg) {
 	var addressList = new Array();
-	var pattern = /[^@.\-_a-zA-Z0-9]@@([a-zA-Z0-9.\-_]+)/g;
+	var pattern = /[^$.\-_a-zA-Z0-9]\$([a-zA-Z0-9.\-_]+)/g;
 	var tempMsg = ' ' + msg + ' ';
 	var address;
 	while (address = pattern.exec(tempMsg)) {

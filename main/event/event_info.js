@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 
 function EventAction() {};
 EventAction.prototype.constructor = EventAction;
@@ -8,13 +8,15 @@ var EventAction = function() {
 };
 EventAction.prototype = {
 	sendMessage : "sendMessage",
+	removedMessage : "removedMessage",
 	sendPrivate : "sendPrivate",
+	removedPrivate : "removedPrivate",
 	sendResponse : "sendResponse",
 	listened : "listened",
 	addGroupMember : "addGroupMember",
 	removeGroupMember : "removeGroupMember",
 	all : function() {
-		return [ EventAction.prototype.sendMessage, EventAction.prototype.sendPrivate, EventAction.prototype.sendResponse, EventAction.prototype.listened, EventAction.prototype.addGroupMember, EventAction.prototype.removeGroupMember ];
+		return [ EventAction.prototype.sendMessage, EventAction.prototype.removedMessage, EventAction.prototype.sendPrivate, EventAction.removedPrivate, EventAction.prototype.sendResponse, EventAction.prototype.listened, EventAction.prototype.addGroupMember, EventAction.prototype.removeGroupMember ];
 	},
 	contains : function(action) {
 		var all = EventAction.prototype.all();

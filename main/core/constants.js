@@ -33,6 +33,9 @@ PathInfo.prototype = {
 	subCategoryNameList : "list",
 	subCategoryNameAddMember : "add_member",
 	subCategoryNameRemoveMember : "remove_member",
+	subCategoryNameAvator : "avator",
+	subCategoryNameChangeAvator : "change_avator",
+	subCategoryNameChangePassword : "change_password",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -62,6 +65,9 @@ PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.ca
 PathInfo.prototype.pAuthWhoami = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameWhoami);
 PathInfo.prototype.pUserList = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameList);
 PathInfo.prototype.pUserRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameRegister);
+PathInfo.prototype.pUserAvator = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameAvator);
+PathInfo.prototype.pUserChangeAvator = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameChangeAvator);
+PathInfo.prototype.pUserChangePassword = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameChangePassword);
 PathInfo.prototype.pGroupList = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameList);
 PathInfo.prototype.pGroupRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameRegister);
 PathInfo.prototype.pGroupDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameDestroy);
@@ -113,7 +119,7 @@ Constants.prototype = {
 	persistorAddress : "atmos_persistor",
 	persistorHostname : "localhost",
 	persistorPort : 27017,
-	persistorDbName : "atmosphere",
+	persistorDbName : "atmosphere2",
 	sessionManagerAddress : "atmos_session_manager",
 	sessionTimeoutMilliseconds : 10 * 60 * 1000,
 	sessionCleanedNotifyAddress : null,
@@ -133,6 +139,10 @@ Constants.prototype = {
 	adminPassword : 'password',
 
 	adminGroupIds : [ 'admin', 'infra' ],
+
+	temporaryPath : 'tmp/',
+
+	avatorBasePath : 'uploaded/avator/',
 
 	publishDelaySeconds : 5,
 };

@@ -1,4 +1,4 @@
-load('vertx.js');
+var vertx = require('vertx');
 load('main/core/constants.js');
 
 var AuthManager = function() {
@@ -23,24 +23,25 @@ AuthManager.prototype = {
 				"password" : password
 			},
 			function(res) {
-				atmos.log('auth-mgr-result: ' + JSON.stringify(res));
-				var atmosSessionId = null;
-				var atmosUserId = null;
+				atmos.log('auth-manager: ' + JSON.stringify(res));
 				if (res['status'] === 'ok') {
-					atmosSessionId = res['sessionID'];
-					atmosUserId = userId;
+					var atmosSessionId = res['sessionID'];
+					var atmosUserId = userId;
+					var authorizedInfo = {};
+					authorizedInfo[AuthManager.prototype.keynameAtmosSessionId] = atmosSessionId;
+					authorizedInfo[AuthManager.prototype.keynameUserId] = atmosUserId;
+					// store authorized information to session
+					atmos.session.putValues(
+						function(res) {
+							callback(res);
+						},
+						sessionId,
+						authorizedInfo
+					);
 				}
-				// store authorized information to session
-				var authorizedInfo = {};
-				authorizedInfo[AuthManager.prototype.keynameAtmosSessionId] = atmosSessionId;
-				authorizedInfo[AuthManager.prototype.keynameUserId] = atmosUserId;
-				atmos.session.putValues(
-					function(res) {
-						callback(res);
-					},
-					sessionId,
-					authorizedInfo
-				);
+				else {
+					callback(false);
+				}
 			}
 		);
 	},

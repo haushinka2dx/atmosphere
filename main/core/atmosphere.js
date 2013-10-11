@@ -1,10 +1,12 @@
-load('vertx.js');
+var vertx = require('vertx');
+var container = require('vertx/container');
 load('main/util/atmos_debug.js');
 load('main/core/constants.js');
 load('main/core/persistor.js');
 load('main/core/callback_info.js');
 load('main/net/http/request_dispatcher.js');
-load('main/managers/session_manager.js');
+//load('main/managers/session_manager.js');
+load('main/managers/session_manager_mongo.js');
 load('main/managers/auth_manager.js');
 load('main/managers/user_manager.js');
 load('main/managers/group_manager.js');
@@ -14,7 +16,7 @@ load('main/event/notification_manager.js');
 var Atmosphere = function() {
 };
 Atmosphere.prototype = {
-	logger : vertx.logger,
+	logger : container.logger,
 	log : function(msg) {
 		plog(Atmosphere.prototype.logger, msg);
 	},
@@ -54,7 +56,8 @@ Atmosphere.prototype = {
 			notFoundHandler = function(req) {
 				Atmosphere.prototype.log('noMatch');
 				dump_request(Atmosphere.prototype.logger, req);
-				req.response.statusCode = 404;
+				req.response.statusCode(404);
+				req.response.statusMessage('No such API');
 				req.response.end();
 			};
 		}
@@ -85,7 +88,7 @@ Atmosphere.prototype = {
 								function(currentUserId) {
 									atmos.log('currentUserId: ' + currentUserId);
 									var currentUserJSON = { currentUserId : currentUserId };
-									sock.writeBuffer(new vertx.Buffer(JSON.stringify(currentUserJSON)));
+									sock.write(new vertx.Buffer(JSON.stringify(currentUserJSON)));
 
 									atmos.notice.addListener(sock, currentUserId);
 								},
@@ -136,6 +139,12 @@ Atmosphere.prototype = {
 			});
 		}
 		return uArray;
+	},
+
+	createTemporaryFilePath : function(extension) {
+		var extName = atmos.can(extension) ? extension : 'tmp';
+		var filename = java.util.UUID.randomUUID() + '.' + extName;
+		return atmos.constants.temporaryPath + filename;
 	},
 };
 
