@@ -163,9 +163,10 @@ function main() {
 		"user_collection" : atmos.constants.authCollectionName,
 		"persistor_address" : atmos.constants.persistorAddress,
 		"session_timeout" : atmos.constants.authTimeoutMilliseconds,
+		"max_connections_per_user" : atmos.constants.maxConnectionsPerUser,
 	};
-
-	container.deployModule('io.vertx~mod-auth-mgr~2.0.0-final', authManagerConf, 1, function() {
+	
+	container.deployModule('io.vertx~mod-auth-mgr~2.1.0-SNAPSHOT', authManagerConf, 1, function() {
 		atmos.log('Auth Manager was deployed.');
 	});
 
