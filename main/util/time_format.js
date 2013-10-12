@@ -6,11 +6,11 @@ var atmosTimeFormat = (function() {
 	AtmosTimeFormat.prototype.getFormatedTime = function(date) {
 		if (Object.prototype.toString.call(date) === "[object Date]") {
 			var year = date.getFullYear();
-			var month = padZero(date.getMonth() + 1);
-			var day = padZero(date.getDate());
-			var hour = padZero(date.getHours());
-			var minute = padZero(date.getMinutes());
-			var second = padZero(date.getSeconds());
+			var month = paddingTwoDigits(date.getMonth() + 1);
+			var day = paddingTwoDigits(date.getDate());
+			var hour = paddingTwoDigits(date.getHours());
+			var minute = paddingTwoDigits(date.getMinutes());
+			var second = paddingTwoDigits(date.getSeconds());
 			return year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
 		}
 		return '';
@@ -21,8 +21,8 @@ var atmosTimeFormat = (function() {
 		return this.getFormatedTime(new Date());
 	}
 
-	// 先頭ゼロ付加
-	function padZero(num) {
+	// 2桁になるように0埋めする
+	function paddingTwoDigits(num) {
 		return ("0" + num).slice(-2);
 	}
 
