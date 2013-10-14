@@ -3,22 +3,21 @@ var atmosTimeFormat = (function() {
 	}
 
 	// return "yyyy/mm/dd hh:mm:ss"
-	AtmosTimeFormat.prototype.getFormatedTime = function(date) {
+	AtmosTimeFormat.prototype.getFormattedTime = function(date) {
 		if (Object.prototype.toString.call(date) === "[object Date]") {
-			var year = date.getFullYear();
-			var month = paddingTwoDigits(date.getMonth() + 1);
-			var day = paddingTwoDigits(date.getDate());
-			var hour = paddingTwoDigits(date.getHours());
-			var minute = paddingTwoDigits(date.getMinutes());
-			var second = paddingTwoDigits(date.getSeconds());
-			return year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+			return date.getFullYear()
+						+ '/' + paddingTwoDigits(date.getMonth() + 1)
+						+ '/' + paddingTwoDigits(date.getDate())
+						+ ' ' + paddingTwoDigits(date.getHours())
+						+ ':' + paddingTwoDigits(date.getMinutes())
+						+ ':' + paddingTwoDigits(date.getSeconds());
 		}
 		return '';
 	}
 
 	//現在時刻取得(yyyy/mm/dd hh:mm:ss)
 	AtmosTimeFormat.prototype.getCurrentTime = function() {
-		return this.getFormatedTime(new Date());
+		return this.getFormattedTime(new Date());
 	}
 
 	// 2桁になるように0埋めする
