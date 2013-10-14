@@ -2,7 +2,7 @@ load('main/util/time_format.js');
 
 function plog(logger, msg) {
 	if (typeof(logger) != 'undefined' && logger != null) {
-		var message = '[' + getCurrentTime() + '] ' + msg;
+		var message = '[' + atmosTimeFormat.getCurrentTime() + '] ' + msg;
 		logger.info(message);
 		// logger.debug(message);
 	}
