@@ -11,6 +11,7 @@ load('main/managers/auth_manager.js');
 load('main/managers/user_manager.js');
 load('main/managers/group_manager.js');
 load('main/managers/messages_manager.js');
+load('main/managers/privates_manager.js');
 load('main/event/notification_manager.js');
 
 var Atmosphere = function() {
@@ -37,6 +38,7 @@ Atmosphere.prototype = {
 	user : getUserManager(),
 	group : getGroupManager(),
 	messages : getMessagesManager(),
+	privates : getPrivatesManager(),
 	notice : getNotificationManager(),
 
 	createCallback : function(callback, callbackTarget) {

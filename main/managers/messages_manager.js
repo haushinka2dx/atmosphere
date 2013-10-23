@@ -30,23 +30,6 @@ MessagesManager.prototype = {
 	getMessages : function(callbackInfo, currentUserId, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
 		var mustConditionCallback = atmos.createCallback(
 			function(mustCondition) {
-//				var where = {};
-//				if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
-//					var messageTypesCondition = this.persistor.createInCondition(
-//						MessagesManager.prototype.cnMessageType,
-//						messagesTypes
-//					);
-//					where = messageTypesCondition;
-//				}
-//				if (atmos.can(condition)) {
-//					where = condition;
-//				}
-//				if (atmos.can(additionalConditionJSON)) {
-//					for (var condKey in additionalConditionJSON) {
-//						where[condKey] = additionalConditionJSON[condKey];
-//					}
-//				}
-
 				var conditionWithMustInners = [];
 				if (atmos.can(mustCondition) && Object.keys(mustCondition).length > 0) {
 					conditionWithMustInners.push(mustCondition);
@@ -79,24 +62,22 @@ MessagesManager.prototype = {
 	},
 
 	getMessagesDirectly : function(callbackInfo, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
-		var where = {};
+		var whereInner = [];
 		if (atmos.can(messagesTypes) && messagesTypes.length > 0) {
 			var messageTypesCondition = this.persistor.createInCondition(
 				MessagesManager.prototype.cnMessageType,
 				messagesTypes
 			);
-			where = messageTypesCondition;
+			whereInner.push(messageTypesCondition);
 		}
 		if (atmos.can(condition)) {
-			for (var condKey in condition) {
-				where[condKey] = condition[condKey];
-			}
+			whereInner.push(condition);
 		}
 		if (atmos.can(additionalConditionJSON)) {
-			for (var condKey in additionalConditionJSON) {
-				where[condKey] = additionalConditionJSON[condKey];
-			}
+			whereInner.push(additionalConditionJSON);
 		}
+		var where = {};
+		where['$and'] = whereInner;
 	
 		var createdAtRange = new RangeCondition(MessagesManager.prototype.persistor.createdAt);
 		if (atmos.can(futureThan) && futureThan.length > 0) {
