@@ -209,9 +209,15 @@ PrivateManager.prototype = {
 		if (includeFromUser) {
 			destUserIds.push(targetMsg[PrivateManager.prototype.cnCreatedBy]);
 		}
-		var toUserIds = targetMsg[PrivateManager.prototype.cnToUserId].forEach(function(toUserId, i, a) {
-			destUserIds.push(toUserId);
-		});
+		var rawToUserIds = targetMsg[PrivateManager.prototype.cnToUserId];
+		if (rawToUserIds.forEach) {
+			var toUserIds = targetMsg[PrivateManager.prototype.cnToUserId].forEach(function(toUserId, i, a) {
+				destUserIds.push(toUserId);
+			});
+		}
+		else if (rawToUserIds.length > 0) {
+			destUserIds.push(rawToUserIds);
+		}
 
 		// remove duplicated users
 		destUserIds = atmos.uniqueArray(destUserIds);
