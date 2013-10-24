@@ -61,17 +61,17 @@ Private.prototype.search = function(req) {
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
 			var andOr = req.getQueryValue(Private.prototype.pnAndOr);
 			atmos.log("andOr: " + andOr);
-			var toUsers = Private.prototype.string2array(req.getQueryValue(Private.prototype.pnToUsers));
+			var toUsers = atmos.string2array(req.getQueryValue(Private.prototype.pnToUsers));
 			atmos.log("toUsers: " + toUsers);
-			var hashtags = Private.prototype.string2array(req.getQueryValue(Private.prototype.pnHashtags));
+			var hashtags = atmos.string2array(req.getQueryValue(Private.prototype.pnHashtags));
 			atmos.log("hashtags: " + hashtags);
-			var createdByUsers = Private.prototype.string2array(req.getQueryValue(Private.prototype.pnCreatedBy));
+			var createdByUsers = atmos.string2array(req.getQueryValue(Private.prototype.pnCreatedBy));
 			atmos.log("createdByUsers: " + createdByUsers);
-			var keywords = Private.prototype.string2array(req.getQueryValue(Private.prototype.pnKeywords));
+			var keywords = atmos.string2array(req.getQueryValue(Private.prototype.pnKeywords));
 			atmos.log("keywords: " + keywords);
-			var responses = Private.prototype.string2array(req.getQueryValue(Private.prototype.pnResponses));
+			var responses = atmos.string2array(req.getQueryValue(Private.prototype.pnResponses));
 			atmos.log("responses: " + responses);
-			var messageIds = Private.prototype.string2array(req.getQueryValue(Private.prototype.pnMessageIds));
+			var messageIds = atmos.string2array(req.getQueryValue(Private.prototype.pnMessageIds));
 			atmos.log("messageIds: " + messageIds);
 			var replyToMessageId = req.getQueryValue(Private.prototype.pnReplyToMessageId);
 			atmos.log("replyToMessageId: " + replyToMessageId);
@@ -146,18 +146,6 @@ Private.prototype.search = function(req) {
 	);
 };
 
-Private.prototype.string2array = function(valuesString) {
-	var ret = [];
-	if (atmos.can(valuesString)) {
-		var srcArray = valuesString.split(',');
-		// trim
-		for (var i=0; i<srcArray.length; i++) {
-			ret.push(srcArray[i].trim());
-		}
-	}
-	return ret;
-};
-
 Private.prototype.send = function(req) {
 	var getBodyAsJSONCallback = atmos.createCallback(
 		function(bodyJSON) {
@@ -177,11 +165,11 @@ Private.prototype.send = function(req) {
 		function(currentUserId) {
 			var getBodyAsJSONCallback = atmos.createCallback(
 				function(bodyJSON) {
-					var toUserIds = this.extractAddressesUsers(bodyJSON['to_user_id']);
+					var toUserIds = atmos.extractAddressesUsers(bodyJSON['to_user_id']);
 					var msg = bodyJSON['message'];
 					var replyTo = bodyJSON['reply_to'];
 			
-					var hashtags = this.extractHashtags(msg);
+					var hashtags = atmos.extractHashtags(msg);
 
 					var sendMessageCallback = atmos.createCallback(
 						function(res) {
@@ -313,28 +301,6 @@ Private.prototype.removeResponse = function(req) {
 	req.getCurrentUserId(
 		getCurrentUserIdCallback
 	);
-};
-
-Private.prototype.extractAddressesUsers = function(msg) {
-	var addressList = new Array();
-	var pattern = /[^@.\-_a-zA-Z0-9]@([a-zA-Z0-9.\-_]+)/g;
-	var tempMsg = ' ' + msg + ' ';
-	var address;
-	while (address = pattern.exec(tempMsg)) {
-		addressList.push(address[1]);
-	}
-	return addressList;
-};
-
-Private.prototype.extractHashtags = function(msg) {
-	var hashtagList = new Array();
-	var pattern = /[^#]#([^#@ \n]+)/g;
-	var tempMsg = ' ' + msg + ' ';
-	var address;
-	while (hashtag = pattern.exec(tempMsg)) {
-		hashtagList.push(hashtag[1]);
-	}
-	return hashtagList;
 };
 
 function getPrivateHandler() {
