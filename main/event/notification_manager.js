@@ -25,7 +25,7 @@ NotificationManager.prototype = {
 	notify : function(eventInfo) {
 		var manager = this;
 		var targetAddresses = [];
-		if (!atmos.can(eventInfo.addressesUsers) || eventInfo.addressesUsers.length == 0) {
+		if (!atmos.canl(eventInfo.addressesUsers)) {
 			targetAddresses.push(manager.addressPublishAll());
 		}
 		else {

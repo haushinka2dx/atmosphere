@@ -1,5 +1,6 @@
 var vertx = require('vertx');
 var container = require('vertx/container');
+load('main/util/general.js');
 load('main/util/strings.js');
 load('main/util/atmos_debug.js');
 load('main/core/constants.js');
@@ -47,7 +48,11 @@ Atmosphere.prototype = {
 	},
 
 	can : function(v) {
-		return typeof(v) != 'undefined' && v != null;
+		return atmosGeneral.can(v);
+	},
+
+	canl : function(v) {
+		return atmosGeneral.canl(v);
 	},
 
 	createHttpServer : function(patternHandlerMapGET, patternHandlerMapPOST, notFoundHandler) {
