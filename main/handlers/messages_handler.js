@@ -62,7 +62,7 @@ Messages.prototype.focusedTimeline = function(req) {
 			//自分がListenしてるユーザーを取得
 			var getSpeakersCallback = atmos.createCallback(
 				function(speakerUserIds) {
-					if (!atmos.canl(speakerUserIds.length)) {
+					if (!atmos.canl(speakerUserIds)) {
 						req.sendResponse('You listen nobody.', 400);
 					}
 					else {
