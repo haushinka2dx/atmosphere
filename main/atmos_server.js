@@ -32,6 +32,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pMessagesMonologTimeline] = [atmos.createCallback(messagesHandler.monologTimeline, messagesHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pMessagesSearch] = [atmos.createCallback(messagesHandler.search, messagesHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pPrivateTimeline] = [atmos.createCallback(privateHandler.timeline, privateHandler), requireAuth, normal];
+	patternsGET[atmos.constants.pathInfo.pPrivateSearch] = [atmos.createCallback(privateHandler.search, privateHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pRelationshipStatus] = [atmos.createCallback(function(req) { req.response.end(); }, null), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pRelationshipListeners] = [atmos.createCallback(relationHandler.listeners, relationHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pRelationshipSpeakers] = [atmos.createCallback(relationHandler.speakers, relationHandler), requireAuth, normal];
@@ -52,6 +53,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pPrivateCancel] = [atmos.createCallback(function(req) { req.response.end(); }, null), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pPrivateDestroy] = [atmos.createCallback(privateHandler.destroy, privateHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pPrivateResponse] = [atmos.createCallback(privateHandler.response, privateHandler), requireAuth, normal];
+	patternsPOST[atmos.constants.pathInfo.pPrivateRemoveResponse] = [atmos.createCallback(privateHandler.removeResponse, messagesHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pRelationshipListen] = [atmos.createCallback(relationHandler.listen, relationHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pReadSet] = [atmos.createCallback(function(req) { req.response.end(); }, null), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pAuthLogin] = [atmos.createCallback(authHandler.tryLogin, authHandler), notRequireAuth, normal];

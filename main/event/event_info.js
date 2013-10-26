@@ -12,6 +12,7 @@ EventAction.prototype = {
 	sendPrivate : "sendPrivate",
 	removedPrivate : "removedPrivate",
 	sendResponse : "sendResponse",
+	sendResponsePrivate : "sendResponsePrivate",
 	listened : "listened",
 	addGroupMember : "addGroupMember",
 	removeGroupMember : "removeGroupMember",
