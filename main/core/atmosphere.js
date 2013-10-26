@@ -1,5 +1,7 @@
 var vertx = require('vertx');
 var container = require('vertx/container');
+load('main/util/general.js');
+load('main/util/strings.js');
 load('main/util/atmos_debug.js');
 load('main/core/constants.js');
 load('main/core/persistor.js');
@@ -11,6 +13,7 @@ load('main/managers/auth_manager.js');
 load('main/managers/user_manager.js');
 load('main/managers/group_manager.js');
 load('main/managers/messages_manager.js');
+load('main/managers/privates_manager.js');
 load('main/event/notification_manager.js');
 
 var Atmosphere = function() {
@@ -37,6 +40,7 @@ Atmosphere.prototype = {
 	user : getUserManager(),
 	group : getGroupManager(),
 	messages : getMessagesManager(),
+	privates : getPrivatesManager(),
 	notice : getNotificationManager(),
 
 	createCallback : function(callback, callbackTarget) {
@@ -44,7 +48,11 @@ Atmosphere.prototype = {
 	},
 
 	can : function(v) {
-		return typeof(v) != 'undefined' && v != null;
+		return atmosGeneral.can(v);
+	},
+
+	canl : function(v) {
+		return atmosGeneral.canl(v);
 	},
 
 	createHttpServer : function(patternHandlerMapGET, patternHandlerMapPOST, notFoundHandler) {
@@ -139,6 +147,27 @@ Atmosphere.prototype = {
 			});
 		}
 		return uArray;
+	},
+
+	string2array : function(src, sep) {
+		if (Atmosphere.prototype.can(sep)) {
+			return atmosStrings.string2array(src, sep);
+		}
+		else {
+			return atmosStrings.string2array(src, ',');
+		}
+	},
+
+	extractAddressesUsers : function(msg) {
+		return atmosStrings.extractAddressesUsers(msg);
+	},
+
+	extractAddressesGroups : function(msg) {
+		return atmosStrings.extractAddressesGroups(msg);
+	},
+
+	extractHashtags : function(msg) {
+		return atmosStrings.extractHashtags(msg);
 	},
 
 	createTemporaryFilePath : function(extension) {

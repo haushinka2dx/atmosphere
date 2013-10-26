@@ -15,7 +15,7 @@ ListenerMap.prototype.getById = function(id) {
 };
 
 ListenerMap.prototype.getByUserIds = function(userIds) {
-	if (!atmos.can(userIds) || userIds.length == 0) {
+	if (!atmos.canl(userIds)) {
 		return [];
 	}
 

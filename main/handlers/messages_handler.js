@@ -62,7 +62,7 @@ Messages.prototype.focusedTimeline = function(req) {
 			//自分がListenしてるユーザーを取得
 			var getSpeakersCallback = atmos.createCallback(
 				function(speakerUserIds) {
-					if (speakerUserIds.length === 0) {
+					if (!atmos.canl(speakerUserIds)) {
 						req.sendResponse('You listen nobody.', 400);
 					}
 					else {
@@ -237,21 +237,21 @@ Messages.prototype.search = function(req) {
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
 			var andOr = req.getQueryValue(Messages.prototype.pnAndOr);
 			atmos.log("andOr: " + andOr);
-			var addressUsers = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnAddressUsers));
+			var addressUsers = atmos.string2array(req.getQueryValue(Messages.prototype.pnAddressUsers));
 			atmos.log("addressUsers: " + addressUsers);
-			var addressGroups = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnAddressGroups));
+			var addressGroups = atmos.string2array(req.getQueryValue(Messages.prototype.pnAddressGroups));
 			atmos.log("addressGroups: " + addressGroups);
-			var messageTypes = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnMessageTypes));
+			var messageTypes = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageTypes));
 			atmos.log("messageTypes: " + messageTypes);
-			var hashtags = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnHashtags));
+			var hashtags = atmos.string2array(req.getQueryValue(Messages.prototype.pnHashtags));
 			atmos.log("hashtags: " + hashtags);
-			var createdByUsers = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnCreatedBy));
+			var createdByUsers = atmos.string2array(req.getQueryValue(Messages.prototype.pnCreatedBy));
 			atmos.log("createdByUsers: " + createdByUsers);
-			var keywords = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnKeywords));
+			var keywords = atmos.string2array(req.getQueryValue(Messages.prototype.pnKeywords));
 			atmos.log("keywords: " + keywords);
-			var responses = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnResponses));
+			var responses = atmos.string2array(req.getQueryValue(Messages.prototype.pnResponses));
 			atmos.log("responses: " + responses);
-			var messageIds = Messages.prototype.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
+			var messageIds = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 			atmos.log("messageIds: " + messageIds);
 			var replyToMessageId = req.getQueryValue(Messages.prototype.pnReplyToMessageId);
 			atmos.log("replyToMessageId: " + replyToMessageId);
@@ -333,18 +333,6 @@ Messages.prototype.search = function(req) {
 	);
 };
 
-Messages.prototype.string2array = function(valuesString) {
-	var ret = [];
-	if (atmos.can(valuesString)) {
-		var srcArray = valuesString.split(',');
-		// trim
-		for (var i=0; i<srcArray.length; i++) {
-			ret.push(srcArray[i].trim());
-		}
-	}
-	return ret;
-};
-
 Messages.prototype.send = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
 		function(currentUserId) {
@@ -355,9 +343,9 @@ Messages.prototype.send = function(req) {
 					var messageType = bodyJSON['message_type'];
 			
 					// extract user_ids from message
-					var addressesUsers = this.extractAddressesUsers(msg);
-					var addressesGroups = this.extractAddressesGroups(msg);
-					var hashtags = this.extractHashtags(msg);
+					var addressesUsers = atmos.extractAddressesUsers(msg);
+					var addressesGroups = atmos.extractAddressesGroups(msg);
+					var hashtags = atmos.extractHashtags(msg);
 
 					if (messageType !== atmos.messages.messageTypeMonolog) {
 						if (addressesGroups.length > 0 ) {
@@ -505,39 +493,6 @@ Messages.prototype.removeResponse = function(req) {
 	req.getCurrentUserId(
 		getCurrentUserIdCallback
 	);
-};
-
-Messages.prototype.extractAddressesUsers = function(msg) {
-	var addressList = new Array();
-	var pattern = /[^@.\-_a-zA-Z0-9]@([a-zA-Z0-9.\-_]+)/g;
-	var tempMsg = ' ' + msg + ' ';
-	var address;
-	while (address = pattern.exec(tempMsg)) {
-		addressList.push(address[1]);
-	}
-	return addressList;
-};
-
-Messages.prototype.extractAddressesGroups = function(msg) {
-	var addressList = new Array();
-	var pattern = /[^$.\-_a-zA-Z0-9]\$([a-zA-Z0-9.\-_]+)/g;
-	var tempMsg = ' ' + msg + ' ';
-	var address;
-	while (address = pattern.exec(tempMsg)) {
-		addressList.push(address[1]);
-	}
-	return addressList;
-};
-
-Messages.prototype.extractHashtags = function(msg) {
-	var hashtagList = new Array();
-	var pattern = /[^#]#([^#@ \n]+)/g;
-	var tempMsg = ' ' + msg + ' ';
-	var address;
-	while (hashtag = pattern.exec(tempMsg)) {
-		hashtagList.push(hashtag[1]);
-	}
-	return hashtagList;
 };
 
 function getMessagesHandler() {
