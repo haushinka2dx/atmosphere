@@ -212,7 +212,7 @@ MessagesManager.prototype = {
 	},
 
 	send : function(callbackInfo, message, messageType, toUsers, toGroups, hashtags, replyTo, createdBy) {
-		if (atmos.can(message) && atmos.can(createdBy)) {
+		if (atmos.canl(message) && atmos.canl(createdBy)) {
 			var dataJSON = {};
 			dataJSON[MessagesManager.prototype.cnMessage] = message;
 			dataJSON[MessagesManager.prototype.cnMessageType] = messageType;
