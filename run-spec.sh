@@ -1,2 +1,2 @@
 #!/bin/sh
-phantomjs spec/phantomjs_runner.js spec/spec_runner.html
+vertx run spec/spec_runner.js -Xmx512m
