@@ -15,11 +15,13 @@ try {
 	load('main/util/general.js');
 	load('main/util/time_format.js');
 	load('main/util/strings.js');
+	load('main/core/atmosphere.js');
 
 	// include spec files here...
 	load('spec/util/general_spec.js');
 	load('spec/util/time_format_spec.js');
 	load('spec/util/strings_spec.js');
+	load('spec/core/atmosphere_spec.js');
 
 	jasmine.getEnv().addReporter(new jasmine.TerminalReporter({verbosity: 2, color: true}));
 	jasmine.getEnv().execute();
