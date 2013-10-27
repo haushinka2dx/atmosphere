@@ -69,7 +69,7 @@ jasmine.getGlobal = function() {
  */
 jasmine.bindOriginal_ = function(base, name) {
   var original = base[name];
-  if (original.apply) {
+  if (original && original.apply) {
     return function() {
       return original.apply(base, arguments);
     };
@@ -2082,9 +2082,7 @@ jasmine.Queue.prototype.next_ = function() {
         var now = new Date().getTime();
         if (self.env.updateInterval && now - self.env.lastUpdate > self.env.updateInterval) {
           self.env.lastUpdate = now;
-          self.env.setTimeout(function() {
-            self.next_();
-          }, 0);
+          self.next_();
         } else {
           if (jasmine.Queue.LOOP_DONT_RECURSE && completedSynchronously) {
             goAgain = true;
