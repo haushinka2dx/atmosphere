@@ -8,8 +8,6 @@ try {
 	load('spec/lib/jasmine-1.3.1/atmos_jasmine.js');
 	load('spec/lib/jasmine-1.3.1/jasmine.terminal_reporter.js');
 	load('spec/lib/jasmine-parameterize/jasmine-parameterize.js');
-	// TODO load error(まだ使ってはいないので、今後使うときに頑張って対応する)
-	//load('spec/lib/sinon/sinon.js');
 
 	// include source files here...
 	load('main/util/general.js');
