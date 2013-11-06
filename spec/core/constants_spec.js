@@ -1,5 +1,7 @@
 describe('Global Function', function(){
 	describe('createRouteMatcherPattern', function(){
+		// TODO 引数が空文字/null/undefinedの場合の挙動を修正する
+		//      現状の実装では以下のように動くが、これは本来正しい振る舞いではない
 		cases([
 			['Cat', 'Sub', '/Cat/Sub'],
 			['Cat', '', '/Cat/'],
