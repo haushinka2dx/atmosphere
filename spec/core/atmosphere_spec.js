@@ -126,25 +126,6 @@ describe('atmos', function(){
 		});
 	});
 
-	describe('string2array', function(){
-		it('string is divided by a specified delimiter', function(){
-			var str = 'a-b';
-			var sep = '-';
-			var expected = ['a', 'b'];
-			spyOn(atmosStrings, 'string2array').andReturn(expected);
-			expect(target.string2array(str, sep)).toEqual(expected);
-			expect(atmosStrings.string2array).toHaveBeenCalledWith(str, sep);
-		});
-
-		it('string is divided by a default delimiter', function(){
-			var str = 'a,b';
-			var expected = ['a', 'b'];
-			spyOn(atmosStrings, 'string2array').andReturn(expected);
-			expect(target.string2array(str)).toEqual(expected);
-			expect(atmosStrings.string2array).toHaveBeenCalledWith(str, ',');
-		});
-	});
-
 	describe('extractAddressesUsers', function(){
 		cases([
 			  ['', []],
@@ -191,11 +172,12 @@ describe('atmos', function(){
 			expect(target.createTemporaryFilePath(extension)).toMatch(expected);
 		});
 
-		// TODO 空文字でもデフォルト拡張子を使うべきな気がする
 		cases([undefined, null])
 		.it('by a default extension', function(extension) {
 			var expected = atmos.constants.temporaryPath + '.*\.tmp$';
 			expect(target.createTemporaryFilePath(extension)).toMatch(expected);
 		});
+
+		// TODO 空文字の場合は拡張子なしのファイル名が返されること(未実装なのでテストもまだなし)
 	});
 });
