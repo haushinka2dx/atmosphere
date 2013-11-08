@@ -17,6 +17,7 @@ try {
 	load('main/core/atmosphere.js');
 	load('main/core/callback_info.js');
 	load('main/core/constants.js');
+	load('main/event/event_info.js');
 
 	// include spec files here...
 	load('spec/util/general_spec.js');
@@ -25,6 +26,7 @@ try {
 	load('spec/core/atmosphere_spec.js');
 	load('spec/core/callback_info_spec.js');
 	load('spec/core/constants_spec.js');
+	load('spec/event/event_info_spec.js');
 
 	jasmine.getEnv().addReporter(new jasmine.TerminalReporter({verbosity: 2, color: true}));
 	jasmine.getEnv().execute();
