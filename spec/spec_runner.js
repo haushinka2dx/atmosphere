@@ -14,7 +14,7 @@ var console = require('vertx/console');
 		// except lib and spec_runner.js
 		vertx.fileSystem.readDir(base, '(?!lib)(?!spec_runner.js).*', function(err, files) {
 			if (err) {
-				console.log('Oops! read directoy error');
+				console.log('Oops! read directory error');
 				console.log(err);
 				container.exit();
 			}
