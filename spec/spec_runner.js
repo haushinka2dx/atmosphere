@@ -40,15 +40,20 @@ var console = require('vertx/console');
 					}
 				});
 			});
+			// 一度でもreadDir処理が走ったらtrueにする
+			// 厳密やるなら「全てのvertx処理が終わったら」という制御を入れないといけないが、
+			// 「これで問題なく動いている」&「制御を入れるとコードが複雑化する」のでこのままにしている
 			spec_ready = true;
 		});
 	}
 
 	load_specs('spec');
 
+	var not_running = true;
 	// Since vert.x fileSystem is asynchronous.
-	vertx.setTimer(1000, function(timerId) {
-		if (spec_ready) {
+	vertx.setPeriodic(1000, function(timerId) {
+		if (spec_ready && not_running) {
+			not_running = false;
 			jasmine.getEnv().addReporter(new jasmine.TerminalReporter({verbosity: 2, color: true}));
 			jasmine.getEnv().execute();
 			container.exit();
