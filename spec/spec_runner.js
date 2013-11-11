@@ -12,7 +12,7 @@ var console = require('vertx/console');
 	var spec_ready = false;
 	function load_specs(base) {
 		// except lib and spec_runner.js
-		vertx.fileSystem.readDir(base, '(?!lib)(?!spec_runner.js).*', function(err, files) {
+		vertx.fileSystem.readDir(base, '(?!\.DS_Store)(?!lib)(?!spec_runner\.js).*', function(err, files) {
 			if (err) {
 				console.log('Oops! read directory error');
 				console.log(err);
