@@ -175,11 +175,12 @@ Atmosphere.prototype = {
 		if (atmos.can(extension)) {
 			if (0 < extension.length) {
 				return basename + '.' + extension;
+			} else {
+				return basename;
 			}
 		} else {
 			return basename + '.tmp'
 		}
-		return basename;
 	},
 };
 
