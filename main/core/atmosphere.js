@@ -171,9 +171,15 @@ Atmosphere.prototype = {
 	},
 
 	createTemporaryFilePath : function(extension) {
-		var extName = atmos.can(extension) ? extension : 'tmp';
-		var filename = java.util.UUID.randomUUID() + '.' + extName;
-		return atmos.constants.temporaryPath + filename;
+		var basename = atmos.constants.temporaryPath + java.util.UUID.randomUUID();
+		if (atmos.can(extension)) {
+			if (0 < extension.length) {
+				return basename + '.' + extension;
+			}
+		} else {
+			return basename + '.tmp'
+		}
+		return basename;
 	},
 };
 

@@ -178,6 +178,11 @@ describe('atmos', function(){
 			expect(target.createTemporaryFilePath(extension)).toMatch(expected);
 		});
 
-		// TODO 空文字の場合は拡張子なしのファイル名が返されること(未実装なのでテストもまだなし)
+		it('by empty extension when empty string', function() {
+			var arg = '';
+			expect(target.createTemporaryFilePath(arg))
+				.toMatch(atmos.constants.temporaryPath + '.*');
+			expect(target.createTemporaryFilePath(arg)).not.toContain('.');
+		});
 	});
 });
