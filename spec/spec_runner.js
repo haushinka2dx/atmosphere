@@ -14,17 +14,13 @@ var console = require('vertx/console');
 		// except lib and spec_runner.js
 		vertx.fileSystem.readDir(base, '(?!\.DS_Store)(?!lib)(?!spec_runner\.js).*', function(err, files) {
 			if (err) {
-				console.log('Oops! read directory error');
-				console.log(err);
-				container.exit();
+				close("Oops! read directory error\n" + err);
 			}
 
 			files.forEach(function(absolute_path) {
 				vertx.fileSystem.props(absolute_path, function(err, props) {
 					if (err) {
-						console.log('Oops! file props error');
-						console.log(err);
-						container.exit();
+						close("Oops! file props error\n" + err);
 					}
 
 					if (props.isDirectory) {
@@ -49,14 +45,24 @@ var console = require('vertx/console');
 
 	load_specs('spec');
 
-	var not_running = true;
+	var is_running = false;
 	// Since vert.x fileSystem is asynchronous.
-	vertx.setPeriodic(1000, function(timerId) {
-		if (spec_ready && not_running) {
-			not_running = false;
+	var run_timer_id = vertx.setPeriodic(1000, function(timerId) {
+		if (spec_ready && !is_running) {
+			is_running = true;
 			jasmine.getEnv().addReporter(new jasmine.TerminalReporter({verbosity: 2, color: true}));
 			jasmine.getEnv().execute();
-			container.exit();
+			close();
 		}
 	});
+
+	function close(msg) {
+		if (msg) {
+			console.log(msg);
+		}
+		if (typeof(run_timer_id) != 'undefined' && run_timer_id != null) {
+			vertx.cancelTimer(run_timer_id);
+		}
+		container.exit();
+	}
 })();
