@@ -16,6 +16,7 @@ UserHandler.prototype.paramNameCurrentUserPassword = 'current_user_password';
 UserHandler.prototype.paramNameBeforeUserId = "before_user_id";
 UserHandler.prototype.paramNameAfterUserId = "after_user_id";
 UserHandler.prototype.paramNameTargetUserId = "user_id";
+UserHandler.prototype.paramNameNewIntroduction = 'new_introduction';
 
 UserHandler.prototype.regist = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
@@ -112,6 +113,41 @@ UserHandler.prototype.changePassword = function(req) {
 					else {
 						req.sendResponse("'" + UserHandler.prototype.paramNameCurrentUserPassword + "' and '" + UserHandler.prototype.paramNameNewUserPassword + "' are must be assigned and must be different.", 400);
 					}
+				},
+				this
+			);
+			req.getBodyAsJSON(
+				getBodyAsJSONCallback
+			);
+		},
+		this
+	);
+	req.getCurrentUserId(
+		getCurrentUserIdCallback
+	);
+};
+
+UserHandler.prototype.changeProfile = function(req) {
+	var getCurrentUserIdCallback = atmos.createCallback(
+		function(currentUserId) {
+			var getBodyAsJSONCallback = atmos.createCallback(
+				function(bodyJSON) {
+					var newIntroduction = bodyJSON[UserHandler.prototype.paramNameNewIntroduction];
+					if (!atmos.can(newIntroduction)) {
+						newIntroduction = '';
+					}
+					var changeCallback = atmos.createCallback(
+						function(changeResult) {
+							req.sendResponse(JSON.stringify(changeResult));
+						},
+						this
+					);
+		
+					atmos.user.changeProfile(
+						changeCallback,
+						currentUserId,
+						newIntroduction
+					);
 				},
 				this
 			);
