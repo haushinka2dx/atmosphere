@@ -11,6 +11,7 @@ UserManager.prototype = {
 	cnUserId : 'username',
 	cnPassword : 'password',
 	cnAvator : 'avator',
+	cnIntroduction : 'introduction',
 	cnGroups : 'groups',
 	cnRelation : 'relationship',
 	cnRelationTypeListen : 'listen',
@@ -120,6 +121,28 @@ UserManager.prototype = {
 			},
 			UserManager.prototype.collectionName,
 			where
+		);
+	},
+
+	changeProfile : function(callbackInfo, userId, introduction) {
+		var condition = {};
+		condition[UserManager.prototype.cnUserId] = userId;
+
+		var updateIntroductionInner = {};
+		updateIntroductionInner[UserManager.prototype.cnIntroduction] = introduction;
+
+		var updateInfo = {};
+		updateInfo["$set"] = updateIntroductionInner;
+
+		UserManager.prototype.persistor.updateByCondition(
+			function(res) {
+				if (atmos.can(callbackInfo)) {
+					callbackInfo.fire(res);
+				}
+			},
+			UserManager.prototype.collectionName,
+			condition,
+			updateInfo
 		);
 	},
 
@@ -523,6 +546,11 @@ UserManager.prototype = {
 		var safeUserInfo = {
 			"user_id" : userInfo[UserManager.prototype.cnUserId],
 		};
+		var introduction = userInfo[UserManager.prototype.cnIntroduction];
+		if (!atmos.can(introduction)) {
+			introduction = '';
+		}
+		safeUserInfo[UserManager.prototype.cnIntroduction] = introduction;
 		safeUserInfo[UserManager.prototype.cnAvator] = userInfo[UserManager.prototype.cnAvator];
 		safeUserInfo[UserManager.prototype.cnGroups] = userInfo[UserManager.prototype.cnGroups];
 		safeUserInfo[UserManager.prototype.cnRelation] = userInfo[UserManager.prototype.cnRelation];

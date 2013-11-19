@@ -36,6 +36,7 @@ PathInfo.prototype = {
 	subCategoryNameAvator : "avator",
 	subCategoryNameChangeAvator : "change_avator",
 	subCategoryNameChangePassword : "change_password",
+	subCategoryNameChangeProfile : "change_profile",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -70,6 +71,7 @@ PathInfo.prototype.pUserRegister = createRouteMatcherPattern(PathInfo.prototype.
 PathInfo.prototype.pUserAvator = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameAvator);
 PathInfo.prototype.pUserChangeAvator = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameChangeAvator);
 PathInfo.prototype.pUserChangePassword = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameChangePassword);
+PathInfo.prototype.pUserChangeProfile = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameChangeProfile);
 PathInfo.prototype.pGroupList = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameList);
 PathInfo.prototype.pGroupRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameRegister);
 PathInfo.prototype.pGroupDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameDestroy);
