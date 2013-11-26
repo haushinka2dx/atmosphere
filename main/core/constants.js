@@ -31,6 +31,7 @@ PathInfo.prototype = {
 	subCategoryNameWhoami : "whoami",
 	subCategoryNameRegister : "register",
 	subCategoryNameList : "list",
+	subCategoryNameShow : "show",
 	subCategoryNameAddMember : "add_member",
 	subCategoryNameRemoveMember : "remove_member",
 	subCategoryNameAvator : "avator",
@@ -67,6 +68,7 @@ PathInfo.prototype.pAuthLogin = createRouteMatcherPattern(PathInfo.prototype.cat
 PathInfo.prototype.pAuthLogout = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameLogout);
 PathInfo.prototype.pAuthWhoami = createRouteMatcherPattern(PathInfo.prototype.categoryNameAuth, PathInfo.prototype.subCategoryNameWhoami);
 PathInfo.prototype.pUserList = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameList);
+PathInfo.prototype.pUserShow = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameShow);
 PathInfo.prototype.pUserRegister = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameRegister);
 PathInfo.prototype.pUserAvator = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameAvator);
 PathInfo.prototype.pUserChangeAvator = createRouteMatcherPattern(PathInfo.prototype.categoryNameUser, PathInfo.prototype.subCategoryNameChangeAvator);

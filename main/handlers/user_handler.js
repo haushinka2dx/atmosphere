@@ -208,6 +208,28 @@ UserHandler.prototype.list = function(req) {
 	atmos.user.getUsers(callbackInfo, where, beforeUserId, afterUserId, count);
 };
 
+UserHandler.prototype.show = function(req) {
+	var targetUserId = req.getQueryValue(UserHandler.prototype.paramNameTargetUserId);
+	atmos.log('UserHandler#show targetUserId: ' + targetUserId);
+	if (atmos.can(targetUserId)) {
+		var getUserCallback = atmos.createCallback(
+			function(res) {
+				if (atmos.can(res)) {
+					req.sendResponse(JSON.stringify(res));
+				}
+				else {
+					req.sendResponse('no user:' + targetUserId, 404);
+				}
+			},
+			this
+		);
+		atmos.user.getUser(getUserCallback, targetUserId);
+	}
+	else {
+		req.sendResponse("'" + UserHandler.prototype.paramNameTargetUserId + "' is must be assigned.", 400);
+	}
+};
+
 UserHandler.prototype.destroy = function(req) {
 	this.destroyInternal(req);
 };
