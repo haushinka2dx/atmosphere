@@ -39,6 +39,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pAuthLogout] = [atmos.createCallback(authHandler.logout, authHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pAuthWhoami] = [atmos.createCallback(authHandler.whoami, authHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pUserList] = [atmos.createCallback(userHandler.list, userHandler), requireAuth, normal];
+	patternsGET[atmos.constants.pathInfo.pUserShow] = [atmos.createCallback(userHandler.show, userHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pUserAvator] = [atmos.createCallback(userHandler.avator, userHandler), notRequireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pGroupList] = [atmos.createCallback(groupHandler.list, groupHandler), requireAuth, normal];
 
