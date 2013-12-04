@@ -48,3 +48,7 @@ spec/spec_runner.html is only opened by a browser.
 - Please install [PhantomJS](http://phantomjs.org/)
 - `cd {repository_root}`
 - Execute a command. `./run-spec.sh`
+
+## APIs
+
+See [wiki page](wiki/APIs)
