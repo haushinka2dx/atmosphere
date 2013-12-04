@@ -16,7 +16,7 @@ RequestInfo.prototype.headerNameSessionId = getConstants().headerNameSessionId;
 RequestInfo.prototype.getHeaderValue = function(name) {
 	var headerValue = null;
 	this.headers.forEach(function(key, value) {
-		if (key === name) {
+		if (key.toLowerCase() === name.toLowerCase()) {
 			headerValue = value;
 			return;
 		}
