@@ -344,8 +344,13 @@ RequestInfo.prototype.sendResponse = function(body, statusCode) {
 	// set cookies
 	if (atmos.can(this.cookies)) {
 		var cookieList = [];
+		var expires = function() {
+			var now = new Date();
+			now.setTime(now.getTime() + (7 * 24 * 60 * 60 * 1000));
+			return now.toUTCString();
+		}
 		Object.keys(this.cookies).forEach(function(key, i, a) {
-			cookieList.push(key + '=' + that.cookies[key] + '; path=/;');
+			cookieList.push(key + '=' + that.cookies[key] + '; path=/; expires=' + expires());
 		});
 		if (cookieList.length > 0) {
 			that.req.response.putHeader('Set-Cookie', cookieList);
