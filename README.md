@@ -51,4 +51,4 @@ spec/spec_runner.html is only opened by a browser.
 
 ## APIs
 
-See [wiki page](wiki/APIs)
+See [wiki page](https://github.com/haushinka2dx/atmosphere/wiki/APIs)
