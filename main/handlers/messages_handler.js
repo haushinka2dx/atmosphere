@@ -275,7 +275,7 @@ Messages.prototype.search = function(req) {
 			if (keywords.length > 0) {
 				var keywordConditions = [];
 				for (var i=0; i<keywords.length; i++) {
-					var regexKeyword = { '$regex' : keywords[i] };
+					var regexKeyword = { '$regex' : decodeURIComponent(keywords[i]) };
 					var keywordCond = {};
 					keywordCond[atmos.messages.cnMessage] = regexKeyword;
 					keywordConditions.push(keywordCond);
