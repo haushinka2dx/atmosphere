@@ -39,13 +39,6 @@ atmosphere
 
 ## Run Spec(Run Test)
 
-### Simple
-
-spec/spec_runner.html is only opened by a browser.
-
-### When performing from a command line
-
-- Please install [PhantomJS](http://phantomjs.org/)
 - `cd {repository_root}`
 - Execute a command. `./run-spec.sh`
 
