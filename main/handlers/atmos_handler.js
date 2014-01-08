@@ -19,12 +19,12 @@ AtmosHandler.prototype.timelineInternal = function(req) {
 	var createdAtRange = new RangeCondition(Persistor.prototype.createdAt);
 	var futureThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 	if (futureThanSrc != null && futureThanSrc.length > 0) {
-		createdAtRange.greaterThan = AtmosHandler.prototype.parseUTC(futureThanSrc);
+		createdAtRange.greaterThan = atmos.parseUTC(futureThanSrc);
 	}
 
 	var pastThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 	if (pastThanSrc != null && pastThanSrc.length > 0) {
-		createdAtRange.lessThan = AtmosHandler.prototype.parseUTC(pastThanSrc);
+		createdAtRange.lessThan = atmos.parseUTC(pastThanSrc);
 	}
 
 	var limit = -1;
@@ -83,12 +83,12 @@ AtmosHandler.prototype.getTimelineInternal = function(callbackInfo, req, additio
 	var createdAtRange = new RangeCondition(Persistor.prototype.createdAt);
 	var futureThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 	if (futureThanSrc != null && futureThanSrc.length > 0) {
-		createdAtRange.greaterThan = AtmosHandler.prototype.parseUTC(futureThanSrc);
+		createdAtRange.greaterThan = atmos.parseUTC(futureThanSrc);
 	}
 
 	var pastThanSrc = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 	if (pastThanSrc != null && pastThanSrc.length > 0) {
-		createdAtRange.lessThan = AtmosHandler.prototype.parseUTC(pastThanSrc);
+		createdAtRange.lessThan = atmos.parseUTC(pastThanSrc);
 	}
 
 	var limit = -1;
@@ -241,10 +241,3 @@ AtmosHandler.prototype.createBlankResponseInfo = function() {
 	}
 	return info;
 };
-
-AtmosHandler.prototype.parseUTC = function(dateString) {
-	var pattern = /([1-9][0-9]{3})-([01][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})Z/;
-	var d = pattern.exec(dateString);
-	return new Date(Date.UTC(d[1],parseInt(d[2],10)-1,d[3],d[4],d[5],d[6],d[7]));
-};
-
