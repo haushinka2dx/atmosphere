@@ -163,7 +163,7 @@ PrivateManager.prototype = {
 	},
 
 	send : function(callbackInfo, message, toUserIds, hashtags, replyTo, createdBy) {
-		if (atmos.can(message) && atmos.can(createdBy)) {
+		if (atmos.canl(message) && atmos.canl(createdBy) && atmos.canl(toUserIds)) {
 			var dataJSON = {};
 			dataJSON[PrivateManager.prototype.cnMessage] = message;
 			dataJSON[PrivateManager.prototype.cnToUserId] = toUserIds;
