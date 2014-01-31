@@ -239,6 +239,7 @@ MessagesManager.prototype = {
 						},
 						this
 					);
+					dataJSON['_id'] = replyJSON['_id'];
 					MessagesManager.prototype.createSentMessageEventInfo(
 						createEventInfoCallback,
 						dataJSON

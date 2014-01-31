@@ -186,6 +186,7 @@ PrivateManager.prototype = {
 						},
 						this
 					);
+					dataJSON['_id'] = replyJSON['_id'];
 					PrivateManager.prototype.createSentMessageEventInfo(
 						createEventInfoCallback,
 						dataJSON
