@@ -33,5 +33,21 @@ var atmosStrings = (function() {
 		return results;
 	};
 
+	AtmosStrings.prototype.endsWith = function(src, stringForSearch) {
+		if (typeof(src) === 'undefined' || typeof(stringForSearch) === 'undefined' || src.length === 0 || stringForSearch.length === 0 || src.length < stringForSearch.length) {
+			return false;
+		}
+		return src.substring(src.length - stringForSearch.length, src.length) === stringForSearch;
+	};
+
+	AtmosStrings.prototype.getExtension = function(filename) {
+		if (filename.lastIndexOf('.') > -1) {
+			return filename.substring(filename.lastIndexOf('.') + 1, filename.length);
+		}
+		else {
+			return '';
+		}
+	};
+
 	return new AtmosStrings();
 }());
