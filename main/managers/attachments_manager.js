@@ -12,7 +12,7 @@ AttachmentsManager.prototype = {
 	cnFilename : 'filename',
 
 	upload : function(callbackInfo, userId, temporaryFilePath, originalFilename) {
-		// move avator file from temporary directory to formally directory
+		// move uploaded file from temporary directory to formal directory
 		var filenameParts = temporaryFilePath.split('/');
 		var filename = filenameParts.length > 0 ? filenameParts[filenameParts.length - 1] : temporaryFilePath;
 		var extension = atmos.getExtension(filename);
