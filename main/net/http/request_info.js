@@ -350,7 +350,6 @@ RequestInfo.prototype.sendResponse = function(body, statusCode) {
 };
 
 RequestInfo.prototype.redirect = function(url) {
-	var that = this;
 	this.req.response.statusCode(302);
 	this.setDefaultHeaders();
 	this.req.response.putHeader('location', url)
