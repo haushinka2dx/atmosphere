@@ -46,7 +46,9 @@ AttachmentsManager.prototype = {
 						AttachmentsManager.prototype.persistor.insert(
 							function(res) {
 								if (atmos.can(callbackInfo)) {
-									callbackInfo.fire(res);
+									var resWithId = res;
+									resWithId[AttachmentsManager.prototype.persistor.pk] = attachmentFilename;
+									callbackInfo.fire(resWithId);
 								}
 							},
 							AttachmentsManager.prototype.collectionName,
