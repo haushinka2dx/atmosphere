@@ -16,6 +16,10 @@ AttachmentsManager.prototype = {
 		var filenameParts = temporaryFilePath.split('/');
 		var filename = filenameParts.length > 0 ? filenameParts[filenameParts.length - 1] : temporaryFilePath;
 		var extension = atmos.getExtension(filename);
+		if (!atmos.canl(extension)) {
+			//本来はこの処理は不要だが、拡張子がないと persistor の insert でコケるので便宜上入れている
+			extension = 'unknown';
+		}
 		if (extension == 'jpg' || extension == 'png') {
 			var basePath = atmos.constants.attachmentsImageBasePath;
 		}
@@ -23,10 +27,12 @@ AttachmentsManager.prototype = {
 			var basePath = atmos.constants.attachmentsEtcBasePath;
 		}
 		vertx.fileSystem.mkDir(basePath, true, function(errMkdir, res) {
-			var attachmentFilePath = basePath + atmos.createTemporaryFileName(extension);
+			var attachmentFilename = atmos.createTemporaryFileName(extension);
+			var attachmentFilePath = basePath + attachmentFilename;
 			vertx.fileSystem.move(temporaryFilePath, attachmentFilePath, function(errorOccured) {
 				if (!errorOccured) {
 					attachmentInfo = {};
+					attachmentInfo[AttachmentsManager.prototype.persistor.pk] = attachmentFilename;
 					attachmentInfo[AttachmentsManager.prototype.cnPath] = attachmentFilePath;
 					attachmentInfo[AttachmentsManager.prototype.cnFilename] = originalFilename;
 					if (extension == 'jpg' || extension == 'png') {

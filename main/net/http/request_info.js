@@ -285,8 +285,7 @@ RequestInfo.prototype.readyBodyMultipart = function(callbackInfo) {
 		var reqInfo = this;
 		reqInfo.uploadedFiles = {};
 		this.req.uploadHandler(function(upload) {
-			var fileParts = upload.filename().split('.');
-			var extension = fileParts.length > 0 ? fileParts[fileParts.length - 1] : null;
+			var extension = atmos.getExtension(upload.filename());
 			var temporaryFilePath = atmos.createTemporaryFilePath(extension);
 			upload.streamToFileSystem(temporaryFilePath);
 			var uploadedInfo = { name : upload.name(), filename : upload.filename(), contentType : upload.contentType(), contentTransferEncoding : upload.contentTransferEncoding(), charset : upload.charset(), size : upload.size(), dataPath : temporaryFilePath };
