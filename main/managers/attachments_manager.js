@@ -20,7 +20,7 @@ AttachmentsManager.prototype = {
 			//本来はこの処理は不要だが、拡張子がないと persistor の insert でコケるので便宜上入れている
 			extension = 'unknown';
 		}
-		if (extension == 'jpg' || extension == 'png') {
+		if (AttachmentsManager.prototype.isImage(extension)) {
 			var basePath = atmos.constants.attachmentsImageBasePath;
 		}
 		else {
@@ -37,7 +37,7 @@ AttachmentsManager.prototype = {
 						attachmentInfo[AttachmentsManager.prototype.persistor.pk] = attachmentFilename;
 						attachmentInfo[AttachmentsManager.prototype.cnPath] = attachmentFilePath;
 						attachmentInfo[AttachmentsManager.prototype.cnFilename] = originalFilename;
-						if (extension == 'jpg' || extension == 'png') {
+						if (AttachmentsManager.prototype.isImage(extension)) {
 							attachmentInfo[AttachmentsManager.prototype.cnType] = 'image';
 						}
 						else {
@@ -62,6 +62,10 @@ AttachmentsManager.prototype = {
 			this
 		);
 		this.createBaseDirectories(createBaseDirectoriesCallback, basePath, new Date());
+	},
+
+	isImage : function(extension) {
+		return extension == 'jpg' || extension == 'png' || extension == 'gif';
 	},
 
 	get : function(callbackInfo, attachmentId) {

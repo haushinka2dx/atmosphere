@@ -59,7 +59,8 @@ AttachmentsHandler.prototype.download = function(req) {
 				if (atmos.can(attachmentInfo)) {
 					var attachmentPath = attachmentInfo[atmos.attachments.cnPath];
 					var attachmentFilename = attachmentInfo[atmos.attachments.cnFilename];
-					if (atmos.isStringEndsWith(attachmentPath, '.jpg') || atmos.isStringEndsWith(attachmentPath, '.png')) {
+					var attachmentExtension = atmos.getExtension(attachmentFilename);
+					if (atmos.attachments.isImage(attachmentExtension)) {
 						if (atmos.canl(imageWidth) && atmos.canl(imageHeight)) {
 							//TODO: リダイレクトじゃなくてforwardに出来ないか…
 							req.redirect(atmos.constants.urlPrefix + '/' + attachmentPath + '?width=' + imageWidth + '&height=' + imageHeight);
