@@ -26,37 +26,42 @@ AttachmentsManager.prototype = {
 		else {
 			var basePath = atmos.constants.attachmentsEtcBasePath;
 		}
-		vertx.fileSystem.mkDir(basePath, true, function(errMkdir, res) {
-			var attachmentFilename = atmos.createTemporaryFileName(extension);
-			var attachmentFilePath = basePath + attachmentFilename;
-			vertx.fileSystem.move(temporaryFilePath, attachmentFilePath, function(errorOccured) {
-				if (!errorOccured) {
-					attachmentInfo = {};
-					attachmentInfo[AttachmentsManager.prototype.persistor.pk] = attachmentFilename;
-					attachmentInfo[AttachmentsManager.prototype.cnPath] = attachmentFilePath;
-					attachmentInfo[AttachmentsManager.prototype.cnFilename] = originalFilename;
-					if (extension == 'jpg' || extension == 'png') {
-						attachmentInfo[AttachmentsManager.prototype.cnType] = 'image';
+
+		var createBaseDirectoriesCallback = atmos.createCallback(
+			function(basePathYYYYMMDD) {
+				var attachmentFilename = atmos.createTemporaryFileName(extension);
+				var attachmentFilePath = basePathYYYYMMDD + attachmentFilename;
+				vertx.fileSystem.move(temporaryFilePath, attachmentFilePath, function(errorOccured) {
+					if (!errorOccured) {
+						attachmentInfo = {};
+						attachmentInfo[AttachmentsManager.prototype.persistor.pk] = attachmentFilename;
+						attachmentInfo[AttachmentsManager.prototype.cnPath] = attachmentFilePath;
+						attachmentInfo[AttachmentsManager.prototype.cnFilename] = originalFilename;
+						if (extension == 'jpg' || extension == 'png') {
+							attachmentInfo[AttachmentsManager.prototype.cnType] = 'image';
+						}
+						else {
+							attachmentInfo[AttachmentsManager.prototype.cnType] = 'etc';
+						}
+						AttachmentsManager.prototype.persistor.insert(
+							function(res) {
+								if (atmos.can(callbackInfo)) {
+									callbackInfo.fire(res);
+								}
+							},
+							AttachmentsManager.prototype.collectionName,
+							attachmentInfo,
+							userId
+						);
 					}
 					else {
-						attachmentInfo[AttachmentsManager.prototype.cnType] = 'etc';
+						callbackInfo.fire({"status":"error"});
 					}
-					AttachmentsManager.prototype.persistor.insert(
-						function(res) {
-							if (atmos.can(callbackInfo)) {
-								callbackInfo.fire(res);
-							}
-						},
-						AttachmentsManager.prototype.collectionName,
-						attachmentInfo,
-						userId
-					);
-				}
-				else {
-					callbackInfo.fire({"status":"error"});
-				}
-			});
-		});
+				});
+			},
+			this
+		);
+		this.createBaseDirectories(createBaseDirectoriesCallback, basePath, new Date());
 	},
 
 	get : function(callbackInfo, attachmentId) {
@@ -106,6 +111,24 @@ AttachmentsManager.prototype = {
 			return ret;
 		}
 	},
+
+	createBaseDirectories : function(callbackInfo, basePath, targetDate) {
+		vertx.fileSystem.mkDir(basePath, true, function(errMkdir, res) {
+			var month = targetDate.getUTCMonth() + 1;
+			var monthStr = month < 10 ? '0' + month : '' + month;
+			var basePathYYYYMM = basePath + targetDate.getUTCFullYear() + monthStr;
+			vertx.fileSystem.mkDir(basePathYYYYMM, true, function(errMkdir, res) {
+				var day = targetDate.getUTCDate();
+				var dayStr = day < 10 ? '0' + day : '' + day;
+				var basePathYYYYMMDD = basePathYYYYMM + '/' + dayStr;
+				vertx.fileSystem.mkDir(basePathYYYYMMDD, true, function(errMkdir, res) {
+					if (atmos.can(callbackInfo)) {
+						callbackInfo.fire(basePathYYYYMMDD + '/');
+					}
+				});
+			});
+		});
+	}
 };
 
 function getAttachmentsManager() {
