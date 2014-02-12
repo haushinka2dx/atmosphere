@@ -14,6 +14,7 @@ load('main/managers/user_manager.js');
 load('main/managers/group_manager.js');
 load('main/managers/messages_manager.js');
 load('main/managers/privates_manager.js');
+load('main/managers/attachments_manager.js');
 load('main/event/notification_manager.js');
 
 var Atmosphere = function() {
@@ -42,6 +43,7 @@ Atmosphere.prototype = {
 	messages : getMessagesManager(),
 	privates : getPrivatesManager(),
 	notice : getNotificationManager(),
+	attachments : getAttachmentsManager(),
 
 	createCallback : function(callback, callbackTarget) {
 		return new CallbackInfo(callback, callbackTarget);
@@ -170,6 +172,14 @@ Atmosphere.prototype = {
 		return atmosStrings.extractHashtags(msg);
 	},
 
+	isStringEndsWith : function(src, stringForSearch) {
+		return atmosStrings.endsWith(src, stringForSearch);
+	},
+
+	getExtension : function(filename) {
+		return atmosStrings.getExtension(filename);
+	},
+
 	createTemporaryFilePath : function(extension) {
 		var basename = atmos.constants.temporaryPath + java.util.UUID.randomUUID();
 		if (atmos.can(extension)) {
@@ -180,6 +190,16 @@ Atmosphere.prototype = {
 			}
 		} else {
 			return basename + '.tmp'
+		}
+	},
+
+	createTemporaryFileName : function(extension) {
+		var name = java.util.UUID.randomUUID();
+		if (atmos.canl(extension)) {
+			return name + '.' + extension;
+		}
+		else {
+			return name;
 		}
 	},
 };

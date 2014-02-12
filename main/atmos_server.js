@@ -5,6 +5,7 @@ load('main/handlers/relationship_handler.js');
 load('main/handlers/auth_handler.js');
 load('main/handlers/user_handler.js');
 load('main/handlers/group_handler.js');
+load('main/handlers/attachments_handler.js');
 
 /// main function
 function main() {
@@ -16,6 +17,7 @@ function main() {
 	var authHandler = getAuthHandler();
 	var userHandler = getUserHandler();
 	var groupHandler = getGroupHandler();
+	var attachmentsHandler = getAttachmentsHandler();
 
 	var requireAuth = true;
 	var notRequireAuth = false;
@@ -42,6 +44,7 @@ function main() {
 	patternsGET[atmos.constants.pathInfo.pUserShow] = [atmos.createCallback(userHandler.show, userHandler), requireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pUserAvator] = [atmos.createCallback(userHandler.avator, userHandler), notRequireAuth, normal];
 	patternsGET[atmos.constants.pathInfo.pGroupList] = [atmos.createCallback(groupHandler.list, groupHandler), requireAuth, normal];
+	patternsGET[atmos.constants.pathInfo.pAttachmentsDownload] = [atmos.createCallback(attachmentsHandler.download, attachmentsHandler), requireAuth, normal];
 
 	// url patterns and handlers for POST method
 	var patternsPOST = {};
@@ -66,6 +69,7 @@ function main() {
 	patternsPOST[atmos.constants.pathInfo.pGroupDestroy] = [atmos.createCallback(groupHandler.destroy, groupHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pGroupAddMember] = [atmos.createCallback(groupHandler.addMember, groupHandler), requireAuth, normal];
 	patternsPOST[atmos.constants.pathInfo.pGroupRemoveMember] = [atmos.createCallback(groupHandler.removeMember, groupHandler), requireAuth, normal];
+	patternsPOST[atmos.constants.pathInfo.pAttachmentsUpload] = [atmos.createCallback(attachmentsHandler.upload, attachmentsHandler), requireAuth, isMultipart];
 
 	var server = atmos.createHttpServer(patternsGET, patternsPOST);
 

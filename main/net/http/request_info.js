@@ -285,8 +285,7 @@ RequestInfo.prototype.readyBodyMultipart = function(callbackInfo) {
 		var reqInfo = this;
 		reqInfo.uploadedFiles = {};
 		this.req.uploadHandler(function(upload) {
-			var fileParts = upload.filename().split('.');
-			var extension = fileParts.length > 0 ? fileParts[fileParts.length - 1] : null;
+			var extension = atmos.getExtension(upload.filename());
 			var temporaryFilePath = atmos.createTemporaryFilePath(extension);
 			upload.streamToFileSystem(temporaryFilePath);
 			var uploadedInfo = { name : upload.name(), filename : upload.filename(), contentType : upload.contentType(), contentTransferEncoding : upload.contentTransferEncoding(), charset : upload.charset(), size : upload.size(), dataPath : temporaryFilePath };
@@ -336,11 +335,50 @@ RequestInfo.prototype.sendResponse = function(body, statusCode) {
 	}
 
 	// set response header
+	this.setDefaultHeaders();
 	this.req.response.putHeader('Content-Type', 'application/json; charset=UTF-8')
-					.putHeader('Access-Control-Allow-Origin', '*');
+	// set cookies
+	this.setDefaultCookies();
+	if (statusCode == 200) {
+		this.req.response.end(body);
+	}
+	else {
+		this.req.response.statusMessage(body);
+		this.req.response.end();
+	}
+};
+
+RequestInfo.prototype.redirect = function(url) {
+	this.req.response.statusCode(302);
+	this.setDefaultHeaders();
+	this.req.response.putHeader('location', url)
+	this.setDefaultCookies();
+	this.req.response.end();
+};
+
+RequestInfo.prototype.sendFile = function(filePath, filename, forDownload) {
+	this.setDefaultHeaders();
+	if (atmos.canl(filename)) {
+		if (forDownload) {
+			this.req.response.putHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
+		}
+		else {
+			this.req.response.putHeader('Content-Disposition', 'filename="' + filename + '"');
+		}
+	}
+	this.setDefaultCookies();
+	this.req.response.sendFile(filePath);
+};
+
+RequestInfo.prototype.setDefaultHeaders = function() {
+	this.req.response.putHeader('Access-Control-Allow-Origin', '*');
 	if (this.sessionId) {
 		this.req.response.putHeader(this.headerNameSessionId, this.sessionId);
 	}
+};
+
+RequestInfo.prototype.setDefaultCookies = function() {
+	var that = this;
 	// set cookies
 	if (atmos.can(this.cookies)) {
 		var cookieList = [];
@@ -356,16 +394,4 @@ RequestInfo.prototype.sendResponse = function(body, statusCode) {
 			that.req.response.putHeader('Set-Cookie', cookieList);
 		}
 	}
-	if (statusCode == 200) {
-		this.req.response.end(body);
-	}
-	else {
-		this.req.response.statusMessage(body);
-		this.req.response.end();
-	}
-};
-
-RequestInfo.prototype.sendFile = function(filePath) {
-	this.req.response.putHeader('Access-Control-Allow-Origin', '*');
-	this.req.response.sendFile(filePath);
 };

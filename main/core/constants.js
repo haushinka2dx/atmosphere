@@ -8,6 +8,7 @@ PathInfo.prototype = {
 	categoryNameAuth : 'auth',
 	categoryNameUser : 'user',
 	categoryNameGroup : 'group',
+	categoryNameAttachments : 'attachments',
 
 	subCategoryNameTimeline : 'timeline',
 	subCategoryNameGlobalTimeline : 'global_timeline',
@@ -38,6 +39,8 @@ PathInfo.prototype = {
 	subCategoryNameChangeAvator : "change_avator",
 	subCategoryNameChangePassword : "change_password",
 	subCategoryNameChangeProfile : "change_profile",
+	subCategoryNameUpload : "upload",
+	subCategoryNameDownload : "download",
 };
 
 PathInfo.prototype.pMessagesTimeline = createRouteMatcherPattern(PathInfo.prototype.categoryNameMessages, PathInfo.prototype.subCategoryNameTimeline);
@@ -79,6 +82,8 @@ PathInfo.prototype.pGroupRegister = createRouteMatcherPattern(PathInfo.prototype
 PathInfo.prototype.pGroupDestroy = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameDestroy);
 PathInfo.prototype.pGroupAddMember = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameAddMember);
 PathInfo.prototype.pGroupRemoveMember = createRouteMatcherPattern(PathInfo.prototype.categoryNameGroup, PathInfo.prototype.subCategoryNameRemoveMember);
+PathInfo.prototype.pAttachmentsUpload = createRouteMatcherPattern(PathInfo.prototype.categoryNameAttachments, PathInfo.prototype.subCategoryNameUpload);
+PathInfo.prototype.pAttachmentsDownload = createRouteMatcherPattern(PathInfo.prototype.categoryNameAttachments, PathInfo.prototype.subCategoryNameDownload);
 
 function getPathInfo() {
 	var p = new PathInfo();
@@ -135,6 +140,7 @@ Constants.prototype = {
 	authCollectionName : "users",
 	maxConnectionsPerUser : 10,
 	headerNameSessionId : "atmosphere-session-id",
+	urlPrefix : "/atmos",
 	pathInfo : getPathInfo(),
 	responseAction : getResponseAction(),
 	// TODO: This is used for encrypt the user password. Please change YOUR OWN PASSWORD!!!
@@ -150,6 +156,8 @@ Constants.prototype = {
 	temporaryPath : 'tmp/',
 
 	avatorBasePath : 'uploaded/avator/',
+	attachmentsImageBasePath : 'uploaded/images/',
+	attachmentsEtcBasePath : 'uploaded/etc/',
 
 	publishDelaySeconds : 5,
 };

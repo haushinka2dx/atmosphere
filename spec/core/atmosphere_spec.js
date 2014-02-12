@@ -165,6 +165,33 @@ describe('atmos', function(){
 		});
 	});
 
+	describe('isStringEndsWith', function() {
+		cases([
+			  ['', '', false],
+			  ['a.txt', '.properties', false],
+			  ['aaa.jpg', '.jpg', true],
+			  ['iii/aaa.jpg', '.jpg', true],
+			  ['iii/aaa.jpg', '.png', false],
+			  ['iii/aaa.jpg', 'iii/aaa.jpg', true],
+		])
+		.it('isStringEndsWith', function(src, strForSearch, expected) {
+			expect(target.isStringEndsWith(src, strForSearch)).toEqual(expected);
+		});
+	});
+
+	describe('getExtension', function() {
+		cases([
+			  ['', ''],
+			  ['atxt', ''],
+			  ['.properties', 'properties'],
+			  ['aaa.jpg', 'jpg'],
+			  ['iii.aaa.png', 'png'],
+		])
+		.it('getExtension', function(filename, expected) {
+			expect(target.getExtension(filename)).toEqual(expected);
+		});
+	});
+
 	describe('createTemporaryFilePath', function(){
 		cases(['txt', 'png'])
 		.it('by a specified extension', function(extension) {
@@ -183,6 +210,20 @@ describe('atmos', function(){
 			expect(target.createTemporaryFilePath(arg))
 				.toMatch(atmos.constants.temporaryPath + '.*');
 			expect(target.createTemporaryFilePath(arg)).not.toContain('.');
+		});
+	});
+
+	describe('createTemporaryFileName', function() {
+		cases(['txt', 'json'])
+		.it('by a specified extension', function(extension) {
+			var testValue = target.createTemporaryFileName(extension);
+			expect(testValue.substring(testValue.length - extension.length - 2) === '.' + extension);
+		});
+
+		cases(['', null, undefined])
+		.it('by actually no extension', function(extension) {
+			var testValue = target.createTemporaryFileName(extension);
+			expect(testValue.length > 0 && testValue.indexOf('.') === -1);
 		});
 	});
 });

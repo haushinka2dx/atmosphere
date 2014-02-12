@@ -56,4 +56,31 @@ describe('atmosStrings', function(){
 			expect(target.extractHashtags(msg)).toEqual(expected);
 		});
 	});
+
+	describe('endsWith', function(){
+		cases([
+			  ['', '', false],
+			  ['a.txt', '.properties', false],
+			  ['aaa.jpg', '.jpg', true],
+			  ['iii/aaa.jpg', '.jpg', true],
+			  ['iii/aaa.jpg', '.png', false],
+			  ['iii/aaa.jpg', 'iii/aaa.jpg', true],
+		])
+		.it('endsWith', function(src, strForSearch, expected) {
+			expect(target.endsWith(src, strForSearch)).toEqual(expected);
+		});
+	});
+
+	describe('getExtension', function(){
+		cases([
+			  ['', ''],
+			  ['atxt', ''],
+			  ['.properties', 'properties'],
+			  ['aaa.jpg', 'jpg'],
+			  ['iii.aaa.png', 'png'],
+		])
+		.it('getExtension', function(filename, expected) {
+			expect(target.getExtension(filename)).toEqual(expected);
+		});
+	});
 });
