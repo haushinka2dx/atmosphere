@@ -27,7 +27,6 @@ Private.prototype.timeline = function(req) {
 				this
 			);
 		
-			var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
 			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
@@ -38,7 +37,6 @@ Private.prototype.timeline = function(req) {
 			atmos.privates.getMessages(
 				timelineInternalCallback,
 				currentUserId,
-				cond,
 				null,
 				futureThan,
 				pastThan,
@@ -132,7 +130,6 @@ Private.prototype.search = function(req) {
 			atmos.privates.getMessages(
 				timelineInternalCallback,
 				currentUserId,
-				cond,
 				additionalCondition,
 				futureThan,
 				pastThan,

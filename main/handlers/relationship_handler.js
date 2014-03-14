@@ -142,7 +142,6 @@ RelationshipHandler.prototype.createRelationship = function(req, relationType) {
 
 RelationshipHandler.prototype.destroy = function(req) {
 	req.sendResponse("This api was not implemented.", 400);
-	//this.destroyInternal(req);
 };
 
 function getRelationshipHandler() {
