@@ -29,9 +29,16 @@ Messages.prototype.globalTimeline = function(req) {
 				this
 			);
 		
+			var messageIds = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
+			
+			var additionalCondition = {};
+			if (messageIds.length > 0) {
+				var messageIdsCondition = atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds);
+				Object.keys(messageIdsCondition).forEach(function(key) { additionalCondition[key] = messageIdsCondition[key]; });
+			}
 		
 			// default sort new -> old
 			var sort = {};
@@ -39,9 +46,8 @@ Messages.prototype.globalTimeline = function(req) {
 			atmos.messages.getMessages(
 				timelineInternalCallback,
 				currentUserId,
-				//[ atmos.messages.messageTypeMessage, atmos.messages.messageTypeAnnounce ],
 				null,
-				null,
+				additionalCondition,
 				futureThan,
 				pastThan,
 				count
@@ -64,6 +70,7 @@ Messages.prototype.focusedTimeline = function(req) {
 						req.sendResponse('You listen nobody.', 400);
 					}
 					else {
+						var messageIds = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 						var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 						var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 						var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
@@ -71,6 +78,10 @@ Messages.prototype.focusedTimeline = function(req) {
 							'created_by',
 							speakerUserIds
 						);
+						if (messageIds.length > 0) {
+							var messageIdsCondition = atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds);
+							Object.keys(messageIdsCondition).forEach(function(key) { additionalCondition[key] = messageIdsCondition[key]; });
+						}
 						var timelineInternalCallback = atmos.createCallback(
 							function(timeline) {
 								req.sendResponse(JSON.stringify(timeline));
@@ -105,12 +116,17 @@ Messages.prototype.focusedTimeline = function(req) {
 Messages.prototype.talkTimeline = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
 		function(currentUserId) {
+			var messageIds = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
 			var toMyself = this.persistor.createInCondition('addresses.users', [ currentUserId ]);
 			var fromMyself = this.persistor.createEqualCondition(this.persistor.createdBy, currentUserId);
 			var fromMyselfOrToMyself = this.persistor.joinConditionsOr( [ fromMyself, toMyself ] );
+			if (messageIds.length > 0) {
+				var messageIdsCondition = atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds);
+				Object.keys(messageIdsCondition).forEach(function(key) { fromMyselfOrToMyself[key] = messageIdsCondition[key]; });
+			}
 	
 			var timelineInternalCallback = atmos.createCallback(
 				function(timeline) {
@@ -141,6 +157,7 @@ Messages.prototype.announceTimeline = function(req) {
 			//自分が所属しているグループを取得
 			var getGroupsCallback = atmos.createCallback(
 				function(groupIds) {
+					var messageIds = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 					var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 					var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 					var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
@@ -154,6 +171,10 @@ Messages.prototype.announceTimeline = function(req) {
 					}
 					else {
 						var fromMyselfOrMyGroup = fromMyself;
+					}
+					if (messageIds.length > 0) {
+						var messageIdsCondition = atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds);
+						Object.keys(messageIdsCondition).forEach(function(key) { fromMyselfOrMyGroup[key] = messageIdsCondition[key]; });
 					}
 
 					var timelineInternalCallback = atmos.createCallback(
@@ -189,12 +210,17 @@ Messages.prototype.announceTimeline = function(req) {
 Messages.prototype.monologTimeline = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
 		function(currentUserId) {
+			var messageIds = atmos.string2array(req.getQueryValue(Messages.prototype.pnMessageIds));
 			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
 			var additionalCondition = {
 				'created_by' : currentUserId
 			};
+			if (messageIds.length > 0) {
+				var messageIdsCondition = atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds);
+				Object.keys(messageIdsCondition).forEach(function(key) { additionalCondition[key] = messageIdsCondition[key]; });
+			}
 			var timelineInternalCallback = atmos.createCallback(
 				function(timeline) {
 					req.sendResponse(JSON.stringify(timeline));
@@ -296,7 +322,7 @@ Messages.prototype.search = function(req) {
 
 			var additionalCondition = {};
 			if (innerConditions.length > 0) {
-				additionalCondition[joint] = innerConditions;
+				additionalCondition[joint] = nnerConditions;
 			}
 			var timelineInternalCallback = atmos.createCallback(
 				function(timeline) {
