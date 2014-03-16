@@ -190,10 +190,6 @@ UserHandler.prototype.avator = function(req) {
 
 UserHandler.prototype.list = function(req) {
 	var where = {};
-	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
-	if (cond != null) {
-		where = JSON.parse(cond);
-	}
 	var beforeUserId = req.getQueryValue(UserHandler.prototype.paramNameBeforeUserId);
 	var afterUserId = req.getQueryValue(UserHandler.prototype.paramNameAfterUserId);
 	var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);

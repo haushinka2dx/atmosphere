@@ -10,7 +10,6 @@ CommonHandler.prototype = {
 	returnCodeSystemError : 999,
 	returnMessageSystemError : "Unexpected error occured.",
 
-	paramNameSearchCondition : "where",
 	paramNameCount : "count",
 	paramNameFutureThan : "future_than",
 	paramNamePastThan : "past_than",

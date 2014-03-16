@@ -27,15 +27,12 @@ MessagesManager.prototype = {
 
 	maxMessagesCountPerRequest : 200,
 
-	getMessages : function(callbackInfo, currentUserId, messagesTypes, condition, additionalConditionJSON, futureThan, pastThan, count) {
+	getMessages : function(callbackInfo, currentUserId, messagesTypes, additionalConditionJSON, futureThan, pastThan, count) {
 		var mustConditionCallback = atmos.createCallback(
 			function(mustCondition) {
 				var conditionWithMustInners = [];
 				if (atmos.can(mustCondition) && Object.keys(mustCondition).length > 0) {
 					conditionWithMustInners.push(mustCondition);
-				}
-				if (atmos.can(condition) && Object.keys(condition).length > 0) {
-					conditionWithMustInners.push(condition);
 				}
 				var conditionWithMust = {};
 				if (conditionWithMustInners.length > 0) {
