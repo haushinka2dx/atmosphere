@@ -28,10 +28,17 @@ Private.prototype.timeline = function(req) {
 			);
 		
 			var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
+			var messageIds = atmos.string2array(req.getQueryValue(Private.prototype.pnMessageIds));
 			var futureThan = req.getQueryValue(AtmosHandler.prototype.paramNameFutureThan);
 			var pastThan = req.getQueryValue(AtmosHandler.prototype.paramNamePastThan);
 			var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
 		
+			var additionalCondition = {};
+			if (messageIds.length > 0) {
+				var messageIdsCondition = atmos.persistor.createInCondition(atmos.messages.cnMessageId, messageIds);
+				Object.keys(messageIdsCondition).forEach(function(key) { additionalCondition[key] = messageIdsCondition[key]; });
+			}
+
 			// default sort new -> old
 			var sort = {};
 			sort[AtmosHandler.prototype.persistor.createdAt] = -1;
@@ -39,7 +46,7 @@ Private.prototype.timeline = function(req) {
 				timelineInternalCallback,
 				currentUserId,
 				cond,
-				null,
+				additionalCondition,
 				futureThan,
 				pastThan,
 				count
