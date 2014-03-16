@@ -64,10 +64,6 @@ GroupHandler.prototype.regist = function(req) {
 
 GroupHandler.prototype.list = function(req) {
 	var where = {};
-	var cond = req.getQueryValue(AtmosHandler.prototype.paramNameSearchCondition);
-	if (cond != null) {
-		where = JSON.parse(cond);
-	}
 	var beforeGroupId = req.getQueryValue(GroupHandler.prototype.paramNameBeforeGroupId);
 	var afterGroupId = req.getQueryValue(GroupHandler.prototype.paramNameAfterGroupId);
 	var count = parseInt(req.getQueryValue(AtmosHandler.prototype.paramNameCount), 10);
