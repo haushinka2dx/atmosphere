@@ -35,17 +35,28 @@ module.exports = function(grunt) {
 				//return ['jshint', 'simplemocha'];
 				return ['simplemocha'];
 			}
+		},
+
+		nodemon: {
+			dev: {
+				script: 'app.js'
+			},
+			options: {
+				env: {
+					NODE_PATH: 'lib:',
+				}
+			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-simple-mocha');
 	grunt.loadNpmTasks('grunt-este-watch');
+	grunt.loadNpmTasks('grunt-nodemon');
 
 	grunt.registerTask('lint', ['jshint']);
 	grunt.registerTask('test', ['simplemocha']);
 	// TODO coverage(./coverage.sh) -> スクリプトの実行方法さえ分かれば
-	// TODO nodemon -> スクリプトの実行方法さえ分かれば
 	grunt.registerTask('all-test', ['jshint', 'simplemocha']);
 	grunt.registerTask('watch-test', ['esteWatch']);
 };
