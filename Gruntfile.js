@@ -1,3 +1,4 @@
+/* jshint maxlen:false */
 'use strict';
 
 module.exports = function(grunt) {
@@ -13,16 +14,15 @@ module.exports = function(grunt) {
 				jshintrc: '.jshintrc'
 			}
 		},
-		simplemocha: {
+
+		mochacov: {
 			options: {
 				ui: 'bdd',
-				reporter: 'spec'
+				reporter: 'spec',
 			},
-
-			all: {
-				src: ['spec/**/*_spec.js']
-			}
+			all: ['spec/**/*_spec.js']
 		},
+
 		// TODO 毎回alltestだときつい
 		esteWatch: {
 			options: {
@@ -32,8 +32,8 @@ module.exports = function(grunt) {
 				}
 			},
 			'*': function() {
-				//return ['jshint', 'simplemocha'];
-				return ['simplemocha'];
+				//return ['jshint', 'mochacov'];
+				return ['mochacov'];
 			}
 		},
 
@@ -46,17 +46,18 @@ module.exports = function(grunt) {
 					NODE_PATH: 'lib:',
 				}
 			}
-		}
+		},
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-simple-mocha');
 	grunt.loadNpmTasks('grunt-este-watch');
 	grunt.loadNpmTasks('grunt-nodemon');
+	grunt.loadNpmTasks('grunt-mocha-cov');
 
 	grunt.registerTask('lint', ['jshint']);
-	grunt.registerTask('test', ['simplemocha']);
-	// TODO coverage(./coverage.sh) -> スクリプトの実行方法さえ分かれば
-	grunt.registerTask('all-test', ['jshint', 'simplemocha']);
+	grunt.registerTask('test', ['mochacov']);
+
+	grunt.registerTask('all-test', ['jshint', 'mochacov']);
 	grunt.registerTask('watch-test', ['esteWatch']);
 };
