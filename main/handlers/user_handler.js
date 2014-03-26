@@ -17,6 +17,8 @@ UserHandler.prototype.paramNameBeforeUserId = "before_user_id";
 UserHandler.prototype.paramNameAfterUserId = "after_user_id";
 UserHandler.prototype.paramNameTargetUserId = "user_id";
 UserHandler.prototype.paramNameNewIntroduction = 'new_introduction';
+UserHandler.prototype.paramNameImageWidth = 'image_width';
+UserHandler.prototype.paramNameImageHeight = 'image_height';
 
 UserHandler.prototype.regist = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
@@ -164,13 +166,20 @@ UserHandler.prototype.changeProfile = function(req) {
 
 UserHandler.prototype.avator = function(req) {
 	var targetUserId = req.getQueryValue(UserHandler.prototype.paramNameTargetUserId);
+	var imageWidth = req.getQueryValue(UserHandler.prototype.paramNameImageWidth);
+	var imageHeight = req.getQueryValue(UserHandler.prototype.paramNameImageHeight);
 	atmos.log('UserHandler#avator targetUserId: ' + targetUserId);
 	if (atmos.can(targetUserId)) {
 		var getUserCallback = atmos.createCallback(
 			function(targetUserInfo) {
 				if (atmos.can(targetUserInfo)) {
 					var avatorPath = targetUserInfo[atmos.user.cnAvator];
-					req.sendFile(avatorPath);
+					if (atmos.canl(imageWidth) && atmos.canl(imageHeight)) {
+						req.redirect(atmos.constants.urlPrefix + '/' + avatorPath + '?width=' + imageWidth + '&height=' + imageHeight);
+					}
+					else {
+						req.sendFile(avatorPath);
+					}
 				}
 				else {
 					req.sendResponse('no user', 404);
