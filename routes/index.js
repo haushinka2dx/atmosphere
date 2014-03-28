@@ -8,7 +8,7 @@ var relationship = require('./relationship');
 var read = require('./read');
 
 function requiredLogin(req, res, next) {
-	if(req.isAuthenticated()) {
+	if (req.isAuthenticated()) {
 		return next();
 	}
 	res.json(401, {status: 'error', message: 'You are not logged in.'});

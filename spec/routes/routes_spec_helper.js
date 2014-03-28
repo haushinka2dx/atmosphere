@@ -25,7 +25,7 @@ beforeEach(function(done) {
 		.field('password', 'test_password_0')
 		.expect(200)
 		.end(function(err, res) {
-			if(err) {
+			if (err) {
 				throw err;
 			}
 			agent.saveCookies(res);

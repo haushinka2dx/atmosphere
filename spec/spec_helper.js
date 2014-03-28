@@ -7,7 +7,7 @@ var expect = require('expect.js');
 
 exports.expectNoError = function(done) {
 	return function(err) {
-		if(err) {
+		if (err) {
 			console.log('');
 			console.log('**** Full exception ****');
 			console.log(err);

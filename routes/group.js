@@ -7,13 +7,13 @@ var _ = require('underscore');
 exports.list = function(req, res){
 	var query = Group.find();
 	query.sort({username: 'asc'});
-	if(req.query.count) {
+	if (req.query.count) {
 		query.limit(req.query.count);
 	}
-	if(req.query.before_group_id) {
+	if (req.query.before_group_id) {
 		query.lt('group_id', req.query.before_group_id);
 	}
-	if(req.query.after_group_id) {
+	if (req.query.after_group_id) {
 		query.gt('group_id', req.query.after_group_id);
 	}
 
@@ -38,7 +38,7 @@ exports.list = function(req, res){
 exports.addMember = function(req, res){
 	var groupId = req.body.group_id;
 	var addUserId = req.body.user_id;
-	if(_.isEmpty(groupId) || _.isEmpty(addUserId)) {
+	if (_.isEmpty(groupId) || _.isEmpty(addUserId)) {
 		res.json(400, "'group_id' and 'user_id' are must be assigned.");
 		return;
 	}
@@ -67,7 +67,7 @@ exports.addMember = function(req, res){
 exports.removeMember = function(req, res){
 	var groupId = req.body.group_id;
 	var addUserId = req.body.user_id;
-	if(_.isEmpty(groupId) || _.isEmpty(addUserId)) {
+	if (_.isEmpty(groupId) || _.isEmpty(addUserId)) {
 		res.json(400, "'group_id' and 'user_id' are must be assigned.");
 		return;
 	}
@@ -96,7 +96,7 @@ exports.removeMember = function(req, res){
 exports.register = function(req, res){
 	var groupId = req.body.new_group_id;
 	var groupType = req.body.new_group_type;
-	if(_.isEmpty(groupId) || _.isEmpty(groupType)) {
+	if (_.isEmpty(groupId) || _.isEmpty(groupType)) {
 		res.json(400, "'new_group_id' and 'new_group_type' are must be assigned.");
 		return;
 	}
@@ -123,7 +123,7 @@ exports.register = function(req, res){
 // Response: ?
 exports.destroy = function(req, res){
 	var groupId = req.body.group_id;
-	if(_.isEmpty(groupId)) {
+	if (_.isEmpty(groupId)) {
 		res.json(400, "'group_id' is must be assigned.");
 		return;
 	}
