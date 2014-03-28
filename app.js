@@ -77,8 +77,8 @@ passport.use(new LocalStrategy(
 			}));
 
 app.use(express.favicon());
+app.use(express.urlencoded());
 app.use(express.json());
-app.use(express.bodyParser());
 
 function isJSON(str) {
 	try {
@@ -99,7 +99,6 @@ app.use(function(req, res, next) {
 	}
 	next();
 });
-app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here')); // TODO
 // Configure session
