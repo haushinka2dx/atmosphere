@@ -77,6 +77,11 @@ passport.use(new LocalStrategy(
 			}));
 
 app.use(express.favicon());
+// supertestがbodyParser()使っていないと動かないので、テスト時だけ読み込む
+// bodyParser()はdeprecatedなので通常時は使わない
+if (module.parent) {
+	app.use(express.bodyParser());
+}
 app.use(express.urlencoded());
 app.use(express.json());
 
