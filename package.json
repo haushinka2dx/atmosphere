@@ -1,0 +1,39 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "NODE_PATH=lib node app.js",
+    "test": "./grunt.sh all-test"
+  },
+  "dependencies": {
+    "express": "3.4.7",
+    "underscore": "~1.5.2",
+    "underscore.string": "~2.3.3",
+    "mongoose": "~3.8.4",
+    "config": "~0.4.34",
+    "rbytes": "~1.0.0",
+    "sockjs": "~0.3.8",
+    "connect-mongo": "~0.4.0",
+    "passport": "~0.1.18",
+    "passport-local": "~0.1.6",
+    "bcrypt": "~0.7.7",
+    "connect-flash": "~0.1.1",
+    "moment": "~2.5.1",
+    "log4js": "~0.6.10"
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.11",
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-este-watch": "~0.1.15",
+    "grunt-simple-mocha": "~0.4.0",
+    "mocha": "~1.17.0",
+    "cases": "0.0.2",
+    "supertest": "~0.9.0",
+    "sinon": "~1.8.1",
+    "expect.js": "~0.2.0",
+    "grunt-nodemon": "~0.2.1",
+    "grunt-mocha-cov": "~0.2.1"
+  }
+}

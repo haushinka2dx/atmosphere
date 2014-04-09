@@ -1,0 +1,55 @@
+{
+  /* Enforcing options */
+  /* ビット演算子の使用禁止 */
+  "bitwise": true,
+  /* キャメルケースであること */
+  "camelcase": true,
+  /* 中身が1文でも波括弧を必要とする */
+  "curly": true,
+  /* 同値演算子(===や!==)を使うこと */
+  "eqeqeq": true,
+  /* 組み込みオブジェクトのprototypeオブジェクトの上書き禁止 */
+  "freeze": true,
+  /* 即時関数はそれをラップする括弧を書くように強制 */
+  "immed": true,
+  /* 定義前変数の使用禁止 */
+  "latedef": true,
+  /* コンストラクタ関数の先頭大文字強制 */
+  "newcap": true,
+  /* arguments.callerおよびarguments.calleeの使用禁止 */
+  "noarg": true,
+  /* 代入しないコンストラクタ関数の使用禁止 */
+  "nonew": true,
+  /* シングルクオーテーションに統一 */
+  "quotmark": "single",
+  /* 未定義変数の使用禁止 */
+  "undef": true,
+  /* 未使用変数の使用禁止 */
+  "unused": true,
+  /* ECMAScript5 の strict mode 強制("use strict") */
+  "strict": true,
+  /* 行末に余分な空白があってはいけない */
+  "trailing": true,
+  /* 1行の最大の長さ */
+  "maxlen": 100,
+
+  /* Relaxing options */
+  "sub": true,
+  "expr": true,
+  "laxbreak": true,
+
+  /* Environments */
+  /* nodeであることを理解してもらう */
+  "node": true,
+
+  /* Globals */
+  "globals"   : {
+    /* MOCHA */
+    "describe" : false,
+    "it" : false,
+    "before" : false,
+    "beforeEach" : false,
+    "after" : false,
+    "afterEach" : false
+  }
+}
