@@ -284,10 +284,30 @@ describe('GET', function() {
 		});
 	});
 
-	describe.skip('/messages/search', function() {
+	describe('/messages/search', function() {
 		describe.skip('任意の条件で検索できる', function() {
-			it('メッセージID指定', function(done) {
+			it.skip('メッセージID指定', function(done) {
 				done();
+			});
+
+			it('フリーワード検索が行える（存在する場合）', function(done) {
+				routes_helper.successGet('/messages/search?keywords=a')
+				.expect(function(res) {
+					var body = res.body;
+					expectjs(body.status).to.be('ok');
+					expectjs(body.count).to.be(3);
+				})
+				.end(done);
+			});
+
+			it('フリーワード検索が行える（存在しない場合）', function(done) {
+				routes_helper.successGet('/messages/search?keywords=zzzzzzzzzzzzzzzzzz')
+				.expect(function(res) {
+					var body = res.body;
+					expectjs(body.status).to.be('ok');
+					expectjs(body.count).to.be(0);
+				})
+				.end(done);
 			});
 		});
 
