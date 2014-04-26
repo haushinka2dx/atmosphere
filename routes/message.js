@@ -15,6 +15,10 @@ function findTimeline(req, res, query) {
 	if (req.query.pastThan) {
 		query.lt('created_at', req.query.pastThan);
 	}
+	var messageIds = strings.string2array(req.query.message_ids, ',');
+	if (!_.isEmpty(messageIds)) {
+		query.in('_id', messageIds);
+	}
 
 	query.exec()
 	.onFulfill(function(docs) {

@@ -98,6 +98,48 @@ describe('GET', function() {
 				.end(done);
 			});
 
+			it('message_idを指定できる（1メッセージ）', function(done) {
+				Message.findOne({message: new RegExp('^my_normal_msg_.*')}).exec()
+				.then(function(message) {
+					routes_helper.successGet('/messages/timeline?message_ids=' + message._id)
+					.expect(function(res) {
+						var body = res.body;
+						expectjs(body.status).to.be('ok');
+						expectjs(body.count).to.be(1);
+						expectjs(body.results[0]._id).to.be(message._id + '');
+					})
+					.end(done);
+				})
+				.end();
+			});
+
+			it('message_idを指定できる（2メッセージ）', function(done) {
+				Message.find({message: new RegExp('^my_normal_msg_.*')}).exec()
+				.then(function(messages) {
+					routes_helper.successGet('/messages/timeline?message_ids=' + messages[0]._id + ',' + messages[1]._id)
+					.expect(function(res) {
+						var body = res.body;
+						expectjs(body.status).to.be('ok');
+						expectjs(body.count).to.be(2);
+						var expectedPattern = new RegExp('(' + messages[0]._id + '|' + messages[1]._id + ')');
+						expectjs(body.results[0]._id).to.match(expectedPattern);
+						expectjs(body.results[1]._id).to.match(expectedPattern);
+					})
+					.end(done);
+				})
+				.end();
+			});
+
+			it('message_idを指定できる（該当なし）', function(done) {
+				routes_helper.successGet('/messages/timeline?message_ids=52fcf1060af12baf9e8d5bba,52fcf1060af12baf9e8d5bbb')
+				.expect(function(res) {
+					var body = res.body;
+					expectjs(body.status).to.be('ok');
+					expectjs(body.count).to.be(0);
+				})
+				.end(done);
+			});
+
 			it.skip('where', function(done) {
 				// TODO クエリストリングの指定が分からん
 				/*
