@@ -324,7 +324,9 @@ Messages.prototype.search = function(req) {
 			if (respondedBy.length == 2) {
 				var respondedByUserId = respondedBy[0];
 				var respondedByAction = respondedBy[1];
-				innerConditions.push(atmos.persistor.createEqualCondition(atmos.messages.cnResponces + '.' + respondedByAction, respondedByUserId));
+				if (atmos.canl(respondedByUserId) && atmos.canl(respondedByAction)) {
+					innerConditions.push(atmos.persistor.createEqualCondition(atmos.messages.cnResponces + '.' + respondedByAction, respondedByUserId));
+				}
 			}
 
 			var joint = andOr == 'or' ? "$or" : "$and";
