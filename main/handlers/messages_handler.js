@@ -18,6 +18,7 @@ Messages.prototype.pnKeywords = 'keywords';
 Messages.prototype.pnResponses = 'responses';
 Messages.prototype.pnMessageIds = 'message_ids';
 Messages.prototype.pnReplyToMessageId = 'reply_to_message_id';
+Messages.prototype.pnRespondedBy = 'responded_by';
 
 Messages.prototype.globalTimeline = function(req) {
 	var getCurrentUserIdCallback = atmos.createCallback(
@@ -271,6 +272,8 @@ Messages.prototype.search = function(req) {
 			atmos.log("messageIds: " + messageIds);
 			var replyToMessageId = req.getQueryValue(Messages.prototype.pnReplyToMessageId);
 			atmos.log("replyToMessageId: " + replyToMessageId);
+			var respondedBy = atmos.string2array(req.getQueryValue(Messages.prototype.pnRespondedBy), ':');
+			atmos.log("respondedBy: " + respondedBy);
 
 			var innerConditions = [];
 			if (addressUsers.length > 0) {
@@ -317,6 +320,13 @@ Messages.prototype.search = function(req) {
 			}
 			if (atmos.can(replyToMessageId)) {
 				innerConditions.push(atmos.persistor.createEqualCondition(atmos.messages.cnReplyTo, replyToMessageId));
+			}
+			if (respondedBy.length == 2) {
+				var respondedByUserId = respondedBy[0];
+				var respondedByAction = respondedBy[1];
+				if (atmos.canl(respondedByUserId) && atmos.canl(respondedByAction)) {
+					innerConditions.push(atmos.persistor.createEqualCondition(atmos.messages.cnResponces + '.' + respondedByAction, respondedByUserId));
+				}
 			}
 
 			var joint = andOr == 'or' ? "$or" : "$and";
